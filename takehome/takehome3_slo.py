@@ -39,18 +39,19 @@ burn_rate.publish('burn_rate')
 current_error_rate.publish('current_error_rate')
 """
 
-with signalfx.SignalFx(
+sfx = signalfx.SignalFx(
     api_endpoint=f"https://api.{REALM}.observability.splunkcloud.com",
     ingest_endpoint=f"https://ingest.{REALM}.observability.splunkcloud.com",
     stream_endpoint=f"https://stream.{REALM}.observability.splunkcloud.com"
-) as sfx:
+)
 
-    with sfx.signalflow(TOKEN) as flow:
-        computation = flow.execute(program)
-        latest = {}
+with sfx.signalflow(TOKEN) as flow:
+    computation = flow.execute(program)
+    latest = {}
 
+    try:
         for msg in computation.stream():
-            if msg.kind == 'data':
+            if hasattr(msg, 'data'):
                 for tsid, value in msg.data.items():
                     meta = computation.get_metadata(tsid)
                     label = meta.get('sf_metric', 'unknown')
@@ -72,3 +73,5 @@ with signalfx.SignalFx(
                     print(f"Allowed error rate: {ALLOWED_ERROR_RATE * 100:.2f}%")
                     print(f"Current error rate: {error_rate * 100:.3f}%")
                     print(f"Burn rate:          {status}")
+    except KeyboardInterrupt:
+        print("\nStopped.")

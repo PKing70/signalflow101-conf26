@@ -27,39 +27,42 @@ if not GITHUB_USERNAME:
 print(f"Sending GitHub latency metrics for {PARTICIPANT_ID}...")
 print("Press Ctrl+C to stop.\n")
 
-while True:
-    start = time.time()
-    requests.get(
-        f"https://api.github.com/users/{GITHUB_USERNAME}",
-        headers={"Accept": "application/vnd.github.v3+json"}
-    )
-    latency_ms = (time.time() - start) * 1000
+try:
+    while True:
+        start = time.time()
+        requests.get(
+            f"https://api.github.com/users/{GITHUB_USERNAME}",
+            headers={"Accept": "application/vnd.github.v3+json"}
+        )
+        latency_ms = (time.time() - start) * 1000
 
-    payload = {
-        "gauge": [
-            {
-                "metric": "workshop.github.latency",
-                "value": latency_ms,
-                "dimensions": {
-                    "participant_id": PARTICIPANT_ID,
-                    "github_username": GITHUB_USERNAME
+        payload = {
+            "gauge": [
+                {
+                    "metric": "workshop.github.latency",
+                    "value": latency_ms,
+                    "dimensions": {
+                        "participant_id": PARTICIPANT_ID,
+                        "github_username": GITHUB_USERNAME
+                    }
                 }
-            }
-        ]
-    }
+            ]
+        }
 
-    response = requests.post(
-        INGEST_URL,
-        headers={
-            "Content-Type": "application/json",
-            "X-SF-TOKEN": TOKEN
-        },
-        json=payload
-    )
+        response = requests.post(
+            INGEST_URL,
+            headers={
+                "Content-Type": "application/json",
+                "X-SF-TOKEN": TOKEN
+            },
+            json=payload
+        )
 
-    if response.status_code != 200:
-        print(f"Warning: metric send failed ({response.status_code}) — check your credentials in .env")
-    else:
-        print(f"Sent: {latency_ms:.1f}ms  (github_username: {GITHUB_USERNAME})")
+        if response.status_code != 200:
+            print(f"Warning: metric send failed ({response.status_code}) — check your credentials in .env")
+        else:
+            print(f"Sent: {latency_ms:.1f}ms  (github_username: {GITHUB_USERNAME})")
 
-    time.sleep(10)
+        time.sleep(10)
+except KeyboardInterrupt:
+    print("\nStopped.")

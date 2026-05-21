@@ -15,22 +15,23 @@ import signalfx
 from config import TOKEN, REALM
 
 program = """
-latency = data('workshop.api.latency').mean(by='participant_id', over='1m')
+latency = data('workshop.api.latency').mean(over='1m').mean(by=['participant_id'])
 latency.publish('avg_latency_by_participant')
 """
 
-with signalfx.SignalFx(
+sfx = signalfx.SignalFx(
     api_endpoint=f"https://api.{REALM}.observability.splunkcloud.com",
     ingest_endpoint=f"https://ingest.{REALM}.observability.splunkcloud.com",
     stream_endpoint=f"https://stream.{REALM}.observability.splunkcloud.com"
-) as sfx:
+)
 
-    with sfx.signalflow(TOKEN) as flow:
-        computation = flow.execute(program)
-        results = {}
+with sfx.signalflow(TOKEN) as flow:
+    computation = flow.execute(program)
+    results = {}
 
+    try:
         for msg in computation.stream():
-            if msg.kind == 'data':
+            if hasattr(msg, 'data'):
                 for tsid, value in msg.data.items():
                     meta = computation.get_metadata(tsid)
                     participant = meta.get('participant_id', 'unknown')
@@ -42,3 +43,5 @@ with signalfx.SignalFx(
                     for participant, latency in sorted_results:
                         bar = "█" * int(latency / 10)
                         print(f"{participant:<40} {latency:>8.1f}ms  {bar}")
+    except KeyboardInterrupt:
+        print("\nStopped.")

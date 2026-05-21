@@ -1,8 +1,8 @@
 """
 Exercise 2a: Start Sending Real Latency
 ----------------------------------------
-Measures real round-trip latency to your FastAPI endpoint
-and sends it to Splunk Observability Cloud every 10 seconds.
+Measures real round-trip latency to the Splunk Observability Cloud
+ingest endpoint and sends it as a metric every 10 seconds.
 
 Leave this running and open a second terminal for Exercise 2b.
 Press Ctrl+C to stop.
@@ -42,11 +42,13 @@ def send_latency(latency_ms):
 print(f"Sending real latency metrics for {PARTICIPANT_ID}...")
 print("Press Ctrl+C to stop.\n")
 
-while True:
-    start = time.time()
-    requests.get("http://localhost:8000/hello")
-    latency_ms = (time.time() - start) * 1000
-
-    send_latency(latency_ms)
-    print(f"Sent: {latency_ms:.1f}ms")
-    time.sleep(10)
+try:
+    while True:
+        start = time.time()
+        requests.get(f"https://ingest.{REALM}.observability.splunkcloud.com", timeout=5)
+        latency_ms = (time.time() - start) * 1000
+        send_latency(latency_ms)
+        print(f"Sent: {latency_ms:.1f}ms")
+        time.sleep(10)
+except KeyboardInterrupt:
+    print("\nStopped. Head to the next terminal for Exercise 2b.")

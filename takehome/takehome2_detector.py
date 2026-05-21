@@ -22,7 +22,7 @@ latency = data('workshop.api.latency',
     filter=filter('participant_id', '{PARTICIPANT_ID}'),
     rollup='count')
 satisfied = latency.map(lambda x: 1 if x < 300 else 0).sum(over='5m')
-tolerating = latency.map(lambda x: 1 if 300 <= x < 1200 else 0).sum(over='5m')
+tolerating = latency.map(lambda x: 1 if x >= 300 and x < 1200 else 0).sum(over='5m')
 total = latency.sum(over='5m')
 apdex = (satisfied + (tolerating / 2)) / total
 detect(when(apdex < 0.85, lasting='5m')).publish('Apdex below Good threshold')

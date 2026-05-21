@@ -39,6 +39,7 @@ response = requests.post(
 
 if response.status_code == 200:
     print(f"Metric sent successfully.")
+    print(response.status_code)
     print(f"participant_id: {PARTICIPANT_ID}")
     print(f"latency:        {latency:.1f}ms")
 else:

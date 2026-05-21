@@ -25,26 +25,27 @@ T_tolerating = T * 4  # 1200ms — frustrated threshold
 program = f"""
 latency = data('workshop.api.latency', rollup='count')
 
-satisfied = latency.map(lambda x: 1 if x < {T} else 0).sum(by='participant_id', over='5m')
-tolerating = latency.map(lambda x: 1 if {T} <= x < {T_tolerating} else 0).sum(by='participant_id', over='5m')
-total = latency.sum(by='participant_id', over='5m')
+satisfied = latency.map(lambda x: 1 if x < {T} else 0).sum(over='5m').sum(by=['participant_id'])
+tolerating = latency.map(lambda x: 1 if x >= {T} and x < {T_tolerating} else 0).sum(over='5m').sum(by=['participant_id'])
+total = latency.sum(over='5m').sum(by=['participant_id'])
 
 apdex = (satisfied + (tolerating / 2)) / total
 apdex.publish('apdex')
 """
 
-with signalfx.SignalFx(
+sfx = signalfx.SignalFx(
     api_endpoint=f"https://api.{REALM}.observability.splunkcloud.com",
     ingest_endpoint=f"https://ingest.{REALM}.observability.splunkcloud.com",
     stream_endpoint=f"https://stream.{REALM}.observability.splunkcloud.com"
-) as sfx:
+)
 
-    with sfx.signalflow(TOKEN) as flow:
-        computation = flow.execute(program)
-        results = {}
+with sfx.signalflow(TOKEN) as flow:
+    computation = flow.execute(program)
+    results = {}
 
+    try:
         for msg in computation.stream():
-            if msg.kind == 'data':
+            if hasattr(msg, 'data'):
                 for tsid, value in msg.data.items():
                     meta = computation.get_metadata(tsid)
                     participant = meta.get('participant_id', 'unknown')
@@ -66,3 +67,5 @@ with signalfx.SignalFx(
                             rating = "Unacceptable"
                         bar = "█" * int(score * 20)
                         print(f"{participant:<40} {score:.2f}  {rating:<12}  {bar}")
+    except KeyboardInterrupt:
+        print("\nStopped.")    

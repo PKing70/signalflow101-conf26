@@ -14,18 +14,19 @@ from exercises.apdex import build_apdex_program
 
 program = build_apdex_program('workshop.github.latency')
 
-with signalfx.SignalFx(
+sfx = signalfx.SignalFx(
     api_endpoint=f"https://api.{REALM}.observability.splunkcloud.com",
     ingest_endpoint=f"https://ingest.{REALM}.observability.splunkcloud.com",
     stream_endpoint=f"https://stream.{REALM}.observability.splunkcloud.com"
-) as sfx:
+)
 
-    with sfx.signalflow(TOKEN) as flow:
-        computation = flow.execute(program)
-        results = {}
+with sfx.signalflow(TOKEN) as flow:
+    computation = flow.execute(program)
+    results = {}
 
+    try:
         for msg in computation.stream():
-            if msg.kind == 'data':
+            if hasattr(msg, 'data'):
                 for tsid, value in msg.data.items():
                     meta = computation.get_metadata(tsid)
                     participant = meta.get('participant_id', 'unknown')
@@ -47,3 +48,5 @@ with signalfx.SignalFx(
                             rating = "Unacceptable"
                         bar = "█" * int(score * 20)
                         print(f"{participant:<40} {score:.2f}  {rating:<12}  {bar}")
+    except KeyboardInterrupt:
+        print("\nStopped.")
