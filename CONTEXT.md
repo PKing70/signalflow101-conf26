@@ -56,15 +56,16 @@ another. This workshop shows attendees what SignalFlow unlocks beyond the UI.
 ## Key Design Decisions (and why — important for new co-presenter too)
 
 **Shared O11y instance, not per-attendee**
-One shared Splunk Show instance for all 50–150 attendees. Simpler credential
+One shared Splunk Show instance for up to 200 attendees. Simpler credential
 distribution, social "whole class" dashboard moment, one cleanup job.
 
-**participant_id dimension = conference registration email**
-Unique, already known to attendees, personally meaningful, no assignment needed.
-Note: need to verify @/. characters work in SignalFlow dimension values.
+**participant_id dimension = participant alias**
+Use aliases like `participant-001` through `participant-200`, not attendee
+email addresses. Easier privacy story on shared dashboards and still unique.
 
 **GitHub Codespaces as the environment**
-Zero install friction. Devcontainer pre-configures Python + dependencies.
+Zero install friction. Devcontainer pre-configures Python + dependencies and
+auto-starts the participant API on port 8000.
 Fallback: Google Colab (recommended), Replit, or local Python one-liner.
 
 **Paste-and-run instructional approach**
@@ -74,8 +75,8 @@ Voice/tone: treat audience as intelligent professionals, not CS students.
 Never explain what Apdex is. Do explain what `import` means.
 
 **chaos-bot as the fleet mystery, not a real attendee**
-chaos-bot@conf26.splunk.com sends elevated latency metrics before and during
-the workshop. Attendees investigate and find it. Never target a real attendee
+`participant-000` sends elevated latency metrics before and during the
+workshop. Attendees investigate and find it. Never target a real attendee
 as the "slow one" — they're already under enough pressure.
 
 **Apdex as the "beyond the UI" payoff**
@@ -95,17 +96,21 @@ This is stated explicitly in Exercise 2's talking points and the slide deck.
 signalflow101-conf26/
 ├── README.md
 ├── config.py                    ← loads .env, exports TOKEN/REALM/PARTICIPANT_ID
+├── workshop_api.py              ← personal API auto-started in Codespaces
+├── signalflow_rest.py           ← direct SignalFlow REST/SSE helper
+├── apdex.py                     ← reusable build_apdex_program() function
 ├── requirements.txt
 ├── .env.example                 ← copy to .env, never commit .env
 ├── .gitignore
 ├── .devcontainer/
-│   └── devcontainer.json        ← ports 8000, 8001; auto pip install
+│   ├── devcontainer.json        ← ports 8000, 8001; auto pip install/start API
+│   └── start-api.sh             ← starts workshop_api.py in Codespaces
 ├── exercises/
 │   ├── exercise1.py             ← send fake latency, verify pipeline
 │   ├── exercise2a.py            ← send real measured latency (continuous)
 │   ├── exercise2b.py            ← SignalFlow fleet investigation
 │   ├── exercise3.py             ← Apdex computation
-│   └── apdex.py                 ← reusable build_apdex_program() function
+│   └── apdex.py                 ← compatibility import for build_apdex_program()
 ├── takehome/
 │   ├── takehome1_api.py         ← FastAPI with /github endpoint (port 8001)
 │   ├── takehome1_sender.py      ← sends workshop.github.latency
@@ -118,6 +123,7 @@ signalflow101-conf26/
 │   └── chaos_bot.py             ← instructor runs this before/during workshop
 ├── workshop-setup/
 │   ├── build_dashboards.py      ← TODO: implement once O11y instance verified
+│   ├── generate_participant_aliases.py ← prints participant alias CSV
 │   └── INSTRUCTOR_NOTES.md      ← day-of checklist, timing, contingencies
 └── docs/
     ├── EXERCISE_GUIDE.md        ← complete exercise document
@@ -140,25 +146,20 @@ Direct REST API via `requests.post()` to:
 Header: `X-SF-TOKEN: {TOKEN}`
 
 **SignalFlow computations (Exercises 2b, 3, take-home Apdex/SLO):**
-Uses `signalfx` Python package (signalflow-client-python).
-⚠️ VERIFY: exact import name and SignalFx() constructor — may differ from
-what we wrote. Check https://github.com/signalfx/signalflow-client-python
+Uses direct REST via `requests.post()` to:
+`https://stream.{REALM}.observability.splunkcloud.com/v2/signalflow/execute`
+The response is a Server-Sent Events stream parsed by `signalflow_rest.py`.
 
 Pattern used throughout:
 ```python
-import signalfx
-with signalfx.SignalFx(
-    api_endpoint=f"https://api.{REALM}.observability.splunkcloud.com",
-    ingest_endpoint=f"https://ingest.{REALM}.observability.splunkcloud.com",
-    stream_endpoint=f"https://stream.{REALM}.observability.splunkcloud.com"
-) as sfx:
-    with sfx.signalflow(TOKEN) as flow:
-        computation = flow.execute(program)
-        for msg in computation.stream():
-            if msg.kind == 'data':
-                for tsid, value in msg.data.items():
-                    meta = computation.get_metadata(tsid)
-                    # meta contains dimension values like participant_id
+from signalflow_rest import stream_signalflow
+
+for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+    if event_name == "data":
+        for point in payload.get("data", []):
+            tsid = point.get("tsId")
+            value = point.get("value")
+            meta = metadata.get(tsid, {})
 ```
 
 **Detector creation (take-home 2 and 3):**
@@ -171,11 +172,12 @@ Direct REST API via `requests.post()` to:
 ## Chaos Bot
 
 `chaos-bot/chaos_bot.py` — fully implemented.
-Sends as `chaos-bot@conf26.splunk.com` (never an attendee's email).
+Sends as `participant-000` (never an attendee alias).
 
 Parameters (tunable at top of file):
-- Baseline: 600–900ms (P50 well above attendees at ~140ms)
-- Spikes: 1400–2000ms, 20% frequency (above 1200ms frustrated threshold)
+- Satisfied: 180-280ms, 25% frequency
+- Tolerating: 650-900ms, 55% frequency
+- Frustrated: 1400-2000ms, 20% frequency
 - Send interval: 5 seconds
 - Expected Apdex: ~0.50–0.55 (Poor) vs attendees at ~0.95+ (Excellent)
 
@@ -199,7 +201,7 @@ Frustrated:  latency >= 1200ms
 Ratings: 0.94+ Excellent | 0.85+ Good | 0.70+ Fair | 0.50+ Poor | <0.50 Unacceptable
 
 The reusable function `build_apdex_program(metric_name, t=300, window='5m')`
-in `exercises/apdex.py` generates the full SignalFlow program string.
+in root-level `apdex.py` generates the full SignalFlow program string.
 ⚠️ VERIFY: `rollup='count'` behavior — is this the correct parameter for
 treating each data point as an individual measurement for bucket counting?
 
@@ -226,9 +228,8 @@ lasting='10m'). ~25–35 min.
 ## Outstanding Items / Placeholders
 
 ### Must resolve before conference (requires O11y instance):
-- [ ] Verify `signalfx` package import and constructor syntax
+- [ ] Verify SignalFlow REST/SSE parsing against the real O11y instance
 - [ ] Verify `rollup='count'` for bucket counting in SignalFlow
-- [ ] Verify `@` and `.` in email-format participant_id dimension values
 - [ ] Verify detector URL format in O11y UI
 - [ ] Implement `workshop-setup/build_dashboards.py`
 - [ ] Fill in O11y navigation steps (3 placeholders in EXERCISE_GUIDE.md):
@@ -289,8 +290,8 @@ Slide structure:
 ## Immediate Next Steps (start here)
 
 1. **Validate Exercise 1** against free trial O11y instance — proves ingest works
-2. **Verify participant_id dimension** with email format (@/. characters)
-3. **Verify SignalFlow client** import and constructor — run exercise2b.py
+2. **Verify participant_id aliases** such as `participant-042` group correctly
+3. **Verify SignalFlow REST/SSE helper** — run exercise2b.py
 4. **Verify rollup='count'** behavior — run exercise3.py
 5. **Run chaos-bot** and observe in O11y — tune parameters if needed
 6. **Implement build_dashboards.py** — Fleet Dashboard and Apdex Dashboard

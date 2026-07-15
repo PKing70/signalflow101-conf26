@@ -14,7 +14,6 @@ Everything you interact with in Splunk Observability Cloud is powered by SignalF
 ## What You'll Need
 
 - A browser
-- Your conference registration email address
 - The workshop credentials sheet handed out at the start of the session
 
 That's it. No installation. No configuration. Just open your browser and follow along.
@@ -52,23 +51,23 @@ The **"What does this code do?"** sections are optional and collapsed by default
 
 ## Getting Started: Your Workshop Credentials
 
-> 🔲 **Placeholder:** Splunk Show credential delivery instructions to be added once the workshop instance is provisioned. This section will include the QR code or URL for the credential page, login instructions using your conference registration email, and where to find your access token and realm once logged in.
+> 🔲 **Placeholder:** Splunk Show credential delivery instructions to be added once the workshop instance is provisioned. This section will include the QR code or URL for the credential page, login instructions, and where to find your access token, realm, and participant alias.
 
 Once you have your credentials, you'll need three pieces of information:
 
 - Your **access token** — provided via the workshop credentials page
 - Your **realm** — for example, `us1` or `us0`; also provided with your credentials
-- Your **participant ID** — the email address you used to register for .conf26
+- Your **participant ID** — an alias such as `participant-042`
 
 Open the file called `.env` in your Codespace. It looks like this:
 
 ```
 SPLUNK_ACCESS_TOKEN=your-token-here
 SPLUNK_REALM=your-realm-here
-PARTICIPANT_ID=your-email-here
+PARTICIPANT_ID=participant-042
 ```
 
-Replace the placeholder values with your credentials and your email address, then save the file. Every script in this workshop reads from this file automatically — you won't need to enter your credentials again.
+Replace the placeholder values with your credentials and participant alias, then save the file. Every script in this workshop reads from this file automatically — you won't need to enter your credentials again.
 
 ---
 
@@ -82,9 +81,9 @@ Your Codespace is already running a small API. Let's make sure everything is wor
 
 In your Codespace, look for the **Ports** tab at the bottom of the screen. You'll see port `8000` listed. Click the globe icon next to it to open your API in a browser tab.
 
-Add `/hello` to the end of the URL. You should see your name — pulled from the `PARTICIPANT_ID` you set in your `.env` file.
+Add `/hello` to the end of the URL. You should see your participant alias — pulled from the `PARTICIPANT_ID` you set in your `.env` file.
 
-If you see your name, your API is running. Move on to Step 2.
+If you see your participant alias, your API is running. Move on to Step 2.
 
 ### Step 2: Send your first metric to Splunk Observability Cloud
 
@@ -132,7 +131,7 @@ You should see output like:
 
 ```
 Metric sent successfully.
-participant_id: sarah.jones@example.com
+participant_id: participant-042
 latency:        287.3ms
 ```
 
@@ -219,20 +218,29 @@ def send_latency(latency_ms):
 print(f"Sending real latency metrics for {PARTICIPANT_ID}...")
 print("Press Ctrl+C to stop.\n")
 
-while True:
-    start = time.time()
-    response = requests.get("http://localhost:8000/hello")
-    latency_ms = (time.time() - start) * 1000
+try:
+    while True:
+        start = time.time()
+        response = requests.get("http://localhost:8000/hello", timeout=5)
+        response.raise_for_status()
+        latency_ms = (time.time() - start) * 1000
 
-    send_latency(latency_ms)
-    print(f"Sent: {latency_ms:.1f}ms")
-    time.sleep(10)
+        send_latency(latency_ms)
+        print(f"Sent: {latency_ms:.1f}ms")
+        time.sleep(10)
+except requests.RequestException as error:
+    print("\nCould not reach your API at http://localhost:8000/hello.")
+    print("In Codespaces, the API should start automatically.")
+    print("If needed, run: python -m uvicorn workshop_api:app --host 0.0.0.0 --port 8000")
+    print(f"Details: {error}")
+except KeyboardInterrupt:
+    print("\nStopped. Head to the next terminal for Exercise 2b.")
 ```
 
 You should see output like:
 
 ```
-Sending real latency metrics for sarah.jones@example.com...
+Sending real latency metrics for participant-042...
 Press Ctrl+C to stop.
 
 Sent: 142.3ms
@@ -267,46 +275,61 @@ Rather than writing the ingest call directly in the loop, we've wrapped it in a 
 With everyone's metrics flowing, let's look at the whole picture. Paste the following into `exercise2b.py` in your second terminal and click **Run**:
 
 ```python
-import signalfx
-from config import TOKEN, REALM
+from config import TOKEN, REALM, PARTICIPANT_ID
+from signalflow_rest import stream_signalflow
+
+DISPLAY_LIMIT = 15
 
 program = """
-latency = data('workshop.api.latency').mean(by='participant_id', over='1m')
+latency = data('workshop.api.latency').mean(over='1m').mean(by=['participant_id'])
 latency.publish('avg_latency_by_participant')
 """
 
-with signalfx.SignalFx(
-    api_endpoint=f"https://api.{REALM}.observability.splunkcloud.com",
-    ingest_endpoint=f"https://ingest.{REALM}.observability.splunkcloud.com",
-    stream_endpoint=f"https://stream.{REALM}.observability.splunkcloud.com"
-) as sfx:
+results = {}
 
-    with sfx.signalflow(TOKEN) as flow:
-        computation = flow.execute(program)
-        results = {}
+try:
+    for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+        if event_name != "data":
+            continue
 
-        for msg in computation.stream():
-            if msg.kind == 'data':
-                for tsid, value in msg.data.items():
-                    meta = computation.get_metadata(tsid)
-                    participant = meta.get('participant_id', 'unknown')
-                    results[participant] = value
+        for point in payload.get("data", []):
+            tsid = point.get("tsId")
+            value = point.get("value")
+            if not tsid or value is None:
+                continue
+            participant = metadata.get(tsid, {}).get("participant_id", "unknown")
+            results[participant] = value
 
-                if results:
-                    print("\n--- Fleet Latency (1-minute average) ---")
-                    sorted_results = sorted(results.items(), key=lambda x: x[1], reverse=True)
-                    for participant, latency in sorted_results:
-                        bar = "█" * int(latency / 10)
-                        print(f"{participant:<40} {latency:>8.1f}ms  {bar}")
+        if results:
+            sorted_results = sorted(results.items(), key=lambda x: x[1], reverse=True)
+            display_results = sorted_results[:DISPLAY_LIMIT]
+            own_result = next(
+                (item for item in sorted_results if item[0] == PARTICIPANT_ID),
+                None,
+            )
+
+            if own_result and own_result not in display_results:
+                display_results.append(("...", None))
+                display_results.append(own_result)
+
+            print(f"\n--- Fleet Latency (top {min(DISPLAY_LIMIT, len(sorted_results))} of {len(sorted_results)}) ---")
+            for participant, latency in display_results:
+                if latency is None:
+                    print(f"... {len(sorted_results)} participants reporting ...")
+                    continue
+                bar = "█" * int(latency / 10)
+                print(f"{participant:<40} {latency:>8.1f}ms  {bar}")
+except KeyboardInterrupt:
+    print("\nStopped.")
 ```
 
 You should see output like:
 
 ```
---- Fleet Latency (1-minute average) ---
-chaos-bot@conf26.splunk.com              847.3ms  ████████████████████████████████████████████████████████████
-sarah.jones@example.com                  143.2ms  ██████████████
-michael.chen@example.com                 138.9ms  █████████████
+--- Fleet Latency (top 15 of 128) ---
+participant-000                          847.3ms  ████████████████████████████████████████████████████████████
+participant-117                          224.8ms  ██████████████████████
+participant-042                          143.2ms  ██████████████
 ...
 ```
 
@@ -320,16 +343,16 @@ Now open the Fleet Dashboard in Splunk Observability Cloud to see the same data 
 <summary><strong>What does this code do? (optional)</strong></summary>
 
 **The SignalFlow program**
-The string assigned to `program` is a SignalFlow program — the same language running behind every chart in Splunk Observability Cloud. `data()` selects your metric stream. `.mean(by='participant_id', over='1m')` computes the 1-minute average latency for each participant separately. `.publish()` makes the results available to read.
+The string assigned to `program` is a SignalFlow program — the same language running behind every chart in Splunk Observability Cloud. `data()` selects your metric stream. `.mean(over='1m')` computes a 1-minute average, and `.mean(by=['participant_id'])` keeps each participant separate. `.publish()` makes the results available to read.
 
-**The SignalFlow client**
-`signalfx.SignalFx()` connects to your Splunk Observability Cloud instance using your realm and token. `sfx.signalflow()` opens a streaming connection to the SignalFlow engine. Unlike the `requests.post()` calls in earlier exercises — which send a single request and receive a single response — this connection stays open and streams results continuously as SignalFlow computes them.
+**The SignalFlow REST API**
+`stream_signalflow()` uses `requests.post()` to start a SignalFlow computation through Splunk Observability Cloud's REST API. Unlike the earlier ingest calls, this response stays open and streams Server-Sent Events as SignalFlow computes new values.
 
 **Reading the stream**
-`computation.stream()` returns messages as they arrive from SignalFlow. We only care about `data` messages — those contain actual metric values. Each data message contains one or more time series identifiers (`tsid`) and their current values.
+`stream_signalflow()` returns messages as they arrive from SignalFlow. We only care about `data` messages — those contain actual metric values. Each data message contains one or more time series identifiers (`tsid`) and their current values.
 
 **Getting the participant name**
-The `tsid` is an internal identifier — a short string that SignalFlow uses to track each time series. `computation.get_metadata(tsid)` translates it back into the dimensions we know — in this case, `participant_id`. That's how we connect a raw number to a name.
+The `tsid` is an internal identifier — a short string that SignalFlow uses to track each time series. SignalFlow sends metadata messages that translate each `tsid` back into the dimensions we know — in this case, `participant_id`. That's how we connect a raw number to a participant alias.
 
 **The bar chart**
 Each `█` character represents 10ms of latency. It makes the outlier immediately obvious without needing to open a separate tool. The console output is a confidence check that your code is working — the Fleet Dashboard in Splunk Observability Cloud is the full visual.
@@ -342,7 +365,7 @@ Each `█` character represents 10ms of latency. It makes the outlier immediatel
 
 You wrote and executed a SignalFlow program directly — the same computation engine that powers every chart in Splunk Observability Cloud. But instead of clicking through the UI to build a chart, you expressed the computation in code, ran it from your Codespace, and streamed the results in real time.
 
-One participant — `chaos-bot@conf26.splunk.com` — is running significantly slower than everyone else. In Exercise 3 we're going to quantify exactly how much slower, using a metric that Splunk Observability Cloud doesn't give you out of the box.
+One participant — `participant-000` — is running significantly slower than everyone else. In Exercise 3 we're going to quantify exactly how much slower, using a metric that Splunk Observability Cloud doesn't give you out of the box.
 
 > 🔵 **Checkpoint 2** — Look up when you reach this point. We'll discuss what you found, why one participant stands out, and what it means before moving on to Exercise 3.
 
@@ -379,8 +402,10 @@ Scores are interpreted as follows:
 Splunk Observability Cloud can show you latency. It can't compute Apdex — at least not without SignalFlow. Paste the following into `exercise3.py` and click **Run**:
 
 ```python
-import signalfx
-from config import TOKEN, REALM
+from config import TOKEN, REALM, PARTICIPANT_ID
+from signalflow_rest import stream_signalflow
+
+DISPLAY_LIMIT = 15
 
 T = 300           # Satisfied threshold in ms
 T_tolerating = T * 4  # 1200ms — frustrated threshold
@@ -388,47 +413,60 @@ T_tolerating = T * 4  # 1200ms — frustrated threshold
 program = f"""
 latency = data('workshop.api.latency', rollup='count')
 
-satisfied = latency.map(lambda x: 1 if x < {T} else 0).sum(by='participant_id', over='5m')
-tolerating = latency.map(lambda x: 1 if {T} <= x < {T_tolerating} else 0).sum(by='participant_id', over='5m')
-total = latency.sum(by='participant_id', over='5m')
+satisfied = latency.map(lambda x: 1 if x < {T} else 0).sum(over='5m').sum(by=['participant_id'])
+tolerating = latency.map(lambda x: 1 if x >= {T} and x < {T_tolerating} else 0).sum(over='5m').sum(by=['participant_id'])
+total = latency.sum(over='5m').sum(by=['participant_id'])
 
 apdex = (satisfied + (tolerating / 2)) / total
 apdex.publish('apdex')
 """
 
-with signalfx.SignalFx(
-    api_endpoint=f"https://api.{REALM}.observability.splunkcloud.com",
-    ingest_endpoint=f"https://ingest.{REALM}.observability.splunkcloud.com",
-    stream_endpoint=f"https://stream.{REALM}.observability.splunkcloud.com"
-) as sfx:
+results = {}
 
-    with sfx.signalflow(TOKEN) as flow:
-        computation = flow.execute(program)
-        results = {}
+try:
+    for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+        if event_name != "data":
+            continue
 
-        for msg in computation.stream():
-            if msg.kind == 'data':
-                for tsid, value in msg.data.items():
-                    meta = computation.get_metadata(tsid)
-                    participant = meta.get('participant_id', 'unknown')
-                    results[participant] = value
+        for point in payload.get("data", []):
+            tsid = point.get("tsId")
+            value = point.get("value")
+            if not tsid or value is None:
+                continue
+            participant = metadata.get(tsid, {}).get("participant_id", "unknown")
+            results[participant] = value
 
-                if results:
-                    print("\n--- Apdex Scores (T=300ms) ---")
-                    sorted_results = sorted(results.items(), key=lambda x: x[1])
-                    for participant, score in sorted_results:
-                        if score >= 0.94:
-                            rating = "Excellent"
-                        elif score >= 0.85:
-                            rating = "Good"
-                        elif score >= 0.70:
-                            rating = "Fair"
-                        elif score >= 0.50:
-                            rating = "Poor"
-                        else:
-                            rating = "Unacceptable"
-                        bar = "█" * int(score * 20)
-                        print(f"{participant:<40} {score:.2f}  {rating:<12}  {bar}")
+        if results:
+            sorted_results = sorted(results.items(), key=lambda x: x[1])
+            display_results = sorted_results[:DISPLAY_LIMIT]
+            own_result = next(
+                (item for item in sorted_results if item[0] == PARTICIPANT_ID),
+                None,
+            )
+
+            if own_result and own_result not in display_results:
+                display_results.append(("...", None))
+                display_results.append(own_result)
+
+            print(f"\n--- Apdex Scores (lowest {min(DISPLAY_LIMIT, len(sorted_results))} of {len(sorted_results)}, T=300ms) ---")
+            for participant, score in display_results:
+                if score is None:
+                    print(f"... {len(sorted_results)} participants reporting ...")
+                    continue
+                if score >= 0.94:
+                    rating = "Excellent"
+                elif score >= 0.85:
+                    rating = "Good"
+                elif score >= 0.70:
+                    rating = "Fair"
+                elif score >= 0.50:
+                    rating = "Poor"
+                else:
+                    rating = "Unacceptable"
+                bar = "█" * int(score * 20)
+                print(f"{participant:<40} {score:.2f}  {rating:<12}  {bar}")
+except KeyboardInterrupt:
+    print("\nStopped.")
 ```
 
 > ⏳ **Note:** It may take 2–3 minutes before scores appear. The computation needs enough data to fill the 5-minute rolling window. If you see no output yet, the script is working — just wait.
@@ -436,10 +474,10 @@ with signalfx.SignalFx(
 You should see output like:
 
 ```
---- Apdex Scores (T=300ms) ---
-chaos-bot@conf26.splunk.com              0.52  Poor          ██████████
-sarah.jones@example.com                  0.96  Excellent     ███████████████████
-michael.chen@example.com                 0.95  Excellent     ███████████████████
+--- Apdex Scores (lowest 15 of 128, T=300ms) ---
+participant-000                          0.52  Poor          ██████████
+participant-042                          0.96  Excellent     ███████████████████
+participant-117                          0.95  Excellent     ███████████████████
 ...
 ```
 
@@ -460,7 +498,7 @@ This is more involved than Exercise 2, but it follows the Apdex formula directly
 
 - `data('workshop.api.latency', rollup='count')` retrieves the latency stream. The `rollup='count'` argument tells SignalFlow to treat each data point as an individual measurement rather than averaging them — which is what we need for counting requests in each bucket.
 - `latency.map(lambda x: 1 if x < 300 else 0)` transforms each data point: if the latency was under 300ms it becomes 1 (satisfied); otherwise 0. This is how SignalFlow counts requests that meet a condition.
-- `.sum(by='participant_id', over='5m')` adds up those 1s and 0s over a 5-minute window, grouped by participant. The result is a count of satisfied requests per participant over the last 5 minutes.
+- `.sum(over='5m').sum(by=['participant_id'])` adds up those 1s and 0s over a 5-minute window, grouped by participant. The result is a count of satisfied requests per participant over the last 5 minutes.
 - The same pattern produces `tolerating` — requests between 300ms and 1200ms.
 - `total` counts all requests regardless of latency.
 - The final line is the Apdex formula expressed as stream arithmetic: `(satisfied + (tolerating / 2)) / total`. SignalFlow handles the division of two streams natively.
@@ -497,7 +535,7 @@ Each take-home exercise includes a timing estimate — not because you're racing
 
 > ⏱ **Estimated time:** 20–30 minutes. The three-terminal setup and the 5-minute Apdex window are the main time variables.
 
-So far your API returns your name from a local file. Real APIs call other services — and those downstream calls are often where latency problems hide. In this exercise you'll add a real downstream dependency to your API: GitHub's public user API. Then you'll measure how long GitHub takes to respond, send that as a metric, and watch how real-world network variability affects your Apdex score.
+So far your API returns your participant alias from local configuration. Real APIs call other services — and those downstream calls are often where latency problems hide. In this exercise you'll add a real downstream dependency to your API: GitHub's public user API. Then you'll measure how long GitHub takes to respond, send that as a metric, and watch how real-world network variability affects your Apdex score.
 
 Along the way we'll introduce a small but important idea: pulling repeated logic into a reusable function. By the end of this exercise, computing Apdex for any metric is a single line of code.
 
@@ -529,9 +567,9 @@ def build_apdex_program(metric_name, t=300, window='5m'):
     t_tolerating = t * 4
     return f"""
 latency = data('{metric_name}', rollup='count')
-satisfied = latency.map(lambda x: 1 if x < {t} else 0).sum(by='participant_id', over='{window}')
-tolerating = latency.map(lambda x: 1 if {t} <= x < {t_tolerating} else 0).sum(by='participant_id', over='{window}')
-total = latency.sum(by='participant_id', over='{window}')
+satisfied = latency.map(lambda x: 1 if x < {t} else 0).sum(over='{window}').sum(by=['participant_id'])
+tolerating = latency.map(lambda x: 1 if x >= {t} and x < {t_tolerating} else 0).sum(over='{window}').sum(by=['participant_id'])
+total = latency.sum(over='{window}').sum(by=['participant_id'])
 apdex = (satisfied + (tolerating / 2)) / total
 apdex.publish('apdex')
 """
@@ -698,7 +736,7 @@ while True:
 You should see output like:
 
 ```
-Sending GitHub latency metrics for sarah.jones@example.com...
+Sending GitHub latency metrics for participant-042...
 Press Ctrl+C to stop.
 
 Sent: 187.4ms  (github_username: sarahj)
@@ -731,45 +769,45 @@ Ten seconds between sends matches the interval in `exercise2a.py`. This gives Sp
 Open a third terminal and paste the following into `takehome1_apdex.py`, then click **Run**:
 
 ```python
-import signalfx
 from config import TOKEN, REALM
 from apdex import build_apdex_program
+from signalflow_rest import stream_signalflow
 
 program = build_apdex_program('workshop.github.latency')
 
-with signalfx.SignalFx(
-    api_endpoint=f"https://api.{REALM}.observability.splunkcloud.com",
-    ingest_endpoint=f"https://ingest.{REALM}.observability.splunkcloud.com",
-    stream_endpoint=f"https://stream.{REALM}.observability.splunkcloud.com"
-) as sfx:
+results = {}
 
-    with sfx.signalflow(TOKEN) as flow:
-        computation = flow.execute(program)
-        results = {}
+try:
+    for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+        if event_name != "data":
+            continue
 
-        for msg in computation.stream():
-            if msg.kind == 'data':
-                for tsid, value in msg.data.items():
-                    meta = computation.get_metadata(tsid)
-                    participant = meta.get('participant_id', 'unknown')
-                    results[participant] = value
+        for point in payload.get("data", []):
+            tsid = point.get("tsId")
+            value = point.get("value")
+            if not tsid or value is None:
+                continue
+            participant = metadata.get(tsid, {}).get("participant_id", "unknown")
+            results[participant] = value
 
-                if results:
-                    print("\n--- GitHub Apdex Scores (T=300ms) ---")
-                    sorted_results = sorted(results.items(), key=lambda x: x[1])
-                    for participant, score in sorted_results:
-                        if score >= 0.94:
-                            rating = "Excellent"
-                        elif score >= 0.85:
-                            rating = "Good"
-                        elif score >= 0.70:
-                            rating = "Fair"
-                        elif score >= 0.50:
-                            rating = "Poor"
-                        else:
-                            rating = "Unacceptable"
-                        bar = "█" * int(score * 20)
-                        print(f"{participant:<40} {score:.2f}  {rating:<12}  {bar}")
+        if results:
+            print("\n--- GitHub Apdex Scores (T=300ms) ---")
+            sorted_results = sorted(results.items(), key=lambda x: x[1])
+            for participant, score in sorted_results:
+                if score >= 0.94:
+                    rating = "Excellent"
+                elif score >= 0.85:
+                    rating = "Good"
+                elif score >= 0.70:
+                    rating = "Fair"
+                elif score >= 0.50:
+                    rating = "Poor"
+                else:
+                    rating = "Unacceptable"
+                bar = "█" * int(score * 20)
+                print(f"{participant:<40} {score:.2f}  {rating:<12}  {bar}")
+except KeyboardInterrupt:
+    print("\nStopped.")
 ```
 
 > ⏳ **Note:** As with Exercise 3, it may take 2–3 minutes before scores appear while the 5-minute window fills with data.
@@ -786,7 +824,7 @@ This line imports the function you created in Step 2. Python looks for a file ca
 This single line replaces the entire SignalFlow program string from Exercise 3. The function takes the metric name, fills in the formula, and returns the complete program. Notice how much shorter and more readable this script is compared to `exercise3.py` — the Apdex computation is identical, just expressed more cleanly.
 
 **Everything else is identical to Exercise 3**
-The SignalFlow client setup, the message loop, the result printing — all unchanged. Only the metric name changed. That's the practical value of the abstraction: write the computation once, apply it to anything.
+The SignalFlow REST call, the message loop, and the result printing are unchanged. Only the metric name changed. That's the practical value of the abstraction: write the computation once, apply it to anything.
 
 </details>
 
@@ -825,7 +863,7 @@ latency = data('workshop.api.latency',
     filter=filter('participant_id', '{PARTICIPANT_ID}'),
     rollup='count')
 satisfied = latency.map(lambda x: 1 if x < 300 else 0).sum(over='5m')
-tolerating = latency.map(lambda x: 1 if 300 <= x < 1200 else 0).sum(over='5m')
+tolerating = latency.map(lambda x: 1 if x >= 300 and x < 1200 else 0).sum(over='5m')
 total = latency.sum(over='5m')
 apdex = (satisfied + (tolerating / 2)) / total
 detect(when(apdex < 0.85, lasting='5m')).publish('Apdex below Good threshold')
@@ -877,7 +915,7 @@ You should see output like:
 
 ```
 Detector created successfully.
-Name:        Apdex Monitor — sarah.jones@example.com
+Name:        Apdex Monitor — participant-042
 ID:          Ab1Cd2EfGhI
 View it at:  https://app.us1.observability.splunkcloud.com/#/detector/v2/Ab1Cd2EfGhI
 ```
@@ -1040,8 +1078,8 @@ We're using a 1-hour window rather than the production-standard 30 days because 
 Paste the following into `takehome3_slo.py` and click **Run**:
 
 ```python
-import signalfx
 from config import TOKEN, REALM, PARTICIPANT_ID
+from signalflow_rest import stream_signalflow
 
 SLO_TARGET = 0.995              # 99.5% of requests must be satisfied
 ALLOWED_ERROR_RATE = 1 - SLO_TARGET  # 0.005
@@ -1062,39 +1100,39 @@ burn_rate.publish('burn_rate')
 current_error_rate.publish('current_error_rate')
 """
 
-with signalfx.SignalFx(
-    api_endpoint=f"https://api.{REALM}.observability.splunkcloud.com",
-    ingest_endpoint=f"https://ingest.{REALM}.observability.splunkcloud.com",
-    stream_endpoint=f"https://stream.{REALM}.observability.splunkcloud.com"
-) as sfx:
+latest = {}
 
-    with sfx.signalflow(TOKEN) as flow:
-        computation = flow.execute(program)
-        latest = {}
+try:
+    for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+        if event_name != "data":
+            continue
 
-        for msg in computation.stream():
-            if msg.kind == 'data':
-                for tsid, value in msg.data.items():
-                    meta = computation.get_metadata(tsid)
-                    label = meta.get('sf_metric', 'unknown')
-                    latest[label] = value
+        for point in payload.get("data", []):
+            tsid = point.get("tsId")
+            value = point.get("value")
+            if not tsid or value is None:
+                continue
+            label = metadata.get(tsid, {}).get("sf_metric", "unknown")
+            latest[label] = value
 
-                if len(latest) == 2:
-                    error_rate = latest.get('current_error_rate', 0)
-                    burn_rate = latest.get('burn_rate', 0)
+        if len(latest) == 2:
+            error_rate = latest.get("current_error_rate", 0)
+            burn_rate = latest.get("burn_rate", 0)
 
-                    if burn_rate >= BURN_RATE_THRESHOLD:
-                        status = f"⚠️  BURNING TOO FAST — {burn_rate:.2f}x"
-                    elif burn_rate >= 1.0:
-                        status = f"⚡ Elevated — {burn_rate:.2f}x"
-                    else:
-                        status = f"✓  Healthy — {burn_rate:.2f}x"
+            if burn_rate >= BURN_RATE_THRESHOLD:
+                status = f"BURNING TOO FAST - {burn_rate:.2f}x"
+            elif burn_rate >= 1.0:
+                status = f"Elevated - {burn_rate:.2f}x"
+            else:
+                status = f"Healthy - {burn_rate:.2f}x"
 
-                    print(f"\n--- SLO Status for {PARTICIPANT_ID} ---")
-                    print(f"SLO target:         {SLO_TARGET * 100:.1f}%")
-                    print(f"Allowed error rate: {ALLOWED_ERROR_RATE * 100:.2f}%")
-                    print(f"Current error rate: {error_rate * 100:.3f}%")
-                    print(f"Burn rate:          {status}")
+            print(f"\n--- SLO Status for {PARTICIPANT_ID} ---")
+            print(f"SLO target:         {SLO_TARGET * 100:.1f}%")
+            print(f"Allowed error rate: {ALLOWED_ERROR_RATE * 100:.2f}%")
+            print(f"Current error rate: {error_rate * 100:.3f}%")
+            print(f"Burn rate:          {status}")
+except KeyboardInterrupt:
+    print("\nStopped.")
 ```
 
 > ⏳ **Note:** This computation uses a 1-hour rolling window. If you haven't been sending metrics for close to an hour, the burn rate will be based on a partial window. It will still work — just keep that context in mind when reading the results.
@@ -1102,21 +1140,21 @@ with signalfx.SignalFx(
 You should see output like:
 
 ```
---- SLO Status for sarah.jones@example.com ---
+--- SLO Status for participant-042 ---
 SLO target:         99.5%
 Allowed error rate: 0.50%
 Current error rate: 0.031%
-Burn rate:          ✓  Healthy — 0.06x
+Burn rate:          Healthy - 0.06x
 ```
 
 If you still have `takehome2_spike.py` running from the previous exercise, your output will look quite different:
 
 ```
---- SLO Status for sarah.jones@example.com ---
+--- SLO Status for participant-042 ---
 SLO target:         99.5%
 Allowed error rate: 0.50%
 Current error rate: 100.000%
-Burn rate:          ⚠️  BURNING TOO FAST — 200.00x
+Burn rate:          BURNING TOO FAST - 200.00x
 ```
 
 A burn rate of 200x means you'd exhaust your entire hourly error budget in about 18 seconds.
@@ -1220,7 +1258,7 @@ You should see output like:
 
 ```
 Burn rate detector created successfully.
-Name:        SLO Burn Rate — sarah.jones@example.com
+Name:        SLO Burn Rate — participant-042
 ID:          Xy9Gh3JkLmN
 View it at:  https://app.us1.observability.splunkcloud.com/#/detector/v2/Xy9Gh3JkLmN
 ```
@@ -1269,7 +1307,7 @@ Open your `.env` file and replace the workshop values with your own:
 ```
 SPLUNK_ACCESS_TOKEN=your-own-access-token
 SPLUNK_REALM=your-own-realm
-PARTICIPANT_ID=your-email-here
+PARTICIPANT_ID=participant-042
 ```
 
 Your access token and realm are available in your Splunk Observability Cloud account under **Settings → Access Tokens** and **Settings → My Profile** respectively. Everything else stays the same — the scripts, the SignalFlow programs, and the detector definitions all work against any Splunk Observability Cloud org without modification.
@@ -1314,12 +1352,12 @@ If you have admin rights on your laptop, a single command installs everything yo
 
 **Mac:**
 ```bash
-brew install python && pip install requests python-dotenv signalfx fastapi uvicorn
+brew install python && pip install requests python-dotenv fastapi uvicorn
 ```
 
 **Windows:**
 ```bash
-winget install Python.Python.3 && pip install requests python-dotenv signalfx fastapi uvicorn
+winget install Python.Python.3 && pip install requests python-dotenv fastapi uvicorn
 ```
 
 Once installed, clone the workshop repository and run the exercises from the repo folder as normal.

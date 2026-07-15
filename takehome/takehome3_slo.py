@@ -17,8 +17,8 @@ close to an hour, results will reflect a partial window — still valid,
 just keep that context in mind.
 """
 
-import signalfx
 from config import TOKEN, REALM, PARTICIPANT_ID
+from signalflow_rest import stream_signalflow
 
 SLO_TARGET = 0.995               # 99.5% of requests must be satisfied
 ALLOWED_ERROR_RATE = 1 - SLO_TARGET  # 0.005
@@ -39,39 +39,36 @@ burn_rate.publish('burn_rate')
 current_error_rate.publish('current_error_rate')
 """
 
-sfx = signalfx.SignalFx(
-    api_endpoint=f"https://api.{REALM}.observability.splunkcloud.com",
-    ingest_endpoint=f"https://ingest.{REALM}.observability.splunkcloud.com",
-    stream_endpoint=f"https://stream.{REALM}.observability.splunkcloud.com"
-)
+latest = {}
 
-with sfx.signalflow(TOKEN) as flow:
-    computation = flow.execute(program)
-    latest = {}
+try:
+    for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+        if event_name != "data":
+            continue
 
-    try:
-        for msg in computation.stream():
-            if hasattr(msg, 'data'):
-                for tsid, value in msg.data.items():
-                    meta = computation.get_metadata(tsid)
-                    label = meta.get('sf_metric', 'unknown')
-                    latest[label] = value
+        for point in payload.get("data", []):
+            tsid = point.get("tsId")
+            value = point.get("value")
+            if not tsid or value is None:
+                continue
+            label = metadata.get(tsid, {}).get("sf_metric", "unknown")
+            latest[label] = value
 
-                if len(latest) == 2:
-                    error_rate = latest.get('current_error_rate', 0)
-                    burn_rate = latest.get('burn_rate', 0)
+        if len(latest) == 2:
+            error_rate = latest.get("current_error_rate", 0)
+            burn_rate = latest.get("burn_rate", 0)
 
-                    if burn_rate >= BURN_RATE_THRESHOLD:
-                        status = f"⚠️  BURNING TOO FAST — {burn_rate:.2f}x"
-                    elif burn_rate >= 1.0:
-                        status = f"⚡ Elevated — {burn_rate:.2f}x"
-                    else:
-                        status = f"✓  Healthy — {burn_rate:.2f}x"
+            if burn_rate >= BURN_RATE_THRESHOLD:
+                status = f"BURNING TOO FAST - {burn_rate:.2f}x"
+            elif burn_rate >= 1.0:
+                status = f"Elevated - {burn_rate:.2f}x"
+            else:
+                status = f"Healthy - {burn_rate:.2f}x"
 
-                    print(f"\n--- SLO Status for {PARTICIPANT_ID} ---")
-                    print(f"SLO target:         {SLO_TARGET * 100:.1f}%")
-                    print(f"Allowed error rate: {ALLOWED_ERROR_RATE * 100:.2f}%")
-                    print(f"Current error rate: {error_rate * 100:.3f}%")
-                    print(f"Burn rate:          {status}")
-    except KeyboardInterrupt:
-        print("\nStopped.")
+            print(f"\n--- SLO Status for {PARTICIPANT_ID} ---")
+            print(f"SLO target:         {SLO_TARGET * 100:.1f}%")
+            print(f"Allowed error rate: {ALLOWED_ERROR_RATE * 100:.2f}%")
+            print(f"Current error rate: {error_rate * 100:.3f}%")
+            print(f"Burn rate:          {status}")
+except KeyboardInterrupt:
+    print("\nStopped.")

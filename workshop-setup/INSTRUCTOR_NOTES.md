@@ -8,12 +8,17 @@ This document is for the instructor. Attendees do not need to read this.
 
 - [ ] Provision Splunk Show workshop instance
 - [ ] Confirm realm and access token distribution method (QR / URL)
+- [ ] Generate participant aliases:
+      ```
+      python workshop-setup/generate_participant_aliases.py --count 200
+      ```
 - [ ] Run `workshop-setup/build_dashboards.py` to create Fleet and Apdex dashboards
 - [ ] Record the dashboard URLs and fill in the placeholders in `docs/EXERCISE_GUIDE.md`
-- [ ] Validate `@` and `.` in email-format `participant_id` dimension values work correctly
+- [ ] Generate participant aliases from `participant-001` through expected room capacity
+- [ ] Confirm SignalFlow REST/SSE execution works from Codespaces
 - [ ] Confirm `rollup='count'` behavior in SignalFlow for bucket counting
 - [ ] Verify detector URL format: `https://app.{REALM}.observability.splunkcloud.com/#/detector/v2/{id}`
-- [ ] Confirm `signalfx` Python package import name from `signalflow-client-python`
+- [ ] Confirm SignalFlow REST/SSE response parsing with real workshop data
 - [ ] Run the chaos bot for 30 minutes and verify it appears correctly in the Fleet Dashboard
 - [ ] Do a full dry run of all three exercises end-to-end, timed
 
@@ -54,10 +59,11 @@ This document is for the instructor. Attendees do not need to read this.
 
 ## Chaos Bot Parameters
 
-The bot sends as `chaos-bot@conf26.splunk.com` with:
-- Baseline latency: 600–900ms (P50 well above attendees at ~140ms)
-- Spike latency: 1400–2000ms (20% of requests — above 1200ms frustrated threshold)
-- This produces Apdex ~0.50–0.55 (Poor) vs attendees at ~0.95+ (Excellent)
+The bot sends as `participant-000` with:
+- Satisfied latency: 180-280ms (25% of requests)
+- Tolerating latency: 650-900ms (55% of requests)
+- Frustrated latency: 1400-2000ms (20% of requests, above 1200ms frustrated threshold)
+- This produces Apdex ~0.50-0.55 (Poor) vs attendees at ~0.95+ (Excellent)
 
 ## If Things Go Wrong
 
@@ -67,7 +73,7 @@ The bot sends as `chaos-bot@conf26.splunk.com` with:
 
 **SignalFlow computation returns no data:** The 1-minute and 5-minute windows need data to fill. Wait a minute and try again.
 
-**Chaos-bot not visible:** Confirm the bot is running, the `participant_id` dimension is exactly `chaos-bot@conf26.splunk.com`, and the Fleet Dashboard filter is set correctly.
+**Chaos-bot not visible:** Confirm the bot is running, the `participant_id` dimension is exactly `participant-000`, and the Fleet Dashboard filter is set correctly.
 
 ## Post-Workshop
 
