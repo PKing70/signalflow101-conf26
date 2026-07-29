@@ -1,8 +1,8 @@
 """
 Exercise 2a: Start Sending Real Latency
-----------------------------------------
-Measures real round-trip latency to the Splunk Observability Cloud
-ingest endpoint and sends it as a metric every 10 seconds.
+---------------------------------------
+Measures real round-trip latency to your Codespace API and sends it
+as a metric every 10 seconds.
 
 Leave this running and open a second terminal for Exercise 2b.
 Press Ctrl+C to stop.
@@ -45,10 +45,16 @@ print("Press Ctrl+C to stop.\n")
 try:
     while True:
         start = time.time()
-        requests.get(f"https://ingest.{REALM}.observability.splunkcloud.com", timeout=5)
+        response = requests.get("http://localhost:8000/hello", timeout=5)
+        response.raise_for_status()
         latency_ms = (time.time() - start) * 1000
         send_latency(latency_ms)
         print(f"Sent: {latency_ms:.1f}ms")
         time.sleep(10)
+except requests.RequestException as error:
+    print("\nCould not reach your API at http://localhost:8000/hello.")
+    print("In Codespaces, the API should start automatically.")
+    print("If needed, run: python -m uvicorn workshop_api:app --host 0.0.0.0 --port 8000")
+    print(f"Details: {error}")
 except KeyboardInterrupt:
     print("\nStopped. Head to the next terminal for Exercise 2b.")

@@ -11,37 +11,49 @@ Then open the Fleet Dashboard in Splunk Observability Cloud to see
 the same data visualized live.
 """
 
-import signalfx
-from config import TOKEN, REALM
+from config import TOKEN, REALM, PARTICIPANT_ID
+from signalflow_rest import stream_signalflow
+
+DISPLAY_LIMIT = 15
 
 program = """
 latency = data('workshop.api.latency').mean(over='1m').mean(by=['participant_id'])
 latency.publish('avg_latency_by_participant')
 """
 
-sfx = signalfx.SignalFx(
-    api_endpoint=f"https://api.{REALM}.observability.splunkcloud.com",
-    ingest_endpoint=f"https://ingest.{REALM}.observability.splunkcloud.com",
-    stream_endpoint=f"https://stream.{REALM}.observability.splunkcloud.com"
-)
+results = {}
 
-with sfx.signalflow(TOKEN) as flow:
-    computation = flow.execute(program)
-    results = {}
+try:
+    for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+        if event_name != "data":
+            continue
 
-    try:
-        for msg in computation.stream():
-            if hasattr(msg, 'data'):
-                for tsid, value in msg.data.items():
-                    meta = computation.get_metadata(tsid)
-                    participant = meta.get('participant_id', 'unknown')
-                    results[participant] = value
+        for point in payload.get("data", []):
+            tsid = point.get("tsId")
+            value = point.get("value")
+            if not tsid or value is None:
+                continue
+            participant = metadata.get(tsid, {}).get("participant_id", "unknown")
+            results[participant] = value
 
-                if results:
-                    print("\n--- Fleet Latency (1-minute average) ---")
-                    sorted_results = sorted(results.items(), key=lambda x: x[1], reverse=True)
-                    for participant, latency in sorted_results:
-                        bar = "█" * int(latency / 10)
-                        print(f"{participant:<40} {latency:>8.1f}ms  {bar}")
-    except KeyboardInterrupt:
-        print("\nStopped.")
+        if results:
+            sorted_results = sorted(results.items(), key=lambda x: x[1], reverse=True)
+            display_results = sorted_results[:DISPLAY_LIMIT]
+            own_result = next(
+                (item for item in sorted_results if item[0] == PARTICIPANT_ID),
+                None,
+            )
+
+            if own_result and own_result not in display_results:
+                display_results.append(("...", None))
+                display_results.append(own_result)
+
+            print(f"\n--- Fleet Latency (top {min(DISPLAY_LIMIT, len(sorted_results))} of {len(sorted_results)}) ---")
+            for participant, latency in display_results:
+                if latency is None:
+                    print(f"... {len(sorted_results)} participants reporting ...")
+                    continue
+                bar = "█" * int(latency / 10)
+                print(f"{participant:<40} {latency:>8.1f}ms  {bar}")
+except KeyboardInterrupt:
+    print("\nStopped.")

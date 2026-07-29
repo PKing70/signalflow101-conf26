@@ -16,8 +16,10 @@ needs enough data to fill the 5-minute rolling window.
 Then open the Apdex Dashboard in Splunk Observability Cloud.
 """
 
-import signalfx
-from config import TOKEN, REALM
+from config import TOKEN, REALM, PARTICIPANT_ID
+from signalflow_rest import stream_signalflow
+
+DISPLAY_LIMIT = 15
 
 T = 300            # Satisfied threshold in ms
 T_tolerating = T * 4  # 1200ms — frustrated threshold
@@ -33,39 +35,49 @@ apdex = (satisfied + (tolerating / 2)) / total
 apdex.publish('apdex')
 """
 
-sfx = signalfx.SignalFx(
-    api_endpoint=f"https://api.{REALM}.observability.splunkcloud.com",
-    ingest_endpoint=f"https://ingest.{REALM}.observability.splunkcloud.com",
-    stream_endpoint=f"https://stream.{REALM}.observability.splunkcloud.com"
-)
+results = {}
 
-with sfx.signalflow(TOKEN) as flow:
-    computation = flow.execute(program)
-    results = {}
+try:
+    for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+        if event_name != "data":
+            continue
 
-    try:
-        for msg in computation.stream():
-            if hasattr(msg, 'data'):
-                for tsid, value in msg.data.items():
-                    meta = computation.get_metadata(tsid)
-                    participant = meta.get('participant_id', 'unknown')
-                    results[participant] = value
+        for point in payload.get("data", []):
+            tsid = point.get("tsId")
+            value = point.get("value")
+            if not tsid or value is None:
+                continue
+            participant = metadata.get(tsid, {}).get("participant_id", "unknown")
+            results[participant] = value
 
-                if results:
-                    print("\n--- Apdex Scores (T=300ms) ---")
-                    sorted_results = sorted(results.items(), key=lambda x: x[1])
-                    for participant, score in sorted_results:
-                        if score >= 0.94:
-                            rating = "Excellent"
-                        elif score >= 0.85:
-                            rating = "Good"
-                        elif score >= 0.70:
-                            rating = "Fair"
-                        elif score >= 0.50:
-                            rating = "Poor"
-                        else:
-                            rating = "Unacceptable"
-                        bar = "█" * int(score * 20)
-                        print(f"{participant:<40} {score:.2f}  {rating:<12}  {bar}")
-    except KeyboardInterrupt:
-        print("\nStopped.")    
+        if results:
+            sorted_results = sorted(results.items(), key=lambda x: x[1])
+            display_results = sorted_results[:DISPLAY_LIMIT]
+            own_result = next(
+                (item for item in sorted_results if item[0] == PARTICIPANT_ID),
+                None,
+            )
+
+            if own_result and own_result not in display_results:
+                display_results.append(("...", None))
+                display_results.append(own_result)
+
+            print(f"\n--- Apdex Scores (lowest {min(DISPLAY_LIMIT, len(sorted_results))} of {len(sorted_results)}, T=300ms) ---")
+            for participant, score in display_results:
+                if score is None:
+                    print(f"... {len(sorted_results)} participants reporting ...")
+                    continue
+                if score >= 0.94:
+                    rating = "Excellent"
+                elif score >= 0.85:
+                    rating = "Good"
+                elif score >= 0.70:
+                    rating = "Fair"
+                elif score >= 0.50:
+                    rating = "Poor"
+                else:
+                    rating = "Unacceptable"
+                bar = "█" * int(score * 20)
+                print(f"{participant:<40} {score:.2f}  {rating:<12}  {bar}")
+except KeyboardInterrupt:
+    print("\nStopped.")

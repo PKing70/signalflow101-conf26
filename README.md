@@ -10,11 +10,11 @@ This repository contains everything you need for the SignalFlow 101 workshop. Yo
 
 Click the button below to launch a pre-configured Python environment in your browser. No installation required.
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/splunk/signalflow101-conf26)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/PKing70/signalflow101-conf26)
 
 Once your Codespace is open:
 
-1. Open the `.env` file and fill in your workshop credentials (handed out at the start of the session)
+1. Open the `.env` file and fill in your workshop credentials and participant alias (handed out at the start of the session)
 2. Open `docs/EXERCISE_GUIDE.md` and follow along
 
 ---
@@ -29,6 +29,8 @@ signalflow101-conf26/
 │   └── devcontainer.json            ← Codespace configuration
 ├── requirements.txt                 ← Python dependencies (auto-installed)
 ├── config.py                        ← loads credentials from .env
+├── workshop_api.py                  ← personal API auto-started in Codespaces
+├── apdex.py                         ← reusable Apdex SignalFlow program builder
 ├── .env.example                     ← credential template — copy to .env
 │
 ├── exercises/                       ← in-workshop exercise scripts
@@ -36,7 +38,7 @@ signalflow101-conf26/
 │   ├── exercise2a.py                ← send real measured latency
 │   ├── exercise2b.py                ← investigate the fleet with SignalFlow
 │   ├── exercise3.py                 ← compute Apdex
-│   └── apdex.py                     ← reusable Apdex function (introduced in take-home 1)
+│   └── apdex.py                     ← compatibility import for the reusable Apdex function
 │
 ├── takehome/                        ← self-paced exercises for after the workshop
 │   ├── takehome1_api.py             ← FastAPI with GitHub downstream dependency
@@ -52,6 +54,7 @@ signalflow101-conf26/
 │
 ├── workshop-setup/                  ← instructor use only
 │   ├── build_dashboards.py          ← programmatically creates Fleet + Apdex dashboards
+│   ├── generate_participant_aliases.py ← creates participant-001 style aliases
 │   └── INSTRUCTOR_NOTES.md         ← day-of setup checklist
 │
 └── docs/
@@ -69,6 +72,7 @@ The workshop uses a shared instance provisioned via Splunk Show. To run these ex
 1. Open `.env` and replace the workshop values with your own access token and realm
 2. Your access token: **Settings → Access Tokens** in the O11y UI
 3. Your realm: **Settings → My Profile** in the O11y UI
+4. Use any unique `PARTICIPANT_ID` value, such as `participant-042`
 
 Don't have an instance yet? [Start a free trial](https://www.splunk.com/en_us/download/splunk-observability-cloud-free-trial.html).
 
