@@ -14,8 +14,10 @@ Click the button below to launch a pre-configured Python environment in your bro
 
 Once your Codespace is open:
 
-1. Open the `.env` file and fill in your workshop credentials and participant alias (handed out at the start of the session)
+1. Open the `.env` file and fill in the workshop realm, token secret(s), and your unique participant alias
 2. Open `docs/EXERCISE_GUIDE.md` and follow along
+
+For the workshop, each participant has their own development environment/login, but everyone sends data to the same Splunk Observability Cloud organization. The realm is shared, and `PARTICIPANT_ID` is what separates your metrics from everyone else's. Your instructor will tell you whether `SPLUNK_API_TOKEN` is a personal token from your Splunk O11y login or a shared workshop API token.
 
 ---
 
@@ -69,10 +71,11 @@ signalflow101-conf26/
 
 The workshop uses a shared instance provisioned via Splunk Show. To run these exercises against your own instance after the workshop:
 
-1. Open `.env` and replace the workshop values with your own access token and realm
-2. Your access token: **Settings → Access Tokens** in the O11y UI
-3. Your realm: **Settings → My Profile** in the O11y UI
-4. Use any unique `PARTICIPANT_ID` value, such as `participant-042`
+1. Open `.env` and replace the workshop values with your own token secrets and realm
+2. Your ingest token: **Settings → Access Tokens** in the O11y UI, with ingest authorization scope
+3. Your API token: your user API access token, or an access token with API authorization scope
+4. Your realm: **Settings → My Profile** in the O11y UI
+5. Use any unique `PARTICIPANT_ID` value, such as `participant-042`
 
 Don't have an instance yet? [Start a free trial](https://www.splunk.com/en_us/download/splunk-observability-cloud-free-trial.html).
 

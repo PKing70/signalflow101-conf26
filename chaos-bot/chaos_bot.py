@@ -33,12 +33,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-TOKEN = os.getenv("SPLUNK_ACCESS_TOKEN")
+TOKEN = os.getenv("SPLUNK_INGEST_TOKEN") or os.getenv("SPLUNK_ACCESS_TOKEN")
 REALM = os.getenv("SPLUNK_REALM")
 
 if not TOKEN or not REALM:
     raise EnvironmentError(
-        "SPLUNK_ACCESS_TOKEN and SPLUNK_REALM must be set in .env"
+        "SPLUNK_INGEST_TOKEN (or SPLUNK_ACCESS_TOKEN) and SPLUNK_REALM must be set in .env"
     )
 
 # The chaos bot always uses this participant_id - never an attendee's.

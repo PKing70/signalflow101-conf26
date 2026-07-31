@@ -8,8 +8,16 @@ Uses Critical severity — a sustained 2x burn rate is more serious
 than Apdex dropping below Good threshold (which used Warning).
 """
 
+import sys
+from pathlib import Path
+
 import requests
-from config import TOKEN, REALM, PARTICIPANT_ID
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from config import API_TOKEN, REALM, PARTICIPANT_ID
 
 API_URL = f"https://api.{REALM}.observability.splunkcloud.com"
 
@@ -21,10 +29,10 @@ BURN_RATE_THRESHOLD = 2.0
 signalflow_program = f"""
 latency = data('workshop.api.latency',
     filter=filter('participant_id', '{PARTICIPANT_ID}'),
-    rollup='count')
+    rollup='latest')
 
-total = latency.sum(over='{WINDOW}')
-frustrated = latency.map(lambda x: 1 if x >= 1200 else 0).sum(over='{WINDOW}')
+total = latency.map(lambda x: 1 if x is not None else 0).sum(over='{WINDOW}')
+frustrated = latency.map(lambda x: 1 if x is not None and x >= 1200 else 0).sum(over='{WINDOW}')
 current_error_rate = frustrated / total
 burn_rate = current_error_rate / {ALLOWED_ERROR_RATE}
 
@@ -56,7 +64,7 @@ response = requests.post(
     f"{API_URL}/v2/detector",
     headers={
         "Content-Type": "application/json",
-        "X-SF-TOKEN": TOKEN
+        "X-SF-TOKEN": API_TOKEN
     },
     json=detector
 )

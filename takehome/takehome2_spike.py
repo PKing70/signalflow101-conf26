@@ -11,9 +11,17 @@ Leave this running and watch for the alert in Splunk Observability Cloud.
 Press Ctrl+C to stop, then restart exercise2a.py to resolve the alert.
 """
 
+import sys
 import time
+from pathlib import Path
+
 import requests
-from config import TOKEN, REALM, PARTICIPANT_ID
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from config import INGEST_TOKEN, REALM, PARTICIPANT_ID
 
 INGEST_URL = f"https://ingest.{REALM}.observability.splunkcloud.com/v2/datapoint"
 
@@ -42,7 +50,7 @@ try:
             INGEST_URL,
             headers={
                 "Content-Type": "application/json",
-                "X-SF-TOKEN": TOKEN
+                "X-SF-TOKEN": INGEST_TOKEN
             },
             json=payload
         )

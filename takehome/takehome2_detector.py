@@ -9,8 +9,16 @@ After running, click the URL in the output to see your detector
 live in the Splunk Observability Cloud UI.
 """
 
+import sys
+from pathlib import Path
+
 import requests
-from config import TOKEN, REALM, PARTICIPANT_ID
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from config import API_TOKEN, REALM, PARTICIPANT_ID
 
 API_URL = f"https://api.{REALM}.observability.splunkcloud.com"
 
@@ -20,10 +28,10 @@ API_URL = f"https://api.{REALM}.observability.splunkcloud.com"
 signalflow_program = f"""
 latency = data('workshop.api.latency',
     filter=filter('participant_id', '{PARTICIPANT_ID}'),
-    rollup='count')
-satisfied = latency.map(lambda x: 1 if x < 300 else 0).sum(over='5m')
-tolerating = latency.map(lambda x: 1 if x >= 300 and x < 1200 else 0).sum(over='5m')
-total = latency.sum(over='5m')
+    rollup='latest')
+satisfied = latency.map(lambda x: 1 if x is not None and x < 300 else 0).sum(over='5m')
+tolerating = latency.map(lambda x: 1 if x is not None and x >= 300 and x < 1200 else 0).sum(over='5m')
+total = latency.map(lambda x: 1 if x is not None else 0).sum(over='5m')
 apdex = (satisfied + (tolerating / 2)) / total
 detect(when(apdex < 0.85, lasting='5m')).publish('Apdex below Good threshold')
 """
@@ -53,7 +61,7 @@ response = requests.post(
     f"{API_URL}/v2/detector",
     headers={
         "Content-Type": "application/json",
-        "X-SF-TOKEN": TOKEN
+        "X-SF-TOKEN": API_TOKEN
     },
     json=detector
 )

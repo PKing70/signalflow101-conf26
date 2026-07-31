@@ -17,7 +17,14 @@ close to an hour, results will reflect a partial window — still valid,
 just keep that context in mind.
 """
 
-from config import TOKEN, REALM, PARTICIPANT_ID
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from config import API_TOKEN, REALM, PARTICIPANT_ID
 from signalflow_rest import stream_signalflow
 
 SLO_TARGET = 0.995               # 99.5% of requests must be satisfied
@@ -28,10 +35,10 @@ BURN_RATE_THRESHOLD = 2.0        # Alert when burning twice as fast as sustainab
 program = f"""
 latency = data('workshop.api.latency',
     filter=filter('participant_id', '{PARTICIPANT_ID}'),
-    rollup='count')
+    rollup='latest')
 
-total = latency.sum(over='{WINDOW}')
-frustrated = latency.map(lambda x: 1 if x >= 1200 else 0).sum(over='{WINDOW}')
+total = latency.map(lambda x: 1 if x is not None else 0).sum(over='{WINDOW}')
+frustrated = latency.map(lambda x: 1 if x is not None and x >= 1200 else 0).sum(over='{WINDOW}')
 current_error_rate = frustrated / total
 burn_rate = current_error_rate / {ALLOWED_ERROR_RATE}
 
@@ -42,7 +49,7 @@ current_error_rate.publish('current_error_rate')
 latest = {}
 
 try:
-    for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+    for event_name, payload, metadata in stream_signalflow(program, API_TOKEN, REALM):
         if event_name != "data":
             continue
 

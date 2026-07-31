@@ -11,7 +11,14 @@ Then open the Fleet Dashboard in Splunk Observability Cloud to see
 the same data visualized live.
 """
 
-from config import TOKEN, REALM, PARTICIPANT_ID
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from config import API_TOKEN, REALM, PARTICIPANT_ID
 from signalflow_rest import stream_signalflow
 
 DISPLAY_LIMIT = 15
@@ -24,7 +31,7 @@ latency.publish('avg_latency_by_participant')
 results = {}
 
 try:
-    for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+    for event_name, payload, metadata in stream_signalflow(program, API_TOKEN, REALM):
         if event_name != "data":
             continue
 
