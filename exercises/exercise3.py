@@ -16,7 +16,14 @@ needs enough data to fill the 5-minute rolling window.
 Then open the Apdex Dashboard in Splunk Observability Cloud.
 """
 
-from config import TOKEN, REALM, PARTICIPANT_ID
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from config import API_TOKEN, REALM, PARTICIPANT_ID
 from signalflow_rest import stream_signalflow
 
 DISPLAY_LIMIT = 15
@@ -25,11 +32,11 @@ T = 300            # Satisfied threshold in ms
 T_tolerating = T * 4  # 1200ms — frustrated threshold
 
 program = f"""
-latency = data('workshop.api.latency', rollup='count')
+latency = data('workshop.api.latency', rollup='latest')
 
-satisfied = latency.map(lambda x: 1 if x < {T} else 0).sum(over='5m').sum(by=['participant_id'])
-tolerating = latency.map(lambda x: 1 if x >= {T} and x < {T_tolerating} else 0).sum(over='5m').sum(by=['participant_id'])
-total = latency.sum(over='5m').sum(by=['participant_id'])
+satisfied = latency.map(lambda x: 1 if x is not None and x < {T} else 0).sum(over='5m').sum(by=['participant_id'])
+tolerating = latency.map(lambda x: 1 if x is not None and x >= {T} and x < {T_tolerating} else 0).sum(over='5m').sum(by=['participant_id'])
+total = latency.map(lambda x: 1 if x is not None else 0).sum(over='5m').sum(by=['participant_id'])
 
 apdex = (satisfied + (tolerating / 2)) / total
 apdex.publish('apdex')
@@ -38,7 +45,7 @@ apdex.publish('apdex')
 results = {}
 
 try:
-    for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+    for event_name, payload, metadata in stream_signalflow(program, API_TOKEN, REALM):
         if event_name != "data":
             continue
 

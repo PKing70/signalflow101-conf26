@@ -8,9 +8,17 @@ Leave this running and open a second terminal for Exercise 2b.
 Press Ctrl+C to stop.
 """
 
+import sys
 import time
+from pathlib import Path
+
 import requests
-from config import TOKEN, REALM, PARTICIPANT_ID
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from config import INGEST_TOKEN, REALM, PARTICIPANT_ID
 
 INGEST_URL = f"https://ingest.{REALM}.observability.splunkcloud.com/v2/datapoint"
 
@@ -31,7 +39,7 @@ def send_latency(latency_ms):
         INGEST_URL,
         headers={
             "Content-Type": "application/json",
-            "X-SF-TOKEN": TOKEN
+            "X-SF-TOKEN": INGEST_TOKEN
         },
         json=payload
     )

@@ -7,16 +7,20 @@ This document is for the instructor. Attendees do not need to read this.
 ## Before the Conference (1–2 weeks out)
 
 - [ ] Provision Splunk Show workshop instance
-- [ ] Confirm realm and access token distribution method (QR / URL)
+- [ ] Confirm realm, ingest token, API token, and participant alias distribution method (QR / URL)
 - [ ] Generate participant aliases:
       ```
       python workshop-setup/generate_participant_aliases.py --count 200
+      ```
+- [ ] Run the live Splunk O11y smoke test:
+      ```
+      python workshop-setup/smoke_test_o11y.py
       ```
 - [ ] Run `workshop-setup/build_dashboards.py` to create Fleet and Apdex dashboards
 - [ ] Record the dashboard URLs and fill in the placeholders in `docs/EXERCISE_GUIDE.md`
 - [ ] Generate participant aliases from `participant-001` through expected room capacity
 - [ ] Confirm SignalFlow REST/SSE execution works from Codespaces
-- [ ] Confirm `rollup='count'` behavior in SignalFlow for bucket counting
+- [x] Confirm Apdex bucket counting uses latency values (`rollup='latest'`) rather than count rollups
 - [ ] Verify detector URL format: `https://app.{REALM}.observability.splunkcloud.com/#/detector/v2/{id}`
 - [ ] Confirm SignalFlow REST/SSE response parsing with real workshop data
 - [ ] Run the chaos bot for 30 minutes and verify it appears correctly in the Fleet Dashboard

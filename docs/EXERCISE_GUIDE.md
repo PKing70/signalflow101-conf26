@@ -51,23 +51,29 @@ The **"What does this code do?"** sections are optional and collapsed by default
 
 ## Getting Started: Your Workshop Credentials
 
-> 🔲 **Placeholder:** Splunk Show credential delivery instructions to be added once the workshop instance is provisioned. This section will include the QR code or URL for the credential page, login instructions, and where to find your access token, realm, and participant alias.
+> 🔲 **Placeholder:** Splunk Show credential delivery instructions to be added once the workshop instance is provisioned. This section will include the QR code or URL for the credential page, login instructions, and where to find your token secret(s), realm, and participant alias.
 
-Once you have your credentials, you'll need three pieces of information:
+For this workshop, your development environment/login is yours, but everyone sends data to the same Splunk Observability Cloud organization. Your `PARTICIPANT_ID` is what separates your metrics from everyone else's.
 
-- Your **access token** — provided via the workshop credentials page
-- Your **realm** — for example, `us1` or `us0`; also provided with your credentials
-- Your **participant ID** — an alias such as `participant-042`
+You'll need these values:
+
+- The shared **realm** — for example, `us1` or `us0`
+- The shared **ingest token secret** — used when Python sends metric datapoints
+- Your **API token secret** — used when Python runs SignalFlow queries
+- Your unique **participant ID** — an alias such as `participant-042`
+
+Your instructor will tell you whether the API token is copied from your own Splunk O11y login or provided as a shared workshop API token. If the credential sheet provides only one workshop token secret, use that same value for both token fields.
 
 Open the file called `.env` in your Codespace. It looks like this:
 
 ```
-SPLUNK_ACCESS_TOKEN=your-token-here
 SPLUNK_REALM=your-realm-here
+SPLUNK_INGEST_TOKEN=your-ingest-token-secret-here
+SPLUNK_API_TOKEN=your-api-token-secret-here
 PARTICIPANT_ID=participant-042
 ```
 
-Replace the placeholder values with your credentials and participant alias, then save the file. Every script in this workshop reads from this file automatically — you won't need to enter your credentials again.
+Replace the placeholder values, then save the file. Every script in this workshop reads from this file automatically — you won't need to enter these values again.
 
 ---
 
@@ -92,7 +98,7 @@ Now let's send a metric. Paste the following into the file called `exercise1.py`
 ```python
 import requests
 import random
-from config import TOKEN, REALM, PARTICIPANT_ID
+from config import INGEST_TOKEN, REALM, PARTICIPANT_ID
 
 # Generate a fake latency value between 100ms and 500ms
 latency = random.uniform(100, 500)
@@ -113,7 +119,7 @@ response = requests.post(
     f"https://ingest.{REALM}.observability.splunkcloud.com/v2/datapoint",
     headers={
         "Content-Type": "application/json",
-        "X-SF-TOKEN": TOKEN
+        "X-SF-TOKEN": INGEST_TOKEN
     },
     json=payload
 )
@@ -145,7 +151,7 @@ When you find your metric, you're looking for `workshop.api.latency` filtered by
 <summary><strong>What does this code do? (optional)</strong></summary>
 
 **The imports**
-The first few lines load tools we need. Think of `import` like opening an app before you use it — `requests` is how Python sends data over the internet, and `random` generates the fake latency value. `from config import` pulls your credentials from the `.env` file you configured earlier — `TOKEN`, `REALM`, and `PARTICIPANT_ID` are available throughout the script without repeating the setup code.
+The first few lines load tools we need. Think of `import` like opening an app before you use it — `requests` is how Python sends data over the internet, and `random` generates the fake latency value. `from config import` pulls your settings from the `.env` file you configured earlier — `INGEST_TOKEN`, `REALM`, and `PARTICIPANT_ID` are available throughout the script without repeating the setup code.
 
 **The payload**
 This is the metric itself — structured the way Splunk Observability Cloud expects to receive it. It has three parts: a name (`workshop.api.latency`), a value (your random latency number), and a dimension (`participant_id`) that tags the metric as yours.
@@ -188,7 +194,7 @@ Your Codespace is already running a FastAPI that responds to requests and measur
 ```python
 import time
 import requests
-from config import TOKEN, REALM, PARTICIPANT_ID
+from config import INGEST_TOKEN, REALM, PARTICIPANT_ID
 
 INGEST_URL = f"https://ingest.{REALM}.observability.splunkcloud.com/v2/datapoint"
 
@@ -208,7 +214,7 @@ def send_latency(latency_ms):
         INGEST_URL,
         headers={
             "Content-Type": "application/json",
-            "X-SF-TOKEN": TOKEN
+            "X-SF-TOKEN": INGEST_TOKEN
         },
         json=payload
     )
@@ -275,7 +281,7 @@ Rather than writing the ingest call directly in the loop, we've wrapped it in a 
 With everyone's metrics flowing, let's look at the whole picture. Paste the following into `exercise2b.py` in your second terminal and click **Run**:
 
 ```python
-from config import TOKEN, REALM, PARTICIPANT_ID
+from config import API_TOKEN, REALM, PARTICIPANT_ID
 from signalflow_rest import stream_signalflow
 
 DISPLAY_LIMIT = 15
@@ -288,7 +294,7 @@ latency.publish('avg_latency_by_participant')
 results = {}
 
 try:
-    for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+    for event_name, payload, metadata in stream_signalflow(program, API_TOKEN, REALM):
         if event_name != "data":
             continue
 
@@ -402,7 +408,7 @@ Scores are interpreted as follows:
 Splunk Observability Cloud can show you latency. It can't compute Apdex — at least not without SignalFlow. Paste the following into `exercise3.py` and click **Run**:
 
 ```python
-from config import TOKEN, REALM, PARTICIPANT_ID
+from config import API_TOKEN, REALM, PARTICIPANT_ID
 from signalflow_rest import stream_signalflow
 
 DISPLAY_LIMIT = 15
@@ -411,11 +417,11 @@ T = 300           # Satisfied threshold in ms
 T_tolerating = T * 4  # 1200ms — frustrated threshold
 
 program = f"""
-latency = data('workshop.api.latency', rollup='count')
+latency = data('workshop.api.latency', rollup='latest')
 
-satisfied = latency.map(lambda x: 1 if x < {T} else 0).sum(over='5m').sum(by=['participant_id'])
-tolerating = latency.map(lambda x: 1 if x >= {T} and x < {T_tolerating} else 0).sum(over='5m').sum(by=['participant_id'])
-total = latency.sum(over='5m').sum(by=['participant_id'])
+satisfied = latency.map(lambda x: 1 if x is not None and x < {T} else 0).sum(over='5m').sum(by=['participant_id'])
+tolerating = latency.map(lambda x: 1 if x is not None and x >= {T} and x < {T_tolerating} else 0).sum(over='5m').sum(by=['participant_id'])
+total = latency.map(lambda x: 1 if x is not None else 0).sum(over='5m').sum(by=['participant_id'])
 
 apdex = (satisfied + (tolerating / 2)) / total
 apdex.publish('apdex')
@@ -424,7 +430,7 @@ apdex.publish('apdex')
 results = {}
 
 try:
-    for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+    for event_name, payload, metadata in stream_signalflow(program, API_TOKEN, REALM):
         if event_name != "data":
             continue
 
@@ -496,8 +502,8 @@ Now open the Apdex Dashboard in Splunk Observability Cloud.
 **The SignalFlow program**
 This is more involved than Exercise 2, but it follows the Apdex formula directly:
 
-- `data('workshop.api.latency', rollup='count')` retrieves the latency stream. The `rollup='count'` argument tells SignalFlow to treat each data point as an individual measurement rather than averaging them — which is what we need for counting requests in each bucket.
-- `latency.map(lambda x: 1 if x < 300 else 0)` transforms each data point: if the latency was under 300ms it becomes 1 (satisfied); otherwise 0. This is how SignalFlow counts requests that meet a condition.
+- `data('workshop.api.latency', rollup='latest')` retrieves the latency stream while preserving the latest latency value in each rollup interval. That matters because we need to compare latency values against Apdex thresholds.
+- `latency.map(lambda x: 1 if x is not None and x < 300 else 0)` transforms each present data point: if the latency was under 300ms it becomes 1 (satisfied); otherwise 0. This is how SignalFlow counts requests that meet a condition.
 - `.sum(over='5m').sum(by=['participant_id'])` adds up those 1s and 0s over a 5-minute window, grouped by participant. The result is a count of satisfied requests per participant over the last 5 minutes.
 - The same pattern produces `tolerating` — requests between 300ms and 1200ms.
 - `total` counts all requests regardless of latency.
@@ -566,10 +572,10 @@ def build_apdex_program(metric_name, t=300, window='5m'):
     """
     t_tolerating = t * 4
     return f"""
-latency = data('{metric_name}', rollup='count')
-satisfied = latency.map(lambda x: 1 if x < {t} else 0).sum(over='{window}').sum(by=['participant_id'])
-tolerating = latency.map(lambda x: 1 if x >= {t} and x < {t_tolerating} else 0).sum(over='{window}').sum(by=['participant_id'])
-total = latency.sum(over='{window}').sum(by=['participant_id'])
+latency = data('{metric_name}', rollup='latest')
+satisfied = latency.map(lambda x: 1 if x is not None and x < {t} else 0).sum(over='{window}').sum(by=['participant_id'])
+tolerating = latency.map(lambda x: 1 if x is not None and x >= {t} and x < {t_tolerating} else 0).sum(over='{window}').sum(by=['participant_id'])
+total = latency.map(lambda x: 1 if x is not None else 0).sum(over='{window}').sum(by=['participant_id'])
 apdex = (satisfied + (tolerating / 2)) / total
 apdex.publish('apdex')
 """
@@ -685,7 +691,7 @@ import os
 import time
 import requests
 from dotenv import load_dotenv
-from config import TOKEN, REALM, PARTICIPANT_ID
+from config import INGEST_TOKEN, REALM, PARTICIPANT_ID
 
 load_dotenv()
 
@@ -720,7 +726,7 @@ while True:
         INGEST_URL,
         headers={
             "Content-Type": "application/json",
-            "X-SF-TOKEN": TOKEN
+            "X-SF-TOKEN": INGEST_TOKEN
         },
         json=payload
     )
@@ -769,7 +775,7 @@ Ten seconds between sends matches the interval in `exercise2a.py`. This gives Sp
 Open a third terminal and paste the following into `takehome1_apdex.py`, then click **Run**:
 
 ```python
-from config import TOKEN, REALM
+from config import API_TOKEN, REALM
 from apdex import build_apdex_program
 from signalflow_rest import stream_signalflow
 
@@ -778,7 +784,7 @@ program = build_apdex_program('workshop.github.latency')
 results = {}
 
 try:
-    for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+    for event_name, payload, metadata in stream_signalflow(program, API_TOKEN, REALM):
         if event_name != "data":
             continue
 
@@ -852,7 +858,7 @@ Paste the following into `takehome2_detector.py` and click **Run**:
 
 ```python
 import requests
-from config import TOKEN, REALM, PARTICIPANT_ID
+from config import API_TOKEN, REALM, PARTICIPANT_ID
 
 API_URL = f"https://api.{REALM}.observability.splunkcloud.com"
 
@@ -861,10 +867,10 @@ API_URL = f"https://api.{REALM}.observability.splunkcloud.com"
 signalflow_program = f"""
 latency = data('workshop.api.latency',
     filter=filter('participant_id', '{PARTICIPANT_ID}'),
-    rollup='count')
-satisfied = latency.map(lambda x: 1 if x < 300 else 0).sum(over='5m')
-tolerating = latency.map(lambda x: 1 if x >= 300 and x < 1200 else 0).sum(over='5m')
-total = latency.sum(over='5m')
+    rollup='latest')
+satisfied = latency.map(lambda x: 1 if x is not None and x < 300 else 0).sum(over='5m')
+tolerating = latency.map(lambda x: 1 if x is not None and x >= 300 and x < 1200 else 0).sum(over='5m')
+total = latency.map(lambda x: 1 if x is not None else 0).sum(over='5m')
 apdex = (satisfied + (tolerating / 2)) / total
 detect(when(apdex < 0.85, lasting='5m')).publish('Apdex below Good threshold')
 """
@@ -894,7 +900,7 @@ response = requests.post(
     f"{API_URL}/v2/detector",
     headers={
         "Content-Type": "application/json",
-        "X-SF-TOKEN": TOKEN
+        "X-SF-TOKEN": API_TOKEN
     },
     json=detector
 )
@@ -953,7 +959,7 @@ Now let's make the alert fire. Paste the following into `takehome2_spike.py` and
 ```python
 import time
 import requests
-from config import TOKEN, REALM, PARTICIPANT_ID
+from config import INGEST_TOKEN, REALM, PARTICIPANT_ID
 
 INGEST_URL = f"https://ingest.{REALM}.observability.splunkcloud.com/v2/datapoint"
 
@@ -981,7 +987,7 @@ while True:
         INGEST_URL,
         headers={
             "Content-Type": "application/json",
-            "X-SF-TOKEN": TOKEN
+            "X-SF-TOKEN": INGEST_TOKEN
         },
         json=payload
     )
@@ -1078,7 +1084,7 @@ We're using a 1-hour window rather than the production-standard 30 days because 
 Paste the following into `takehome3_slo.py` and click **Run**:
 
 ```python
-from config import TOKEN, REALM, PARTICIPANT_ID
+from config import API_TOKEN, REALM, PARTICIPANT_ID
 from signalflow_rest import stream_signalflow
 
 SLO_TARGET = 0.995              # 99.5% of requests must be satisfied
@@ -1089,10 +1095,10 @@ BURN_RATE_THRESHOLD = 2.0       # Alert when burning budget twice as fast as sus
 program = f"""
 latency = data('workshop.api.latency',
     filter=filter('participant_id', '{PARTICIPANT_ID}'),
-    rollup='count')
+    rollup='latest')
 
-total = latency.sum(over='{WINDOW}')
-frustrated = latency.map(lambda x: 1 if x >= 1200 else 0).sum(over='{WINDOW}')
+total = latency.map(lambda x: 1 if x is not None else 0).sum(over='{WINDOW}')
+frustrated = latency.map(lambda x: 1 if x is not None and x >= 1200 else 0).sum(over='{WINDOW}')
 current_error_rate = frustrated / total
 burn_rate = current_error_rate / {ALLOWED_ERROR_RATE}
 
@@ -1103,7 +1109,7 @@ current_error_rate.publish('current_error_rate')
 latest = {}
 
 try:
-    for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+    for event_name, payload, metadata in stream_signalflow(program, API_TOKEN, REALM):
         if event_name != "data":
             continue
 
@@ -1190,7 +1196,7 @@ Now let's make Splunk Observability Cloud watch this for you automatically. Past
 
 ```python
 import requests
-from config import TOKEN, REALM, PARTICIPANT_ID
+from config import API_TOKEN, REALM, PARTICIPANT_ID
 
 API_URL = f"https://api.{REALM}.observability.splunkcloud.com"
 
@@ -1202,10 +1208,10 @@ BURN_RATE_THRESHOLD = 2.0
 signalflow_program = f"""
 latency = data('workshop.api.latency',
     filter=filter('participant_id', '{PARTICIPANT_ID}'),
-    rollup='count')
+    rollup='latest')
 
-total = latency.sum(over='{WINDOW}')
-frustrated = latency.map(lambda x: 1 if x >= 1200 else 0).sum(over='{WINDOW}')
+total = latency.map(lambda x: 1 if x is not None else 0).sum(over='{WINDOW}')
+frustrated = latency.map(lambda x: 1 if x is not None and x >= 1200 else 0).sum(over='{WINDOW}')
 current_error_rate = frustrated / total
 burn_rate = current_error_rate / {ALLOWED_ERROR_RATE}
 
@@ -1237,7 +1243,7 @@ response = requests.post(
     f"{API_URL}/v2/detector",
     headers={
         "Content-Type": "application/json",
-        "X-SF-TOKEN": TOKEN
+        "X-SF-TOKEN": API_TOKEN
     },
     json=detector
 )
@@ -1310,7 +1316,16 @@ SPLUNK_REALM=your-own-realm
 PARTICIPANT_ID=participant-042
 ```
 
-Your access token and realm are available in your Splunk Observability Cloud account under **Settings → Access Tokens** and **Settings → My Profile** respectively. Everything else stays the same — the scripts, the SignalFlow programs, and the detector definitions all work against any Splunk Observability Cloud org without modification.
+If you are using the split-token setup, use this format instead:
+
+```
+SPLUNK_REALM=your-own-realm
+SPLUNK_INGEST_TOKEN=your-own-ingest-token-secret
+SPLUNK_API_TOKEN=your-own-api-token-secret
+PARTICIPANT_ID=participant-042
+```
+
+Your access tokens and realm are available in your Splunk Observability Cloud account under **Settings → Access Tokens** and **Settings → My Profile** respectively. Everything else stays the same — the scripts, the SignalFlow programs, and the detector definitions all work against any Splunk Observability Cloud org without modification.
 
 ### If you don't have a Splunk Observability Cloud org yet
 
@@ -1318,7 +1333,7 @@ Splunk offers a free trial that gives you full access to Splunk Observability Cl
 
 **[https://www.splunk.com/en_us/download/splunk-observability-cloud-free-trial.html](https://www.splunk.com/en_us/download/splunk-observability-cloud-free-trial.html)**
 
-Once your trial is provisioned, find your access token and realm in the account settings and update your `.env` file as described above.
+Once your trial is provisioned, find your token secret(s) and realm in the account settings and update your `.env` file as described above.
 
 ### If your Codespace has expired
 

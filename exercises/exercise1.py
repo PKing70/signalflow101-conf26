@@ -9,8 +9,16 @@ O11y Data Explorer filtered by your participant_id.
 """
 
 import random
+import sys
+from pathlib import Path
+
 import requests
-from config import TOKEN, REALM, PARTICIPANT_ID
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from config import INGEST_TOKEN, REALM, PARTICIPANT_ID
 
 # Generate a fake latency value between 100ms and 500ms.
 # We'll replace this with a real measured value in Exercise 2.
@@ -32,7 +40,7 @@ response = requests.post(
     f"https://ingest.{REALM}.observability.splunkcloud.com/v2/datapoint",
     headers={
         "Content-Type": "application/json",
-        "X-SF-TOKEN": TOKEN
+        "X-SF-TOKEN": INGEST_TOKEN
     },
     json=payload
 )

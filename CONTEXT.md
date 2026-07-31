@@ -55,9 +55,11 @@ another. This workshop shows attendees what SignalFlow unlocks beyond the UI.
 
 ## Key Design Decisions (and why — important for new co-presenter too)
 
-**Shared O11y instance, not per-attendee**
-One shared Splunk Show instance for up to 200 attendees. Simpler credential
-distribution, social "whole class" dashboard moment, one cleanup job.
+**Shared O11y organization, not per-attendee O11y**
+Each attendee has their own development environment/login, but the workshop
+uses one shared Splunk Observability Cloud organization for up to 200
+attendees. This gives us the social "whole class" dashboard moment and one
+cleanup job.
 
 **participant_id dimension = participant alias**
 Use aliases like `participant-001` through `participant-200`, not attendee
@@ -95,7 +97,7 @@ This is stated explicitly in Exercise 2's talking points and the slide deck.
 ```
 signalflow101-conf26/
 ├── README.md
-├── config.py                    ← loads .env, exports TOKEN/REALM/PARTICIPANT_ID
+├── config.py                    ← loads .env, exports INGEST_TOKEN/API_TOKEN/REALM/PARTICIPANT_ID
 ├── workshop_api.py              ← personal API auto-started in Codespaces
 ├── signalflow_rest.py           ← direct SignalFlow REST/SSE helper
 ├── apdex.py                     ← reusable build_apdex_program() function
@@ -136,14 +138,14 @@ signalflow101-conf26/
 ## Python / API Approach
 
 **Credential loading:** All scripts import from `config.py` at repo root.
-`config.py` uses `python-dotenv` to load `.env` and validates all three
-required values (TOKEN, REALM, PARTICIPANT_ID) on import, failing fast
+`config.py` uses `python-dotenv` to load `.env` and validates the required
+values (INGEST_TOKEN, API_TOKEN, REALM, PARTICIPANT_ID) on import, failing fast
 with a clear message if any are missing.
 
 **Metric ingest (Exercises 1, 2a, chaos-bot, take-home senders):**
 Direct REST API via `requests.post()` to:
 `https://ingest.{REALM}.observability.splunkcloud.com/v2/datapoint`
-Header: `X-SF-TOKEN: {TOKEN}`
+Header: `X-SF-TOKEN: {INGEST_TOKEN}`
 
 **SignalFlow computations (Exercises 2b, 3, take-home Apdex/SLO):**
 Uses direct REST via `requests.post()` to:
@@ -154,7 +156,7 @@ Pattern used throughout:
 ```python
 from signalflow_rest import stream_signalflow
 
-for event_name, payload, metadata in stream_signalflow(program, TOKEN, REALM):
+for event_name, payload, metadata in stream_signalflow(program, API_TOKEN, REALM):
     if event_name == "data":
         for point in payload.get("data", []):
             tsid = point.get("tsId")
@@ -182,7 +184,8 @@ Parameters (tunable at top of file):
 - Expected Apdex: ~0.50–0.55 (Poor) vs attendees at ~0.95+ (Excellent)
 
 Run from repo root: `python chaos-bot/chaos_bot.py`
-Requires only SPLUNK_ACCESS_TOKEN and SPLUNK_REALM in .env (not PARTICIPANT_ID).
+Requires only SPLUNK_INGEST_TOKEN (or SPLUNK_ACCESS_TOKEN fallback) and
+SPLUNK_REALM in .env (not PARTICIPANT_ID).
 
 ---
 
@@ -202,8 +205,10 @@ Ratings: 0.94+ Excellent | 0.85+ Good | 0.70+ Fair | 0.50+ Poor | <0.50 Unaccept
 
 The reusable function `build_apdex_program(metric_name, t=300, window='5m')`
 in root-level `apdex.py` generates the full SignalFlow program string.
-⚠️ VERIFY: `rollup='count'` behavior — is this the correct parameter for
-treating each data point as an individual measurement for bucket counting?
+Verified against live O11y data: Apdex bucket counting must classify latency
+values, so the program uses `rollup='latest'` and maps each present value to
+bucket counters. `rollup='count'` counts datapoints in the rollup interval and
+does not preserve the latency value for threshold comparisons.
 
 ---
 
@@ -229,7 +234,7 @@ lasting='10m'). ~25–35 min.
 
 ### Must resolve before conference (requires O11y instance):
 - [ ] Verify SignalFlow REST/SSE parsing against the real O11y instance
-- [ ] Verify `rollup='count'` for bucket counting in SignalFlow
+- [x] Verify Apdex bucket counting semantics in SignalFlow
 - [ ] Verify detector URL format in O11y UI
 - [ ] Implement `workshop-setup/build_dashboards.py`
 - [ ] Fill in O11y navigation steps (3 placeholders in EXERCISE_GUIDE.md):
@@ -292,7 +297,7 @@ Slide structure:
 1. **Validate Exercise 1** against free trial O11y instance — proves ingest works
 2. **Verify participant_id aliases** such as `participant-042` group correctly
 3. **Verify SignalFlow REST/SSE helper** — run exercise2b.py
-4. **Verify rollup='count'** behavior — run exercise3.py
+4. **Verify Apdex bucket counting** — run exercise3.py against live data
 5. **Run chaos-bot** and observe in O11y — tune parameters if needed
 6. **Implement build_dashboards.py** — Fleet Dashboard and Apdex Dashboard
 7. **Fill in exercise doc placeholders** as each piece is verified

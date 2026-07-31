@@ -9,10 +9,18 @@ Press Ctrl+C to stop.
 """
 
 import os
+import sys
 import time
+from pathlib import Path
+
 import requests
 from dotenv import load_dotenv
-from config import TOKEN, REALM, PARTICIPANT_ID
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from config import INGEST_TOKEN, REALM, PARTICIPANT_ID
 
 load_dotenv()
 
@@ -53,7 +61,7 @@ try:
             INGEST_URL,
             headers={
                 "Content-Type": "application/json",
-                "X-SF-TOKEN": TOKEN
+                "X-SF-TOKEN": INGEST_TOKEN
             },
             json=payload
         )

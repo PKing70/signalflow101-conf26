@@ -29,7 +29,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-TOKEN = os.getenv("SPLUNK_ACCESS_TOKEN")
+TOKEN = os.getenv("SPLUNK_API_TOKEN") or os.getenv("SPLUNK_ACCESS_TOKEN")
 REALM = os.getenv("SPLUNK_REALM")
 
 API_URL = f"https://api.{REALM}.observability.splunkcloud.com"
