@@ -16,14 +16,14 @@ This document is for the instructor. Attendees do not need to read this.
       ```
       python workshop-setup/smoke_test_o11y.py
       ```
-- [ ] Run `workshop-setup/build_dashboards.py` to create Fleet and Apdex dashboards
-- [ ] Record the dashboard URLs and fill in the placeholders in `docs/EXERCISE_GUIDE.md`
+- [x] Run `workshop-setup/build_dashboards.py` to create/update the workshop dashboard
+- [x] Record the dashboard URL in `docs/EXERCISE_GUIDE.md`
 - [ ] Generate participant aliases from `participant-001` through expected room capacity
 - [ ] Confirm SignalFlow REST/SSE execution works from Codespaces
 - [x] Confirm Apdex bucket counting uses latency values (`rollup='latest'`) rather than count rollups
 - [ ] Verify detector URL format: `https://app.{REALM}.observability.splunkcloud.com/#/detector/v2/{id}`
 - [ ] Confirm SignalFlow REST/SSE response parsing with real workshop data
-- [ ] Run the chaos bot for 30 minutes and verify it appears correctly in the Fleet Dashboard
+- [ ] Run the chaos bot for 30 minutes and verify it appears correctly in the workshop dashboard
 - [ ] Do a full dry run of all three exercises end-to-end, timed
 
 ## Day Before
@@ -32,7 +32,7 @@ This document is for the instructor. Attendees do not need to read this.
       ```
       python chaos-bot/chaos_bot.py
       ```
-- [ ] Verify chaos-bot metrics are flowing in the O11y Fleet Dashboard
+- [ ] Verify chaos-bot metrics are flowing in the O11y workshop dashboard
 - [ ] Confirm Apdex score for chaos-bot is Poor (~0.50–0.55)
 - [ ] Confirm Apdex scores for normal (clean) metrics are Excellent (~0.95+)
 - [ ] Prepare credential distribution (print sheets / QR code slide ready)
@@ -41,7 +41,7 @@ This document is for the instructor. Attendees do not need to read this.
 ## Day Of — Before Attendees Arrive
 
 - [ ] Chaos bot is running and anomalous in the dashboard
-- [ ] Fleet Dashboard and Apdex Dashboard are visible and loading
+- [ ] Workshop dashboard is visible and loading
 - [ ] Credential sheets / QR codes ready for distribution
 - [ ] Slide deck loaded and presenting correctly
 - [ ] Spare laptop with exercise doc open as instructor reference
@@ -77,7 +77,7 @@ The bot sends as `participant-000` with:
 
 **SignalFlow computation returns no data:** The 1-minute and 5-minute windows need data to fill. Wait a minute and try again.
 
-**Chaos-bot not visible:** Confirm the bot is running, the `participant_id` dimension is exactly `participant-000`, and the Fleet Dashboard filter is set correctly.
+**Chaos-bot not visible:** Confirm the bot is running, the `participant_id` dimension is exactly `participant-000`, and the workshop dashboard filter is set correctly.
 
 ## Post-Workshop
 

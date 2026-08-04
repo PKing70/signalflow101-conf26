@@ -341,9 +341,11 @@ participant-042                          143.2ms  ██████████
 
 One participant stands out. That's not a coincidence.
 
-Now open the Fleet Dashboard in Splunk Observability Cloud to see the same data visualized live.
+Now open the workshop dashboard in Splunk Observability Cloud to see the same data visualized live:
 
-> 🔲 **Placeholder:** O11y Fleet Dashboard navigation steps — to be added once the workshop instance is provisioned.
+https://app.us1.observability.splunkcloud.com/#/dashboard/HOkNhxUAwAE?groupId=HOkNjAJA4AM
+
+In the dashboard group **SignalFlow 101 - .conf26**, open **SignalFlow 101 - Workshop Fleet** and look at **Fleet latency by participant**. The same outlier should stand out there.
 
 <details>
 <summary><strong>What does this code do? (optional)</strong></summary>
@@ -361,7 +363,7 @@ The string assigned to `program` is a SignalFlow program — the same language r
 The `tsid` is an internal identifier — a short string that SignalFlow uses to track each time series. SignalFlow sends metadata messages that translate each `tsid` back into the dimensions we know — in this case, `participant_id`. That's how we connect a raw number to a participant alias.
 
 **The bar chart**
-Each `█` character represents 10ms of latency. It makes the outlier immediately obvious without needing to open a separate tool. The console output is a confidence check that your code is working — the Fleet Dashboard in Splunk Observability Cloud is the full visual.
+Each `█` character represents 10ms of latency. It makes the outlier immediately obvious without needing to open a separate tool. The console output is a confidence check that your code is working — the workshop dashboard in Splunk Observability Cloud is the full visual.
 
 </details>
 
@@ -419,9 +421,9 @@ T_tolerating = T * 4  # 1200ms — frustrated threshold
 program = f"""
 latency = data('workshop.api.latency', rollup='latest')
 
-satisfied = latency.map(lambda x: 1 if x is not None and x < {T} else 0).sum(over='5m').sum(by=['participant_id'])
-tolerating = latency.map(lambda x: 1 if x is not None and x >= {T} and x < {T_tolerating} else 0).sum(over='5m').sum(by=['participant_id'])
-total = latency.map(lambda x: 1 if x is not None else 0).sum(over='5m').sum(by=['participant_id'])
+satisfied = latency.map(lambda x: 1 if x is not None and x < {T} else 0).sum(by=['participant_id']).sum(over='5m')
+tolerating = latency.map(lambda x: 1 if x is not None and x >= {T} and x < {T_tolerating} else 0).sum(by=['participant_id']).sum(over='5m')
+total = latency.map(lambda x: 1 if x is not None else 0).sum(by=['participant_id']).sum(over='5m')
 
 apdex = (satisfied + (tolerating / 2)) / total
 apdex.publish('apdex')
@@ -489,9 +491,7 @@ participant-117                          0.95  Excellent     ██████�
 
 The chaos-bot's Apdex score tells a clearer story than its raw latency alone. It's not just slow — by an industry-standard measure, it's delivering a poor experience.
 
-Now open the Apdex Dashboard in Splunk Observability Cloud.
-
-> 🔲 **Placeholder:** O11y Apdex Dashboard navigation steps — to be added once the workshop instance is provisioned.
+Return to the same workshop dashboard and look at **Apdex by participant**. The chaos-bot should now show a Poor or Unacceptable score while normal participants remain Excellent.
 
 <details>
 <summary><strong>What does this code do? (optional)</strong></summary>
@@ -504,7 +504,7 @@ This is more involved than Exercise 2, but it follows the Apdex formula directly
 
 - `data('workshop.api.latency', rollup='latest')` retrieves the latency stream while preserving the latest latency value in each rollup interval. That matters because we need to compare latency values against Apdex thresholds.
 - `latency.map(lambda x: 1 if x is not None and x < 300 else 0)` transforms each present data point: if the latency was under 300ms it becomes 1 (satisfied); otherwise 0. This is how SignalFlow counts requests that meet a condition.
-- `.sum(over='5m').sum(by=['participant_id'])` adds up those 1s and 0s over a 5-minute window, grouped by participant. The result is a count of satisfied requests per participant over the last 5 minutes.
+- `.sum(by=['participant_id']).sum(over='5m')` groups those 1s and 0s by participant, then adds them up over a 5-minute window. The result is a count of satisfied requests per participant over the last 5 minutes.
 - The same pattern produces `tolerating` — requests between 300ms and 1200ms.
 - `total` counts all requests regardless of latency.
 - The final line is the Apdex formula expressed as stream arithmetic: `(satisfied + (tolerating / 2)) / total`. SignalFlow handles the division of two streams natively.
@@ -525,7 +525,7 @@ You computed a metric that Splunk Observability Cloud doesn't ship — using the
 
 That's what SignalFlow as an API unlocks. The UI gives you a powerful set of built-in analytics. The API gives you the engine underneath — and the engine can compute anything you can express mathematically. Apdex today. Error budget burn rate in the take-home exercises. A custom composite health score for your own business logic whenever you need one.
 
-> 🔵 **Checkpoint 3** — Look up when you reach this point. We'll discuss the Apdex scores, confirm the chaos-bot is the culprit, and look at the Apdex Dashboard together before closing out the in-room exercises.
+> 🔵 **Checkpoint 3** — Look up when you reach this point. We'll discuss the Apdex scores, confirm the chaos-bot is the culprit, and look at the workshop dashboard together before closing out the in-room exercises.
 
 ---
 
@@ -573,9 +573,9 @@ def build_apdex_program(metric_name, t=300, window='5m'):
     t_tolerating = t * 4
     return f"""
 latency = data('{metric_name}', rollup='latest')
-satisfied = latency.map(lambda x: 1 if x is not None and x < {t} else 0).sum(over='{window}').sum(by=['participant_id'])
-tolerating = latency.map(lambda x: 1 if x is not None and x >= {t} and x < {t_tolerating} else 0).sum(over='{window}').sum(by=['participant_id'])
-total = latency.map(lambda x: 1 if x is not None else 0).sum(over='{window}').sum(by=['participant_id'])
+satisfied = latency.map(lambda x: 1 if x is not None and x < {t} else 0).sum(by=['participant_id']).sum(over='{window}')
+tolerating = latency.map(lambda x: 1 if x is not None and x >= {t} and x < {t_tolerating} else 0).sum(by=['participant_id']).sum(over='{window}')
+total = latency.map(lambda x: 1 if x is not None else 0).sum(by=['participant_id']).sum(over='{window}')
 apdex = (satisfied + (tolerating / 2)) / total
 apdex.publish('apdex')
 """

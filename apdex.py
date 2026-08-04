@@ -14,9 +14,9 @@ def build_apdex_program(metric_name, t=300, window="5m"):
     t_tolerating = t * 4
     return f"""
 latency = data('{metric_name}', rollup='latest')
-satisfied = latency.map(lambda x: 1 if x is not None and x < {t} else 0).sum(over='{window}').sum(by=['participant_id'])
-tolerating = latency.map(lambda x: 1 if x is not None and x >= {t} and x < {t_tolerating} else 0).sum(over='{window}').sum(by=['participant_id'])
-total = latency.map(lambda x: 1 if x is not None else 0).sum(over='{window}').sum(by=['participant_id'])
+satisfied = latency.map(lambda x: 1 if x is not None and x < {t} else 0).sum(by=['participant_id']).sum(over='{window}')
+tolerating = latency.map(lambda x: 1 if x is not None and x >= {t} and x < {t_tolerating} else 0).sum(by=['participant_id']).sum(over='{window}')
+total = latency.map(lambda x: 1 if x is not None else 0).sum(by=['participant_id']).sum(over='{window}')
 apdex = (satisfied + (tolerating / 2)) / total
 apdex.publish('apdex')
 """
