@@ -55,7 +55,7 @@ signalflow101-conf26/
 │   └── chaos_bot.py                 ← instructor-run bot that seeds the fleet mystery
 │
 ├── workshop-setup/                  ← instructor use only
-│   ├── build_dashboards.py          ← programmatically creates Fleet + Apdex dashboards
+│   ├── build_dashboards.py          ← programmatically creates/updates the workshop dashboard
 │   ├── generate_participant_aliases.py ← creates participant-001 style aliases
 │   └── INSTRUCTOR_NOTES.md         ← day-of setup checklist
 │

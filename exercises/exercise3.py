@@ -34,9 +34,9 @@ T_tolerating = T * 4  # 1200ms — frustrated threshold
 program = f"""
 latency = data('workshop.api.latency', rollup='latest')
 
-satisfied = latency.map(lambda x: 1 if x is not None and x < {T} else 0).sum(over='5m').sum(by=['participant_id'])
-tolerating = latency.map(lambda x: 1 if x is not None and x >= {T} and x < {T_tolerating} else 0).sum(over='5m').sum(by=['participant_id'])
-total = latency.map(lambda x: 1 if x is not None else 0).sum(over='5m').sum(by=['participant_id'])
+satisfied = latency.map(lambda x: 1 if x is not None and x < {T} else 0).sum(by=['participant_id']).sum(over='5m')
+tolerating = latency.map(lambda x: 1 if x is not None and x >= {T} and x < {T_tolerating} else 0).sum(by=['participant_id']).sum(over='5m')
+total = latency.map(lambda x: 1 if x is not None else 0).sum(by=['participant_id']).sum(over='5m')
 
 apdex = (satisfied + (tolerating / 2)) / total
 apdex.publish('apdex')
