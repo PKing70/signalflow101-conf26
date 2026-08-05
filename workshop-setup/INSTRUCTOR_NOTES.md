@@ -18,6 +18,7 @@ This document is for the instructor. Attendees do not need to read this.
       ```
 - [x] Run `workshop-setup/build_dashboards.py` to create/update the workshop dashboard
 - [x] Record the dashboard URL in `docs/EXERCISE_GUIDE.md`
+- [ ] Complete the instructor rehearsal in `workshop-setup/REHEARSAL_GUIDE.md`
 - [ ] Generate participant aliases from `participant-001` through expected room capacity
 - [ ] Confirm SignalFlow REST/SSE execution works from Replit
 - [ ] Confirm SignalFlow REST/SSE execution works from the Splunk Show SSH/CLI environment
@@ -39,6 +40,7 @@ This document is for the instructor. Attendees do not need to read this.
 - [ ] Prepare credential distribution (print sheets / QR code slide ready)
 - [ ] Test Replit import from a fresh account to verify attendee experience
 - [ ] Test Splunk Show SSH/CLI login from a fresh participant account
+- [ ] Run the instructor rehearsal once more from `workshop-setup/REHEARSAL_GUIDE.md`
 
 ## Day Of — Before Attendees Arrive
 
@@ -70,6 +72,10 @@ The bot sends as `participant-000` with:
 - Tolerating latency: 650-900ms (55% of requests)
 - Frustrated latency: 1400-2000ms (20% of requests, above 1200ms frustrated threshold)
 - This produces Apdex ~0.50-0.55 (Poor) vs attendees at ~0.95+ (Excellent)
+
+For one-person rehearsal and video capture, use
+`workshop-setup/REHEARSAL_GUIDE.md`. It covers running the instructor
+chaos-bot and a normal participant environment side by side.
 
 ## If Things Go Wrong
 

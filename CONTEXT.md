@@ -126,6 +126,7 @@ signalflow101-conf26/
 ├── workshop-setup/
 │   ├── build_dashboards.py      ← creates/updates the workshop dashboard
 │   ├── generate_participant_aliases.py ← prints participant alias CSV
+│   ├── REHEARSAL_GUIDE.md       ← instructor-only chaos-bot + participant simulation guide
 │   └── INSTRUCTOR_NOTES.md      ← day-of checklist, timing, contingencies
 └── docs/
     ├── EXERCISE_GUIDE.md        ← complete exercise document
@@ -190,6 +191,11 @@ Run from repo root: `python chaos-bot/chaos_bot.py`
 Requires only SPLUNK_INGEST_TOKEN (or SPLUNK_ACCESS_TOKEN fallback) and
 SPLUNK_REALM in .env (not PARTICIPANT_ID).
 
+For dry runs and reviewer/video-capture simulation, use
+`workshop-setup/REHEARSAL_GUIDE.md`. It walks through running the instructor
+chaos-bot alongside a normal participant environment without exposing this
+attendee-spoiling flow in Replit workflows.
+
 ---
 
 ## Apdex Formula
@@ -243,7 +249,7 @@ lasting='10m'). ~25–35 min.
 - [ ] Fill in remaining O11y navigation steps:
       - Exercise 1 Step 3: finding metric in Data Explorer
 - [ ] Fill in credential delivery section (Splunk Show flow TBD)
-- [ ] Tune chaos-bot parameters against real data
+- [ ] Run `workshop-setup/REHEARSAL_GUIDE.md` against real data and tune chaos-bot parameters if needed
 - [ ] Full dry run end-to-end, timed
 
 ### Pending external dependencies:
@@ -299,8 +305,8 @@ Slide structure:
 2. **Verify participant_id aliases** such as `participant-042` group correctly
 3. **Verify SignalFlow REST/SSE helper** — run exercise2b.py
 4. **Verify Apdex bucket counting** — run exercise3.py against live data
-5. **Run chaos-bot** and observe in O11y — tune parameters if needed
-6. **Implement build_dashboards.py** — Fleet Dashboard and Apdex Dashboard
+5. **Run chaos-bot rehearsal** using `workshop-setup/REHEARSAL_GUIDE.md` and observe in O11y
+6. **Keep dashboard validation current** — Fleet latency, chaos-bot latency, and Apdex charts
 7. **Fill in exercise doc placeholders** as each piece is verified
 
 ---
