@@ -19,7 +19,8 @@ This document is for the instructor. Attendees do not need to read this.
 - [x] Run `workshop-setup/build_dashboards.py` to create/update the workshop dashboard
 - [x] Record the dashboard URL in `docs/EXERCISE_GUIDE.md`
 - [ ] Generate participant aliases from `participant-001` through expected room capacity
-- [ ] Confirm SignalFlow REST/SSE execution works from Codespaces
+- [ ] Confirm SignalFlow REST/SSE execution works from Replit
+- [ ] Confirm SignalFlow REST/SSE execution works from the Splunk Show SSH/CLI environment
 - [x] Confirm Apdex bucket counting uses latency values (`rollup='latest'`) rather than count rollups
 - [ ] Verify detector URL format: `https://app.{REALM}.observability.splunkcloud.com/#/detector/v2/{id}`
 - [ ] Confirm SignalFlow REST/SSE response parsing with real workshop data
@@ -36,7 +37,8 @@ This document is for the instructor. Attendees do not need to read this.
 - [ ] Confirm Apdex score for chaos-bot is Poor (~0.50–0.55)
 - [ ] Confirm Apdex scores for normal (clean) metrics are Excellent (~0.95+)
 - [ ] Prepare credential distribution (print sheets / QR code slide ready)
-- [ ] Test Codespace launch from a fresh GitHub account to verify attendee experience
+- [ ] Test Replit import from a fresh account to verify attendee experience
+- [ ] Test Splunk Show SSH/CLI login from a fresh participant account
 
 ## Day Of — Before Attendees Arrive
 
@@ -51,7 +53,7 @@ This document is for the instructor. Attendees do not need to read this.
 | Time  | Activity |
 |-------|----------|
 | 0:00  | Intro, SignalFlow framing, workshop overview |
-| 0:10  | Credential setup — everyone opens Codespace and configures .env |
+| 0:10  | Credential setup — everyone opens the chosen workshop environment and configures values |
 | 0:20  | **Checkpoint 1** — confirm everyone's metric visible in O11y |
 | 0:22  | Exercise 2 begins |
 | 0:35  | **Checkpoint 2** — discuss chaos-bot finding |
@@ -71,7 +73,9 @@ The bot sends as `participant-000` with:
 
 ## If Things Go Wrong
 
-**Codespace won't launch:** Direct attendees to the Google Colab fallback link in the appendix of the exercise guide.
+**Replit unavailable:** Direct attendees to the Splunk Show SSH/CLI environment if their account has access.
+
+**Splunk Show SSH unavailable:** Use Replit if available, or let attendees with a pre-existing Python environment continue locally.
 
 **Metrics not appearing in O11y:** Check the `.env` credentials. The most common issue is a typo in the realm (e.g. `us1` vs `us0`).
 

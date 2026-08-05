@@ -6,9 +6,9 @@ The workshop scripts measure this endpoint and send the latency to Splunk
 Observability Cloud.
 
 The app intentionally reads .env on each request and falls back to environment
-variables. That lets local/Codespaces users update PARTICIPANT_ID without a
-restart. Replit users should set Secrets before starting the workflow, or
-restart the workflow after editing Secrets.
+variables. That lets Splunk Show SSH/CLI and local Python users update
+PARTICIPANT_ID without a restart. Replit users should set Secrets before
+starting the workflow, or restart the workflow after editing Secrets.
 """
 
 import hashlib

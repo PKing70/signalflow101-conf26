@@ -5,7 +5,8 @@ Every script in this repo imports from here:
     from config import INGEST_TOKEN, API_TOKEN, REALM, PARTICIPANT_ID
 
 Set your credentials in Replit Secrets, environment variables, or a .env file
-at the root of the repo. For local/Codespaces use, copy .env.example to .env.
+at the root of the repo. For Splunk Show SSH/CLI or local Python, copy
+.env.example to .env.
 """
 
 import os
@@ -40,6 +41,6 @@ if _missing:
     raise EnvironmentError(
         f"\n\nMissing required workshop values: {', '.join(_missing)}\n"
         "In Replit, add them in Tools > Secrets.\n"
-        "In Codespaces or local Python, copy .env.example to .env and fill it in.\n"
+        "In Splunk Show SSH/CLI or local Python, copy .env.example to .env and fill it in.\n"
         "Your PARTICIPANT_ID should look like participant-042, not an email address.\n"
     )

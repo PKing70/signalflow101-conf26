@@ -41,7 +41,7 @@ another. This workshop shows attendees what SignalFlow unlocks beyond the UI.
 | Time  | Activity |
 |-------|----------|
 | 0:00  | Intro, SignalFlow framing |
-| 0:10  | Setup — Replit/Codespace, credentials |
+| 0:10  | Setup — workshop environment, credentials |
 | 0:20  | Checkpoint 1 — metric visible in O11y |
 | 0:22  | Exercise 2 begins |
 | 0:35  | Checkpoint 2 — chaos-bot found |
@@ -65,11 +65,11 @@ cleanup job.
 Use aliases like `participant-001` through `participant-200`, not attendee
 email addresses. Easier privacy story on shared dashboards and still unique.
 
-**Browser-based Python as the environment**
-Zero install friction is the priority. Replit is now an active candidate with
-repo-defined workflows. GitHub Codespaces remains supported via the
-devcontainer path. Local Python is a fallback for attendees who already have a
-working development environment.
+**Python environment options**
+Zero install friction is the priority. Supported attendee paths are Replit,
+the shared Splunk Show Python environment over SSH/CLI, and a participant's
+own pre-existing Python environment. Local Python is not a support target
+during the 60-minute session.
 
 **Paste-and-run instructional approach**
 Code blocks just work when pasted. Optional collapsed `<details>` explainers
@@ -100,16 +100,13 @@ signalflow101-conf26/
 ├── README.md
 ├── .replit                      ← Replit run button and workflow config
 ├── config.py                    ← loads env/.env, exports INGEST_TOKEN/API_TOKEN/REALM/PARTICIPANT_ID
-├── workshop.py                  ← helper commands used by Replit workflows
+├── workshop.py                  ← helper commands used by workflows and CLI paths
 ├── workshop_api.py              ← personal API measured by exercises
 ├── signalflow_rest.py           ← direct SignalFlow REST/SSE helper
 ├── apdex.py                     ← reusable build_apdex_program() function
 ├── requirements.txt
 ├── .env.example                 ← copy to .env, never commit .env
 ├── .gitignore
-├── .devcontainer/
-│   ├── devcontainer.json        ← ports 8000, 8001; auto pip install/start API
-│   └── start-api.sh             ← starts workshop_api.py in Codespaces
 ├── exercises/
 │   ├── exercise1.py             ← send fake latency, verify pipeline
 │   ├── exercise2a.py            ← send real measured latency (continuous)
@@ -132,6 +129,8 @@ signalflow101-conf26/
 │   └── INSTRUCTOR_NOTES.md      ← day-of checklist, timing, contingencies
 └── docs/
     ├── EXERCISE_GUIDE.md        ← complete exercise document
+    ├── REPLIT.md                ← Replit setup and workflow guide
+    ├── SPLUNK_SHOW.md           ← Splunk Show SSH/CLI setup guide
     ├── signalflow101_conf26.pptx ← slide deck draft
     └── signalflow101_conf26.pdf  ← PDF export
 ```
@@ -195,7 +194,7 @@ SPLUNK_REALM in .env (not PARTICIPANT_ID).
 
 ## Apdex Formula
 
-T = 300ms for this workshop (safer than 200ms given Codespace network latency).
+T = 300ms for this workshop (safer than 200ms given browser and shared-environment network latency).
 
 ```
 Apdex = (Satisfied + Tolerating/2) / Total
@@ -253,8 +252,8 @@ lasting='10m'). ~25–35 min.
 - [ ] New co-presenter identified → onboarding rationale summary
 
 ### Nice to have:
-- [ ] Google Colab fallback notebook link
 - [ ] Replit attendee workflow dry run
+- [ ] Splunk Show SSH/CLI dry run
 - [ ] Screenshots from real O11y instance for slide deck
 
 ---
