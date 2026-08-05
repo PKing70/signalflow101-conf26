@@ -1,11 +1,11 @@
 """
-config.py — loads workshop credentials from .env
+config.py - loads workshop credentials from environment or .env
 
 Every script in this repo imports from here:
     from config import INGEST_TOKEN, API_TOKEN, REALM, PARTICIPANT_ID
 
-Set your credentials in the .env file at the root of the repo.
-Copy .env.example to .env and fill in the values.
+Set your credentials in Replit Secrets, environment variables, or a .env file
+at the root of the repo. For local/Codespaces use, copy .env.example to .env.
 """
 
 import os
@@ -38,7 +38,8 @@ _missing = [k for k, v in {
 
 if _missing:
     raise EnvironmentError(
-        f"\n\nMissing required values in your .env file: {', '.join(_missing)}\n"
-        "Copy .env.example to .env and fill in your workshop credentials.\n"
+        f"\n\nMissing required workshop values: {', '.join(_missing)}\n"
+        "In Replit, add them in Tools > Secrets.\n"
+        "In Codespaces or local Python, copy .env.example to .env and fill it in.\n"
         "Your PARTICIPANT_ID should look like participant-042, not an email address.\n"
     )

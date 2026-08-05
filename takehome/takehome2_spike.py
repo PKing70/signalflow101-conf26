@@ -56,7 +56,7 @@ try:
         )
 
         if response.status_code != 200:
-            print(f"Warning: metric send failed ({response.status_code}) — check your credentials in .env")
+            print(f"Warning: metric send failed ({response.status_code}) - check your workshop credentials")
         else:
             print(f"Sent: {latency_ms}ms (frustrated request)")
 

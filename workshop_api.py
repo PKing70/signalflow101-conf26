@@ -1,13 +1,14 @@
 """
 workshop_api.py - Personal workshop API
 
-This FastAPI app runs in each participant's Codespace. The workshop
-scripts measure this endpoint and send the latency to Splunk
+This FastAPI app runs in each participant's browser-based Python environment.
+The workshop scripts measure this endpoint and send the latency to Splunk
 Observability Cloud.
 
-The app intentionally reads .env on each request. That lets the server
-start before an attendee has filled in their credentials, then pick up
-PARTICIPANT_ID as soon as the file is saved.
+The app intentionally reads .env on each request and falls back to environment
+variables. That lets local/Codespaces users update PARTICIPANT_ID without a
+restart. Replit users should set Secrets before starting the workflow, or
+restart the workflow after editing Secrets.
 """
 
 import hashlib
@@ -28,9 +29,12 @@ app = FastAPI(title="SignalFlow 101 Workshop API")
 
 
 def current_participant_id():
-    """Read the participant alias from .env without requiring a restart."""
+    """Read the participant alias without requiring a restart."""
     values = dotenv_values(ENV_PATH) if ENV_PATH.exists() else {}
-    participant_id = values.get("PARTICIPANT_ID") or os.getenv("PARTICIPANT_ID")
+    participant_id = values.get("PARTICIPANT_ID")
+    if participant_id in PLACEHOLDER_IDS:
+        participant_id = None
+    participant_id = participant_id or os.getenv("PARTICIPANT_ID")
     if not participant_id:
         return DEFAULT_PARTICIPANT_ID
     participant_id = participant_id.strip()
