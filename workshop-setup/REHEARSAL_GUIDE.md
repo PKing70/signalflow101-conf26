@@ -10,28 +10,72 @@ dry runs, video capture, and co-presenter review.
 ## Video Capture Quick Start
 
 Send this section to a reviewer who needs to set up before recording.
+No Codex setup is required.
 
-1. Clone or update the repo from `https://github.com/PKing70/signalflow101-conf26`.
-2. Get workshop secrets for the shared Splunk O11y organization:
-   `SPLUNK_REALM`, `SPLUNK_INGEST_TOKEN`, `SPLUNK_API_TOKEN`, and a test
-   `PARTICIPANT_ID` such as `participant-777`.
-3. In a local terminal, create `.env` with `SPLUNK_REALM=us1` and
-   `SPLUNK_INGEST_TOKEN=<token secret>`. Then create the repo-local Python
-   environment with `python -m venv .venv` and
-   `.venv/bin/python -m pip install -r requirements.txt`, then start the
-   chaos-bot with `.venv/bin/python chaos-bot/chaos_bot.py`.
-   If package install fails because a private package index returns an auth
-   error, rerun the install with
-   `.venv/bin/python -m pip install --index-url https://pypi.org/simple -r requirements.txt`.
-4. In Replit, import the same repo or pull the latest `main`, add the four
+Before starting, the reviewer needs:
+
+- The repo URL: `https://github.com/PKing70/signalflow101-conf26`.
+- Access to the shared Splunk O11y organization.
+- The workshop dashboard URL.
+- Token secrets for `SPLUNK_INGEST_TOKEN` and `SPLUNK_API_TOKEN`.
+- The realm, currently `us1`.
+- A rehearsal participant ID outside the real attendee range, such as
+  `participant-777`.
+- A Replit account, unless using the CLI fallback path.
+
+Then:
+
+1. Clone or update the repo.
+2. Create a local `.env` file for the chaos-bot with `SPLUNK_REALM=us1` and
+   `SPLUNK_INGEST_TOKEN=<token secret>`.
+3. Create the repo-local Python environment and install dependencies.
+4. Start the chaos-bot locally.
+5. In Replit, import the same repo or pull the latest `main`, add the four
    workshop values in Secrets, and run the attendee workflows in order:
    `0 - Check setup`, `1 - Start API`, `2 - Send latency metrics`,
    `3 - View fleet latency`, and `4 - Compute Apdex`.
-5. Capture output only after secrets are hidden. The key visuals are `/hello`,
+6. Capture output only after secrets are hidden. The key visuals are `/hello`,
    sender output, fleet latency with `participant-000` as the outlier, Apdex
    with `participant-000` as Poor, and the Splunk O11y dashboard.
 
 The detailed version of each step follows.
+
+## Start From A Local Checkout
+
+If this is a new local checkout:
+
+```bash
+git clone https://github.com/PKing70/signalflow101-conf26.git
+cd signalflow101-conf26
+```
+
+If the repo already exists locally:
+
+```bash
+cd /path/to/signalflow101-conf26
+git switch main
+git pull
+```
+
+If `git pull` reports local changes, stop and use a fresh clone in another
+folder for the rehearsal. Do not overwrite local work just to record the demo.
+
+Use Python 3.10 or newer. On Mac/Linux, `python3` is usually the safest command.
+On Windows PowerShell, use `py -3`.
+
+Confirm Python before continuing:
+
+Mac/Linux:
+
+```bash
+python3 --version
+```
+
+Windows PowerShell:
+
+```powershell
+py -3 --version
+```
 
 ## Goal
 
@@ -72,7 +116,7 @@ real attendee's assigned ID.
 
 Use two separate environments:
 
-- Instructor terminal: runs `python chaos-bot/chaos_bot.py`.
+- Instructor terminal: runs the chaos-bot.
 - Participant environment: runs the same steps an attendee will run.
 
 For participant simulation, Replit is the preferred path because it matches the
@@ -84,33 +128,74 @@ repo too, and a visible chaos-bot workflow would spoil the reveal.
 
 ## Step 1: Start The Chaos-Bot
 
-From a terminal in the repo root, configure instructor values. If you use a
-local `.env` file, it can contain just the ingest values needed by the bot:
+From a terminal in the repo root, configure instructor values. You can copy the
+example file and edit it, or create `.env` manually:
+
+Mac/Linux:
+
+```bash
+cp .env.example .env
+```
+
+Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+For the chaos-bot, `.env` only needs the ingest values:
 
 ```text
 SPLUNK_REALM=us1
 SPLUNK_INGEST_TOKEN=<token secret>
 ```
 
+The chaos-bot ignores `PARTICIPANT_ID` and always sends as `participant-000`.
+
 If the local Python environment does not have the workshop packages installed,
 create a repo-local virtual environment and install dependencies:
 
+Mac/Linux:
+
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
+```
+
+Windows PowerShell:
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\python -m pip install -r requirements.txt
 ```
 
 If package install fails because a private package index returns an auth error,
 rerun it against public PyPI:
 
+Mac/Linux:
+
 ```bash
 .venv/bin/python -m pip install --index-url https://pypi.org/simple -r requirements.txt
 ```
 
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python -m pip install --index-url https://pypi.org/simple -r requirements.txt
+```
+
 Then run:
+
+Mac/Linux:
 
 ```bash
 .venv/bin/python chaos-bot/chaos_bot.py
+```
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python chaos-bot/chaos_bot.py
 ```
 
 Expected output:
