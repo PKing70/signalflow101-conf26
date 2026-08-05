@@ -18,7 +18,7 @@ Use the environment named by your instructor. The supported workshop paths are:
 
 ### Replit
 
-Use [docs/REPLIT.md](docs/REPLIT.md) if the workshop is running in Replit. Replit uses **Secrets** for `SPLUNK_REALM`, token secrets, and `PARTICIPANT_ID`, then provides named workflows for each exercise step.
+Use [docs/REPLIT.md](docs/REPLIT.md) if the workshop is running in Replit. Replit uses **Secrets** for `SPLUNK_REALM`, token secrets, and `PARTICIPANT_ID`, then provides named workflows for the timed in-room exercise steps.
 
 ### Splunk Show SSH/CLI
 

@@ -32,8 +32,9 @@ Then:
 4. Start the chaos-bot locally.
 5. In Replit, import the same repo or pull the latest `main`, add the four
    workshop values in Secrets, and run the attendee workflows in order:
-   `0 - Check setup`, `1 - Start API`, `2 - Send latency metrics`,
-   `3 - View fleet latency`, and `4 - Compute Apdex`.
+   `0 - Check setup`, `1 - Start API`, `1a - Send first metric`,
+   `2 - Send latency metrics`, `3 - View fleet latency`, and
+   `4 - Compute Apdex`.
 6. Capture output only after secrets are hidden. The key visuals are `/hello`,
    sender output, fleet latency with `participant-000` as the outlier, Apdex
    with `participant-000` as Poor, and the Splunk O11y dashboard.
@@ -231,10 +232,11 @@ Then run these workflows:
 1. `0 - Check setup`
 2. `1 - Start API`
 3. Open Preview and add `/hello` to the path.
-4. `2 - Send latency metrics`
-5. `3 - View fleet latency`
-6. Stop the fleet query.
-7. `4 - Compute Apdex`
+4. `1a - Send first metric`
+5. `2 - Send latency metrics`
+6. `3 - View fleet latency`
+7. Stop the fleet query.
+8. `4 - Compute Apdex`
 
 Expected `/hello` output:
 
@@ -244,6 +246,14 @@ Expected `/hello` output:
   "message": "hello from participant-777",
   "simulated_processing_ms": 105.5
 }
+```
+
+Expected first metric output:
+
+```text
+Metric sent successfully.
+participant_id: participant-777
+latency:        287.3ms
 ```
 
 Expected sender output:
@@ -309,6 +319,7 @@ python workshop.py serve
 In terminal 2:
 
 ```bash
+python exercises/exercise1.py
 python workshop.py send
 ```
 
@@ -354,6 +365,7 @@ For a clean reviewer or video-capture pass:
   the Secrets pane.
 - Capture `0 - Check setup` succeeding.
 - Capture Preview at `/hello`.
+- Capture the first metric send printing `Metric sent successfully`.
 - Capture the sender printing `Sent: ...ms`.
 - Capture the fleet query showing `participant-000` above the test participant.
 - Capture Apdex showing `participant-000` as Poor and the test participant as

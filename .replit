@@ -52,6 +52,18 @@ args = "python workshop.py serve"
 waitForPort = 8000
 
 [[workflows.workflow]]
+name = "1a - Send first metric"
+mode = "sequential"
+author = "codex"
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python exercises/exercise1.py"
+
+[[workflows.workflow]]
 name = "2 - Send latency metrics"
 mode = "sequential"
 author = "codex"
