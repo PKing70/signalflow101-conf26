@@ -5,9 +5,9 @@ Adds a /github endpoint to your FastAPI that calls GitHub's
 public user API and measures real downstream latency.
 
 Runs on port 8001 alongside the original API on port 8000.
-Visit port 8001 in your Codespace Ports tab, then add /github.
+Visit port 8001 in your browser-based Python environment, then add /github.
 
-Requires GITHUB_USERNAME in your .env file.
+Requires GITHUB_USERNAME in Replit Secrets, environment variables, or .env.
 """
 
 import os
@@ -24,7 +24,7 @@ PARTICIPANT_ID = os.getenv("PARTICIPANT_ID")
 
 if not GITHUB_USERNAME:
     raise EnvironmentError(
-        "GITHUB_USERNAME not set in .env — add it before running this script."
+        "GITHUB_USERNAME is not set. Add it in Replit Secrets or .env before running this script."
     )
 
 app = FastAPI()

@@ -1,7 +1,7 @@
 """
 Exercise 2a: Start Sending Real Latency
 ---------------------------------------
-Measures real round-trip latency to your Codespace API and sends it
+Measures real round-trip latency to your workshop API and sends it
 as a metric every 10 seconds.
 
 Leave this running and open a second terminal for Exercise 2b.
@@ -44,7 +44,7 @@ def send_latency(latency_ms):
         json=payload
     )
     if response.status_code != 200:
-        print(f"Warning: metric send failed ({response.status_code}) — check your credentials in .env")
+        print(f"Warning: metric send failed ({response.status_code}) - check your workshop credentials")
 
 
 print(f"Sending real latency metrics for {PARTICIPANT_ID}...")
@@ -61,8 +61,7 @@ try:
         time.sleep(10)
 except requests.RequestException as error:
     print("\nCould not reach your API at http://localhost:8000/hello.")
-    print("In Codespaces, the API should start automatically.")
-    print("If needed, run: python -m uvicorn workshop_api:app --host 0.0.0.0 --port 8000")
+    print("Start the API workflow, or run: python workshop.py serve")
     print(f"Details: {error}")
 except KeyboardInterrupt:
     print("\nStopped. Head to the next terminal for Exercise 2b.")

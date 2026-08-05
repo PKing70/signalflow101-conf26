@@ -23,7 +23,7 @@ Workshop repo: https://github.com/PKing70/signalflow101-conf26
 **Title:** SignalFlow 101: Build Your First App for Splunk Observability Cloud
 **Conference:** .conf26
 **Format:** 60-minute hands-on workshop
-**Session ID:** TBD (to be assigned by .conf26)
+**Session ID:** DEV1942
 
 **Audience:** Splunk Observability Cloud users and power users. Familiar with
 dashboards, detectors, metrics, dimensions. NOT expected to be developers or
@@ -41,7 +41,7 @@ another. This workshop shows attendees what SignalFlow unlocks beyond the UI.
 | Time  | Activity |
 |-------|----------|
 | 0:00  | Intro, SignalFlow framing |
-| 0:10  | Setup — Codespace, .env, credentials |
+| 0:10  | Setup — Replit/Codespace, credentials |
 | 0:20  | Checkpoint 1 — metric visible in O11y |
 | 0:22  | Exercise 2 begins |
 | 0:35  | Checkpoint 2 — chaos-bot found |
@@ -65,10 +65,11 @@ cleanup job.
 Use aliases like `participant-001` through `participant-200`, not attendee
 email addresses. Easier privacy story on shared dashboards and still unique.
 
-**GitHub Codespaces as the environment**
-Zero install friction. Devcontainer pre-configures Python + dependencies and
-auto-starts the participant API on port 8000.
-Fallback: Google Colab (recommended), Replit, or local Python one-liner.
+**Browser-based Python as the environment**
+Zero install friction is the priority. Replit is now an active candidate with
+repo-defined workflows. GitHub Codespaces remains supported via the
+devcontainer path. Local Python is a fallback for attendees who already have a
+working development environment.
 
 **Paste-and-run instructional approach**
 Code blocks just work when pasted. Optional collapsed `<details>` explainers
@@ -97,8 +98,10 @@ This is stated explicitly in Exercise 2's talking points and the slide deck.
 ```
 signalflow101-conf26/
 ├── README.md
-├── config.py                    ← loads .env, exports INGEST_TOKEN/API_TOKEN/REALM/PARTICIPANT_ID
-├── workshop_api.py              ← personal API auto-started in Codespaces
+├── .replit                      ← Replit run button and workflow config
+├── config.py                    ← loads env/.env, exports INGEST_TOKEN/API_TOKEN/REALM/PARTICIPANT_ID
+├── workshop.py                  ← helper commands used by Replit workflows
+├── workshop_api.py              ← personal API measured by exercises
 ├── signalflow_rest.py           ← direct SignalFlow REST/SSE helper
 ├── apdex.py                     ← reusable build_apdex_program() function
 ├── requirements.txt
@@ -124,7 +127,7 @@ signalflow101-conf26/
 ├── chaos-bot/
 │   └── chaos_bot.py             ← instructor runs this before/during workshop
 ├── workshop-setup/
-│   ├── build_dashboards.py      ← TODO: implement once O11y instance verified
+│   ├── build_dashboards.py      ← creates/updates the workshop dashboard
 │   ├── generate_participant_aliases.py ← prints participant alias CSV
 │   └── INSTRUCTOR_NOTES.md      ← day-of checklist, timing, contingencies
 └── docs/
@@ -138,9 +141,10 @@ signalflow101-conf26/
 ## Python / API Approach
 
 **Credential loading:** All scripts import from `config.py` at repo root.
-`config.py` uses `python-dotenv` to load `.env` and validates the required
-values (INGEST_TOKEN, API_TOKEN, REALM, PARTICIPANT_ID) on import, failing fast
-with a clear message if any are missing.
+`config.py` uses `python-dotenv` to load `.env` when present, also works with
+Replit Secrets/environment variables, and validates the required values
+(INGEST_TOKEN, API_TOKEN, REALM, PARTICIPANT_ID) on import, failing fast with a
+clear message if any are missing.
 
 **Metric ingest (Exercises 1, 2a, chaos-bot, take-home senders):**
 Direct REST API via `requests.post()` to:
@@ -236,11 +240,9 @@ lasting='10m'). ~25–35 min.
 - [ ] Verify SignalFlow REST/SSE parsing against the real O11y instance
 - [x] Verify Apdex bucket counting semantics in SignalFlow
 - [ ] Verify detector URL format in O11y UI
-- [ ] Implement `workshop-setup/build_dashboards.py`
-- [ ] Fill in O11y navigation steps (3 placeholders in EXERCISE_GUIDE.md):
+- [x] Implement `workshop-setup/build_dashboards.py`
+- [ ] Fill in remaining O11y navigation steps:
       - Exercise 1 Step 3: finding metric in Data Explorer
-      - Exercise 2b: Fleet Dashboard navigation
-      - Exercise 3: Apdex Dashboard navigation
 - [ ] Fill in credential delivery section (Splunk Show flow TBD)
 - [ ] Tune chaos-bot parameters against real data
 - [ ] Full dry run end-to-end, timed
@@ -252,7 +254,7 @@ lasting='10m'). ~25–35 min.
 
 ### Nice to have:
 - [ ] Google Colab fallback notebook link
-- [ ] Replit fallback project link
+- [ ] Replit attendee workflow dry run
 - [ ] Screenshots from real O11y instance for slide deck
 
 ---

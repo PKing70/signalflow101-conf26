@@ -55,6 +55,8 @@ The **"What does this code do?"** sections are optional and collapsed by default
 
 For this workshop, your development environment/login is yours, but everyone sends data to the same Splunk Observability Cloud organization. Your `PARTICIPANT_ID` is what separates your metrics from everyone else's.
 
+If you are using Replit, add the workshop values in **Tools > Secrets** instead of editing `.env`. See [`docs/REPLIT.md`](REPLIT.md) for the Replit workflow path.
+
 You'll need these values:
 
 - The shared **realm** — for example, `us1` or `us0`
@@ -64,7 +66,7 @@ You'll need these values:
 
 Your instructor will tell you whether the API token is copied from your own Splunk O11y login or provided as a shared workshop API token. If the credential sheet provides only one workshop token secret, use that same value for both token fields.
 
-Open the file called `.env` in your Codespace. It looks like this:
+If you are using Codespaces or local Python, open the file called `.env`. It looks like this:
 
 ```
 SPLUNK_REALM=your-realm-here
@@ -81,19 +83,22 @@ Replace the placeholder values, then save the file. Every script in this worksho
 
 > ⏱ **Timing:** This exercise takes approximately 8–12 minutes. If you finish early, read the "What does this code do?" section while you wait for the checkpoint.
 
-Your Codespace is already running a small API. Let's make sure everything is working — and prove that your Python environment can talk to Splunk Observability Cloud — before we go further.
+Your workshop environment can run a small API. Let's make sure everything is working — and prove that your Python environment can talk to Splunk Observability Cloud — before we go further.
 
 ### Step 1: Visit your API
 
-In your Codespace, look for the **Ports** tab at the bottom of the screen. You'll see port `8000` listed. Click the globe icon next to it to open your API in a browser tab.
+Start the API using your environment's run control:
 
-Add `/hello` to the end of the URL. You should see your participant alias — pulled from the `PARTICIPANT_ID` you set in your `.env` file.
+- In Replit, run the workflow `1 - Start API`, then open the web preview.
+- In Codespaces, look for the **Ports** tab at the bottom of the screen. You'll see port `8000` listed. Click the globe icon next to it to open your API in a browser tab.
+
+Add `/hello` to the end of the URL. You should see your participant alias — pulled from the `PARTICIPANT_ID` you configured earlier.
 
 If you see your participant alias, your API is running. Move on to Step 2.
 
 ### Step 2: Send your first metric to Splunk Observability Cloud
 
-Now let's send a metric. Paste the following into the file called `exercise1.py` in your Codespace and click **Run**:
+Now let's send a metric. Open the file called `exercise1.py` and run it in your workshop environment.
 
 ```python
 import requests
@@ -189,7 +194,7 @@ In Exercise 1 you proved the pipeline works. Now let's make the data meaningful 
 
 ### Step 1: Start sending real latency
 
-Your Codespace is already running a FastAPI that responds to requests and measures how long each one takes. Paste the following into `exercise2a.py` and click **Run**:
+Your API responds to requests and measures how long each one takes. Run `exercise2a.py` in your workshop environment. In Replit, use the workflow `2 - Send latency metrics`.
 
 ```python
 import time
@@ -219,7 +224,7 @@ def send_latency(latency_ms):
         json=payload
     )
     if response.status_code != 200:
-        print(f"Warning: metric send failed ({response.status_code}) — check your credentials in .env")
+        print(f"Warning: metric send failed ({response.status_code}) - check your workshop credentials")
 
 print(f"Sending real latency metrics for {PARTICIPANT_ID}...")
 print("Press Ctrl+C to stop.\n")
@@ -236,8 +241,7 @@ try:
         time.sleep(10)
 except requests.RequestException as error:
     print("\nCould not reach your API at http://localhost:8000/hello.")
-    print("In Codespaces, the API should start automatically.")
-    print("If needed, run: python -m uvicorn workshop_api:app --host 0.0.0.0 --port 8000")
+    print("Start the API workflow, or run: python workshop.py serve")
     print(f"Details: {error}")
 except KeyboardInterrupt:
     print("\nStopped. Head to the next terminal for Exercise 2b.")
@@ -254,7 +258,7 @@ Sent: 138.7ms
 Sent: 145.1ms
 ```
 
-Leave this running. Open a second terminal in your Codespace for Step 2.
+Leave this running. Open a second terminal or workflow for Step 2. In Replit, leave `2 - Send latency metrics` running and start `3 - View fleet latency` when instructed.
 
 <details>
 <summary><strong>What does this code do? (optional)</strong></summary>
@@ -371,7 +375,7 @@ Each `█` character represents 10ms of latency. It makes the outlier immediatel
 
 **What just happened?**
 
-You wrote and executed a SignalFlow program directly — the same computation engine that powers every chart in Splunk Observability Cloud. But instead of clicking through the UI to build a chart, you expressed the computation in code, ran it from your Codespace, and streamed the results in real time.
+You wrote and executed a SignalFlow program directly — the same computation engine that powers every chart in Splunk Observability Cloud. But instead of clicking through the UI to build a chart, you expressed the computation in code, ran it from your workshop environment, and streamed the results in real time.
 
 One participant — `participant-000` — is running significantly slower than everyone else. In Exercise 3 we're going to quantify exactly how much slower, using a metric that Splunk Observability Cloud doesn't give you out of the box.
 
@@ -732,7 +736,7 @@ while True:
     )
 
     if response.status_code != 200:
-        print(f"Warning: metric send failed ({response.status_code}) — check your credentials in .env")
+        print(f"Warning: metric send failed ({response.status_code}) - check your workshop credentials")
     else:
         print(f"Sent: {latency_ms:.1f}ms  (github_username: {GITHUB_USERNAME})")
 
@@ -993,7 +997,7 @@ while True:
     )
 
     if response.status_code != 200:
-        print(f"Warning: metric send failed ({response.status_code}) — check your credentials in .env")
+        print(f"Warning: metric send failed ({response.status_code}) - check your workshop credentials")
     else:
         print(f"Sent: {latency_ms}ms (frustrated request)")
 
@@ -1359,7 +1363,7 @@ Once open, run the first cell to install dependencies, then follow the exercise 
 
 Replit runs Python in your browser and supports multiple files and terminals, making it the closest experience to Codespaces of the browser-based alternatives.
 
-> 🔲 **Placeholder:** Link to pre-built Replit project — to be added once the workshop exercises are finalized and tested.
+Use [docs/REPLIT.md](REPLIT.md) for the current Replit setup path and workflow names.
 
 ### Option 3: Local Python
 

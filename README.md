@@ -1,6 +1,8 @@
 # SignalFlow 101: Build Your First App for Splunk Observability Cloud
 
-**Workshop · 60 minutes · .conf26**
+**Workshop · 60 minutes · .conf26 · DEV1942**
+
+Short link: [https://tinyurl.com/DEV1942](https://tinyurl.com/DEV1942)
 
 This repository contains everything you need for the SignalFlow 101 workshop. You'll write Python that talks directly to the Splunk Observability Cloud SignalFlow API — sending metrics, investigating a fleet-wide latency anomaly, and computing an Apdex score that the O11y UI can't give you out of the box.
 
@@ -8,7 +10,13 @@ This repository contains everything you need for the SignalFlow 101 workshop. Yo
 
 ## Get Started (Attendees)
 
-Click the button below to launch a pre-configured Python environment in your browser. No installation required.
+Use the environment named by your instructor. The repo supports Replit, GitHub Codespaces, and local Python.
+
+### Replit
+
+Use [docs/REPLIT.md](docs/REPLIT.md) if the workshop is running in Replit. Replit uses **Secrets** for `SPLUNK_REALM`, token secrets, and `PARTICIPANT_ID`, then provides named workflows for each exercise step.
+
+### GitHub Codespaces
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/PKing70/signalflow101-conf26)
 
@@ -30,8 +38,10 @@ signalflow101-conf26/
 ├── .devcontainer/
 │   └── devcontainer.json            ← Codespace configuration
 ├── requirements.txt                 ← Python dependencies (auto-installed)
-├── config.py                        ← loads credentials from .env
-├── workshop_api.py                  ← personal API auto-started in Codespaces
+├── .replit                          ← Replit run button and workflow configuration
+├── config.py                        ← loads credentials from environment or .env
+├── workshop.py                      ← helper commands used by Replit workflows
+├── workshop_api.py                  ← personal API measured by the exercises
 ├── apdex.py                         ← reusable Apdex SignalFlow program builder
 ├── .env.example                     ← credential template — copy to .env
 │
@@ -61,6 +71,7 @@ signalflow101-conf26/
 │
 └── docs/
     ├── EXERCISE_GUIDE.md            ← full exercise document
+    ├── REPLIT.md                    ← Replit setup and workflow guide
     ├── signalflow101_conf26.pptx    ← slide deck (working draft)
     └── signalflow101_conf26.pdf     ← PDF export for easy viewing
 ```
@@ -83,7 +94,7 @@ Don't have an instance yet? [Start a free trial](https://www.splunk.com/en_us/do
 
 ## Fallback Environments
 
-If GitHub Codespaces is unavailable, see the **Appendix** in `docs/EXERCISE_GUIDE.md` for Google Colab, Replit, and local Python alternatives.
+If the recommended environment is unavailable, see the **Appendix** in `docs/EXERCISE_GUIDE.md` for browser-based and local alternatives.
 
 ---
 

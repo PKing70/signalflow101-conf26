@@ -1,0 +1,105 @@
+entrypoint = "workshop.py"
+modules = ["python-3.11"]
+
+[nix]
+channel = "stable-24_05"
+
+[packager]
+language = "python3"
+
+[packager.features]
+guessImports = true
+packageSearch = true
+enabledForHosting = false
+
+[deployment]
+run = ["python", "workshop.py", "serve"]
+ignorePorts = false
+
+[[ports]]
+localPort = 8000
+externalPort = 80
+
+[workflows]
+runButton = "1 - Start API"
+
+[[workflows.workflow]]
+name = "0 - Check setup"
+mode = "sequential"
+author = "codex"
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python workshop.py check"
+
+[[workflows.workflow]]
+name = "1 - Start API"
+mode = "sequential"
+author = "codex"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python workshop.py serve"
+waitForPort = 8000
+
+[[workflows.workflow]]
+name = "2 - Send latency metrics"
+mode = "sequential"
+author = "codex"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python workshop.py send"
+
+[[workflows.workflow]]
+name = "3 - View fleet latency"
+mode = "sequential"
+author = "codex"
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python workshop.py fleet"
+
+[[workflows.workflow]]
+name = "4 - Compute Apdex"
+mode = "sequential"
+author = "codex"
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python workshop.py apdex"
+
+[[workflows.workflow]]
+name = "In-room - API + sender"
+mode = "parallel"
+author = "codex"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python workshop.py serve"
+waitForPort = 8000
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python workshop.py send"
