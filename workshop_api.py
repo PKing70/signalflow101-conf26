@@ -61,6 +61,16 @@ def health():
     return {"status": "ok"}
 
 
+@app.get("/")
+def index():
+    return {
+        "status": "ok",
+        "message": "SignalFlow 101 workshop API is running. Add /hello to this URL for the exercise response.",
+        "participant_id": current_participant_id(),
+        "next_path": "/hello",
+    }
+
+
 @app.get("/hello")
 def hello():
     participant_id = current_participant_id()
