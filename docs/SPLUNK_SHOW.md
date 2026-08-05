@@ -37,13 +37,21 @@ Start your API:
 python workshop.py serve
 ```
 
-Open a second terminal for the sender and queries:
+Open a second terminal for the one-shot metric and sender:
 
 ```bash
+python exercises/exercise1.py
 python workshop.py send
+```
+
+Open a third terminal for the queries:
+
+```bash
 python workshop.py fleet
 python workshop.py apdex
 ```
+
+Stop `python workshop.py fleet` before running `python workshop.py apdex`.
 
 Stop long-running commands with `Ctrl+C`.
 

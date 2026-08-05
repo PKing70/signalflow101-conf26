@@ -53,6 +53,7 @@ You should see these workflows:
 |---|---|
 | `0 - Check setup` | Verifies packages and required workshop values |
 | `1 - Start API` | Starts your personal FastAPI service on port 8000 |
+| `1a - Send first metric` | Sends one synthetic latency metric for Exercise 1 |
 | `2 - Send latency metrics` | Measures your API and sends latency to Splunk O11y |
 | `3 - View fleet latency` | Runs the SignalFlow fleet query |
 | `4 - Compute Apdex` | Runs the SignalFlow Apdex query |
@@ -65,12 +66,13 @@ Recommended in-room flow:
 3. Run `1 - Start API`.
 4. Press **Cmd+K** or **Ctrl+K**, search for `Preview`, and open **Preview**.
 5. If Preview opens to `/`, add `/hello` to the path. You should see JSON with your `participant_id`.
-6. Run `2 - Send latency metrics` and leave it running.
-7. Run `3 - View fleet latency` when the instructor asks you to investigate the fleet.
-8. Stop `3 - View fleet latency` before starting the next query.
-9. Run `4 - Compute Apdex` when the instructor asks you to compute Apdex.
+6. Run `1a - Send first metric` when Exercise 1 asks you to send one metric.
+7. Run `2 - Send latency metrics` and leave it running.
+8. Run `3 - View fleet latency` when the instructor asks you to investigate the fleet.
+9. Stop `3 - View fleet latency` before starting the next query.
+10. Run `4 - Compute Apdex` when the instructor asks you to compute Apdex.
 
-After `0 - Check setup` succeeds, `In-room - API + sender` is a shortcut that starts the API and latency sender together. Use the separate workflows if you want clearer output while learning the flow.
+After Exercise 1, `In-room - API + sender` is a shortcut that starts the API and latency sender together for Exercise 2. Use the separate workflows if you want clearer output while learning the flow.
 
 The long-running workflows print continuously. Stop them with the Replit Stop button or `Ctrl+C` in the console.
 
@@ -104,6 +106,14 @@ Expected `/hello` output:
   "message": "hello from participant-345",
   "simulated_processing_ms": 105.5
 }
+```
+
+Expected first metric output:
+
+```text
+Metric sent successfully.
+participant_id: participant-345
+latency:        287.3ms
 ```
 
 Expected sender output:
@@ -140,17 +150,36 @@ participant-1                            1.00  Excellent     ██████�
 
 ## Shell Fallback
 
-If the Workflows pane is unavailable, use the Shell:
+If the Workflows pane is unavailable, use the Shell. Keep long-running commands
+open while you run the next command in another shell.
+
+Check setup:
 
 ```bash
 python workshop.py check
+```
+
+Terminal 1:
+
+```bash
 python workshop.py serve
+```
+
+Terminal 2:
+
+```bash
+python exercises/exercise1.py
 python workshop.py send
+```
+
+Terminal 3:
+
+```bash
 python workshop.py fleet
 python workshop.py apdex
 ```
 
-Keep `python workshop.py serve` running while you run the sender in another workflow or shell.
+Stop `python workshop.py fleet` before running `python workshop.py apdex`.
 
 ## Troubleshooting
 

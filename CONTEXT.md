@@ -77,6 +77,12 @@ for attendees who want to understand the code. No one is required to read them.
 Voice/tone: treat audience as intelligent professionals, not CS students.
 Never explain what Apdex is. Do explain what `import` means.
 
+For Replit, attendees run imported workflows during the timed in-room exercises
+instead of pasting code: `0 - Check setup`, `1 - Start API`,
+`1a - Send first metric`, `2 - Send latency metrics`, `3 - View fleet latency`,
+and `4 - Compute Apdex`. Take-home exercises do not have prebuilt Replit
+workflows; use Shell/terminal commands there.
+
 **chaos-bot as the fleet mystery, not a real attendee**
 `participant-000` sends elevated latency metrics before and during the
 workshop. Attendees investigate and find it. Never target a real attendee
