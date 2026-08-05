@@ -1,6 +1,6 @@
 # Replit Setup
 
-Use this path if GitHub Codespaces or Splunk Show's Python environment is not available on your laptop.
+Use this path if your instructor chooses Replit for the workshop, or if the shared Splunk Show Python environment is not available to you.
 
 Replit runs Python in your browser. You do not need to install Python locally, but you do need a Replit account and your workshop credentials.
 

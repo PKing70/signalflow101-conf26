@@ -15,8 +15,12 @@ Everything you interact with in Splunk Observability Cloud is powered by SignalF
 
 - A browser
 - The workshop credentials sheet handed out at the start of the session
+- One supported Python environment:
+  - Replit
+  - The shared Splunk Show Python environment, accessed over SSH
+  - Your own pre-existing Python environment
 
-That's it. No installation. No configuration. Just open your browser and follow along.
+If you use Replit or the Splunk Show environment, you do not need to install Python on your laptop. If you use your own Python environment, it should already be working before the workshop starts.
 
 ---
 
@@ -55,7 +59,11 @@ The **"What does this code do?"** sections are optional and collapsed by default
 
 For this workshop, your development environment/login is yours, but everyone sends data to the same Splunk Observability Cloud organization. Your `PARTICIPANT_ID` is what separates your metrics from everyone else's.
 
-If you are using Replit, add the workshop values in **Tools > Secrets** instead of editing `.env`. See [`docs/REPLIT.md`](REPLIT.md) for the Replit workflow path.
+Use the setup path chosen by your instructor:
+
+- **Replit:** add the workshop values in **Tools > Secrets**. See [`docs/REPLIT.md`](REPLIT.md) for the Replit workflow path.
+- **Splunk Show SSH/CLI:** connect to the shared Python environment and use a `.env` file. See [`docs/SPLUNK_SHOW.md`](SPLUNK_SHOW.md) for the CLI path.
+- **Your own Python environment:** use a `.env` file from the repo root. This path is only for attendees who already had Python working before the workshop.
 
 You'll need these values:
 
@@ -66,7 +74,7 @@ You'll need these values:
 
 Your instructor will tell you whether the API token is copied from your own Splunk O11y login or provided as a shared workshop API token. If the credential sheet provides only one workshop token secret, use that same value for both token fields.
 
-If you are using Codespaces or local Python, open the file called `.env`. It looks like this:
+If you are using Splunk Show SSH/CLI or your own Python environment, open the file called `.env`. It looks like this:
 
 ```
 SPLUNK_REALM=your-realm-here
@@ -81,7 +89,7 @@ Replace the placeholder values, then save the file. Every script in this worksho
 
 ## Exercise 1: Meet Your API
 
-> ⏱ **Timing:** This exercise takes approximately 8–12 minutes. If you finish early, read the "What does this code do?" section while you wait for the checkpoint.
+> ⏱ **Timing:** This exercise is timeboxed to 10 minutes. If you finish early, read the "What does this code do?" section while you wait for the checkpoint.
 
 Your workshop environment can run a small API. Let's make sure everything is working — and prove that your Python environment can talk to Splunk Observability Cloud — before we go further.
 
@@ -90,7 +98,7 @@ Your workshop environment can run a small API. Let's make sure everything is wor
 Start the API using your environment's run control:
 
 - In Replit, run the workflow `1 - Start API`, then open the web preview.
-- In Codespaces, look for the **Ports** tab at the bottom of the screen. You'll see port `8000` listed. Click the globe icon next to it to open your API in a browser tab.
+- In Splunk Show SSH/CLI or your own Python environment, run `python workshop.py serve` in one terminal. If your instructor provides a URL or port-forwarding instructions, open that URL in your browser.
 
 Add `/hello` to the end of the URL. You should see your participant alias — pulled from the `PARTICIPANT_ID` you configured earlier.
 
@@ -549,7 +557,7 @@ So far your API returns your participant alias from local configuration. Real AP
 
 Along the way we'll introduce a small but important idea: pulling repeated logic into a reusable function. By the end of this exercise, computing Apdex for any metric is a single line of code.
 
-You already have a GitHub account — you're using it right now for this Codespace. So this isn't a random downstream service. It's one you have a direct connection to.
+If you have a GitHub account, use your own username. If not, use a public GitHub username suggested by your instructor. The point is to measure a real downstream service with real network behavior.
 
 ### Step 1: Add your GitHub username to your config
 
@@ -616,7 +624,7 @@ Those two lines replace the entire program string from Exercise 3 and produce id
 
 ### Step 3: Add a new endpoint to your FastAPI
 
-Paste the following into `takehome1_api.py` and click **Run**:
+Paste the following into `takehome1_api.py` and run it from your workshop environment:
 
 ```python
 import os
@@ -657,7 +665,7 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8001)
 ```
 
-Visit port `8001` in your Codespace's Ports tab and add `/github` to the URL. You should see something like:
+Open the URL your environment provides for port `8001` and add `/github` to the URL. You should see something like:
 
 ```json
 {
@@ -676,7 +684,7 @@ Visit port `8001` in your Codespace's Ports tab and add `/github` to the URL. Yo
 `@app.get("/github")` adds a new route to the FastAPI application alongside the existing `/hello` route. When a browser or script calls this URL, the function beneath it runs. It calls the GitHub API, measures how long that takes, and returns the result along with the measured latency.
 
 **Why port 8001**
-The original FastAPI runs on port 8000. Running this one on port 8001 means both can run simultaneously without conflicting. You'll see both listed in your Codespace's Ports tab.
+The original FastAPI runs on port 8000. Running this one on port 8001 means both can run simultaneously without conflicting. In browser environments, you may see both ports listed in the environment's preview or port-forwarding UI.
 
 **`time.time()` before and after**
 The latency measurement is identical to what `exercise2a.py` does — capture the time before the call, capture it again after, subtract to get the duration. The difference is that here we're measuring a real external HTTP call to GitHub rather than a local call to our own API. That's what makes the latency real and variable.
@@ -822,7 +830,7 @@ except KeyboardInterrupt:
 
 > ⏳ **Note:** As with Exercise 3, it may take 2–3 minutes before scores appear while the 5-minute window fills with data.
 
-You should see Apdex scores for `workshop.github.latency` — and unlike the synthetic API, these will vary based on real network conditions between your Codespace and GitHub's servers.
+You should see Apdex scores for `workshop.github.latency` — and unlike the synthetic API, these will vary based on real network conditions between your Python environment and GitHub's servers.
 
 <details>
 <summary><strong>What does this code do? (optional)</strong></summary>
@@ -1339,47 +1347,29 @@ Splunk offers a free trial that gives you full access to Splunk Observability Cl
 
 Once your trial is provisioned, find your token secret(s) and realm in the account settings and update your `.env` file as described above.
 
-### If your Codespace has expired
-
-GitHub Codespaces remain active for up to 30 days of inactivity. If yours has expired, you can relaunch it from the GitHub repository page — your files will still be there. The environment will rebuild automatically using the same devcontainer configuration.
-
-If you'd prefer to run the exercises outside of a Codespace entirely, see the appendix below.
-
 ---
 
-## Appendix: If You Can't Use GitHub Codespaces
+## Appendix: Workshop Environment Options
 
-If GitHub is unavailable or restricted in your environment, the following alternatives work with all of the exercises in this document. All three connect to the same Splunk Observability Cloud instance using the same credentials — you won't miss any functionality.
+The workshop supports the following Python environments. All three connect to the same Splunk Observability Cloud instance using the same credentials.
 
-### Option 1: Google Colab (recommended fallback)
+### Option 1: Replit
 
-Google Colab runs Python notebooks in your browser with no installation required. A Google account is all you need.
-
-> 🔲 **Placeholder:** Link to pre-built Colab notebook — to be added once the workshop exercises are finalized and tested.
-
-Once open, run the first cell to install dependencies, then follow the exercise steps as written. The code is identical — Colab runs it in notebook cells rather than a terminal.
-
-### Option 2: Replit
-
-Replit runs Python in your browser and supports multiple files and terminals, making it the closest experience to Codespaces of the browser-based alternatives.
+Replit runs Python in your browser and provides named workflows for each exercise step.
 
 Use [docs/REPLIT.md](REPLIT.md) for the current Replit setup path and workflow names.
 
-### Option 3: Local Python
+### Option 2: Splunk Show SSH/CLI
 
-If you have admin rights on your laptop, a single command installs everything you need:
+The shared Splunk Show Python environment gives you a terminal without requiring a local Python install. Your instructor will provide SSH and login details.
 
-**Mac:**
-```bash
-brew install python && pip install requests python-dotenv fastapi uvicorn
-```
+Use [docs/SPLUNK_SHOW.md](SPLUNK_SHOW.md) for the CLI setup path and commands.
 
-**Windows:**
-```bash
-winget install Python.Python.3 && pip install requests python-dotenv fastapi uvicorn
-```
+### Option 3: Your own Python environment
 
-Once installed, clone the workshop repository and run the exercises from the repo folder as normal.
+Use this path only if you already had Python working before the workshop. We will not troubleshoot laptop-specific Python, firewall, package manager, or IDE issues during the 60-minute session.
+
+From the repo folder, install dependencies with `pip install -r requirements.txt`, copy `.env.example` to `.env`, fill in the workshop values, and run the exercises from your terminal.
 
 ---
 

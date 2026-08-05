@@ -1,8 +1,8 @@
 """
-workshop.py - small command helper for browser-based workshop environments.
+workshop.py - small command helper for workshop Python environments.
 
-Replit workflows and Codespaces terminals both call into this file so attendees
-can run short, named commands instead of copying longer shell commands.
+Replit workflows and CLI terminals call into this file so attendees can run
+short, named commands instead of copying longer shell commands.
 """
 
 import argparse
@@ -105,7 +105,7 @@ def check_setup(_args):
 
     print("\nNot ready yet.")
     print("In Replit, add these values in Tools > Secrets.")
-    print("In Codespaces or local Python, copy .env.example to .env and fill it in.")
+    print("In Splunk Show SSH/CLI or local Python, copy .env.example to .env and fill it in.")
     return 1
 
 

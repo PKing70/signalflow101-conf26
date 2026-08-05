@@ -10,20 +10,23 @@ This repository contains everything you need for the SignalFlow 101 workshop. Yo
 
 ## Get Started (Attendees)
 
-Use the environment named by your instructor. The repo supports Replit, GitHub Codespaces, and local Python.
+Use the environment named by your instructor. The supported workshop paths are:
+
+1. **Replit** — browser-based Python with repo-defined workflows.
+2. **Splunk Show Python environment** — SSH into the shared workshop host and run the CLI commands from a terminal.
+3. **Your own Python environment** — only if you already had Python working before the workshop.
 
 ### Replit
 
 Use [docs/REPLIT.md](docs/REPLIT.md) if the workshop is running in Replit. Replit uses **Secrets** for `SPLUNK_REALM`, token secrets, and `PARTICIPANT_ID`, then provides named workflows for each exercise step.
 
-### GitHub Codespaces
+### Splunk Show SSH/CLI
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/PKing70/signalflow101-conf26)
+Use [docs/SPLUNK_SHOW.md](docs/SPLUNK_SHOW.md) if the workshop is running in the shared Splunk Show Python environment. Your instructor will provide SSH/login details. This path uses `.env` for workshop values and terminal commands such as `python workshop.py check`.
 
-Once your Codespace is open:
+### Existing Local Python
 
-1. Open the `.env` file and fill in the workshop realm, token secret(s), and your unique participant alias
-2. Open `docs/EXERCISE_GUIDE.md` and follow along
+Use your own Python environment only if it was already working before the workshop. We will not troubleshoot laptop-specific Python, firewall, package manager, or IDE issues during the 60-minute session. Copy `.env.example` to `.env`, fill in the workshop values, install `requirements.txt`, then follow `docs/EXERCISE_GUIDE.md`.
 
 For the workshop, each participant has their own development environment/login, but everyone sends data to the same Splunk Observability Cloud organization. The realm is shared, and `PARTICIPANT_ID` is what separates your metrics from everyone else's. Your instructor will tell you whether `SPLUNK_API_TOKEN` is a personal token from your Splunk O11y login or a shared workshop API token.
 
@@ -35,12 +38,10 @@ For the workshop, each participant has their own development environment/login, 
 signalflow101-conf26/
 │
 ├── README.md                        ← you are here
-├── .devcontainer/
-│   └── devcontainer.json            ← Codespace configuration
-├── requirements.txt                 ← Python dependencies (auto-installed)
+├── requirements.txt                 ← Python dependencies
 ├── .replit                          ← Replit run button and workflow configuration
 ├── config.py                        ← loads credentials from environment or .env
-├── workshop.py                      ← helper commands used by Replit workflows
+├── workshop.py                      ← helper commands used by workflows and CLI paths
 ├── workshop_api.py                  ← personal API measured by the exercises
 ├── apdex.py                         ← reusable Apdex SignalFlow program builder
 ├── .env.example                     ← credential template — copy to .env
@@ -72,6 +73,7 @@ signalflow101-conf26/
 └── docs/
     ├── EXERCISE_GUIDE.md            ← full exercise document
     ├── REPLIT.md                    ← Replit setup and workflow guide
+    ├── SPLUNK_SHOW.md               ← Splunk Show SSH/CLI setup guide
     ├── signalflow101_conf26.pptx    ← slide deck (working draft)
     └── signalflow101_conf26.pdf     ← PDF export for easy viewing
 ```
@@ -94,7 +96,7 @@ Don't have an instance yet? [Start a free trial](https://www.splunk.com/en_us/do
 
 ## Fallback Environments
 
-If the recommended environment is unavailable, see the **Appendix** in `docs/EXERCISE_GUIDE.md` for browser-based and local alternatives.
+If the recommended environment is unavailable, see the **Appendix** in `docs/EXERCISE_GUIDE.md` for the supported workshop alternatives.
 
 ---
 
