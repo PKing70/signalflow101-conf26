@@ -43,8 +43,8 @@ workshop environment:
 
 1. **Replit:** run the named workflow. The code blocks show what the workflow
    runs; you do not need to paste them during the timed workshop.
-2. **Splunk Show SSH/CLI or local Python:** paste or update the code block in
-   the named file, save it, then run the Python command shown.
+2. **Splunk Show SSH/CLI or local Python:** run the command for your
+   environment, then review the Python listing if you have time.
 3. **Observe** what happens in Splunk Observability Cloud
 4. **Read** the explanation at your own pace
 
@@ -53,7 +53,9 @@ To stop any running script at any time, use the Replit Stop button or press
 
 The checkpoints throughout the session are your signal to pause and look up — that's when we'll discuss what just happened and what it means before moving on.
 
-The **"What does this code do?"** sections are optional and collapsed by default. Open them if you're curious or have time. Skip them if you need to keep pace — you won't miss anything required.
+The **Interesting parts** sections explain the Python you just ran. Read them
+if you're curious or have time. Skip them if you need to keep pace — you won't
+miss anything required.
 
 ---
 
@@ -69,6 +71,74 @@ Use the setup path chosen by your instructor:
 - **Splunk Show SSH/CLI:** connect to the shared Python environment and use a `.env` file. See [`docs/SPLUNK_SHOW.md`](SPLUNK_SHOW.md) for the CLI path.
 - **Your own Python environment:** use a `.env` file from the repo root. This path is only for attendees who already had Python working before the workshop.
 
+### Get the workshop files
+
+Before any exercise command will work, your environment needs a copy of the
+workshop repo.
+
+#### Replit
+
+Import the workshop repo into Replit, then add the four required Secrets. Replit
+uses the files and workflows from the imported repo; you do not need to copy
+`workshop.py` or the exercise files by hand.
+
+#### Splunk Show SSH/CLI
+
+Your instructor will tell you whether the repo is already present in the shared
+Splunk Show Python environment. After you SSH in, either change into the
+provided repo folder or clone it:
+
+```bash
+git clone https://github.com/PKing70/signalflow101-conf26.git
+cd signalflow101-conf26
+```
+
+If the instructor says dependencies are not already installed, run:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+#### Local Python
+
+Use this path only if Python already works on your laptop. First choose where
+you want the workshop folder to live. The example below creates a parent folder
+called `workshops` in your home directory, then clones the repo inside it:
+
+```bash
+mkdir -p ~/workshops
+cd ~/workshops
+if [ ! -d signalflow101-conf26 ]; then git clone https://github.com/PKing70/signalflow101-conf26.git; fi
+cd signalflow101-conf26
+python -m venv .venv
+.venv/bin/python -c "import sys; print(sys.executable)"
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+The `.venv/bin/python -c ...` command should print a path inside `.venv`.
+For local Python on Mac/Linux, use `.venv/bin/python` for the exercise
+commands below. On Windows, use `.venv\Scripts\python` instead.
+
+If `pip` reports that it cannot find a package such as `requests`, your Python
+environment may be pointed at a private company package index. If your laptop
+is allowed to reach public PyPI, retry with:
+
+```bash
+.venv/bin/python -m pip install --index-url https://pypi.org/simple -r requirements.txt
+```
+
+If that is blocked by your laptop or network policy, use Replit or the Splunk
+Show SSH/CLI environment instead. We will not troubleshoot local package-index
+or enterprise laptop policy issues during the timed workshop.
+
+Because these commands call `.venv/bin/python` directly, you do not need to
+activate the virtual environment first.
+
+If you already cloned or downloaded the repo, open that existing folder instead
+of cloning it again. If `git clone` says the destination path already exists,
+that means the repo folder is already there; `cd signalflow101-conf26` and keep
+going.
+
 You'll need these values:
 
 - The shared **realm** — for example, `us1` or `us0`
@@ -78,7 +148,25 @@ You'll need these values:
 
 Your instructor will tell you whether the API token is copied from your own Splunk O11y login or provided as a shared workshop API token. If the credential sheet provides only one workshop token secret, use that same value for both token fields.
 
-If you are using Splunk Show SSH/CLI or your own Python environment, open the file called `.env`. It looks like this:
+If you are using Splunk Show SSH/CLI or your own Python environment, create
+your `.env` file if it does not already exist:
+
+```bash
+[ -f .env ] || cp .env.example .env
+```
+
+Then open `.env` in a text editor. Use VS Code, another IDE, or any editor you
+already know. If you are working only in a terminal, use `nano`:
+
+```bash
+nano .env
+```
+
+If you use `nano`, use the arrow keys to move around and replace the placeholder
+values. When you are finished, press **Ctrl+O**, press **Enter** to write the
+file, then press **Ctrl+X** to exit.
+
+Your `.env` file should look like this after you edit it:
 
 ```
 SPLUNK_REALM=your-realm-here
@@ -87,22 +175,60 @@ SPLUNK_API_TOKEN=your-api-token-secret-here
 PARTICIPANT_ID=participant-042
 ```
 
-Replace the placeholder values, then save the file. Every script in this workshop reads from this file automatically — you won't need to enter these values again.
+Every script in this workshop reads from `.env` automatically — you won't need
+to enter these values again.
 
 ---
 
 ## Exercise 1: Meet Your API
 
-> ⏱ **Timing:** This exercise is timeboxed to 10 minutes. If you finish early, read the "What does this code do?" section while you wait for the checkpoint.
+> ⏱ **Timing:** This exercise is timeboxed to 10 minutes. If you finish early, read the "Interesting parts" section while you wait for the checkpoint.
 
 Your workshop environment can run a small API. Let's make sure everything is working — and prove that your Python environment can talk to Splunk Observability Cloud — before we go further.
 
-### Files at a glance
+### Step 1: Visit your API
 
-#### `workshop_api.py` — Your Personal API
+#### Replit
 
-This file starts a small FastAPI service and gives you a `/hello` endpoint.
-That endpoint returns your participant ID and waits for a small simulated delay.
+Run the workflow `1 - Start API`, then open the web preview.
+
+#### Splunk Show SSH/CLI or local Python
+
+If you are using Splunk Show SSH/CLI:
+
+Open one terminal for the API, then run:
+
+```bash
+python workshop.py serve
+```
+
+If you are using local Python on Mac/Linux:
+
+Open one terminal for the API, then run:
+
+```bash
+.venv/bin/python workshop.py serve
+```
+
+Leave this API terminal running for the rest of the timed exercises.
+
+If your instructor provides a URL or port-forwarding instructions, open that URL
+in your browser.
+
+Add `/hello` to the end of the URL. You should see your participant alias —
+pulled from the `PARTICIPANT_ID` you configured earlier.
+
+Expected browser result:
+
+```json
+{
+  "participant_id": "participant-042",
+  "message": "hello from participant-042",
+  "simulated_processing_ms": 105.5
+}
+```
+
+The relevant part of `workshop_api.py` is shown below.
 
 ```python
 @app.get("/hello")
@@ -117,52 +243,11 @@ def hello():
     }
 ```
 
-What to notice: this is the API being measured. It is intentionally simple so
-the observability pattern is easy to see: call an endpoint, measure the time,
-send that measurement as a metric.
+#### Interesting parts
 
-#### `exercises/exercise1.py` — Send One Test Datapoint
-
-This file proves that your credentials, realm, and participant ID work.
-
-```python
-payload = {
-    "gauge": [
-        {
-            "metric": "workshop.api.latency",
-            "value": latency,
-            "dimensions": {
-                "participant_id": PARTICIPANT_ID
-            }
-        }
-    ]
-}
-```
-
-What to notice: a metric datapoint is just structured data. The metric name is
-`workshop.api.latency`, the value is a latency number, and the `participant_id`
-dimension tells Splunk Observability Cloud which participant sent it.
-
-### Step 1: Visit your API
-
-Start the API using your environment's run control:
-
-#### Replit
-
-Run the workflow `1 - Start API`, then open the web preview.
-
-#### Splunk Show SSH/CLI or local Python
-
-Run the API in one terminal:
-
-```bash
-python workshop.py serve
-```
-
-If your instructor provides a URL or port-forwarding instructions, open that URL
-in your browser.
-
-Add `/hello` to the end of the URL. You should see your participant alias — pulled from the `PARTICIPANT_ID` you configured earlier.
+The `/hello` endpoint is the API being measured. It returns your participant ID
+and waits for a small simulated delay. The observability pattern is deliberately
+simple: call an endpoint, measure the time, send that measurement as a metric.
 
 If you see your participant alias, your API is running. Move on to Step 2.
 
@@ -176,12 +261,32 @@ Run the workflow `1a - Send first metric`.
 
 #### Splunk Show SSH/CLI or local Python
 
-Paste the following code into `exercises/exercise1.py`, save it, then run this
-command from the repo root:
+If you are using Splunk Show SSH/CLI:
+
+Leave the API command from Step 1 running. Open another terminal, then run:
 
 ```bash
 python exercises/exercise1.py
 ```
+
+If you are using local Python on Mac/Linux:
+
+Leave the API command from Step 1 running. Open another terminal, then run:
+
+```bash
+cd ~/workshops/signalflow101-conf26
+.venv/bin/python exercises/exercise1.py
+```
+
+Expected terminal result:
+
+```
+Metric sent successfully.
+participant_id: participant-042
+latency:        287.3ms
+```
+
+The contents of `exercises/exercise1.py` are shown below for reference.
 
 ```python
 import random
@@ -229,41 +334,26 @@ else:
     print(response.text)
 ```
 
-You should see output like:
+#### Interesting parts
 
-```
-Metric sent successfully.
-participant_id: participant-042
-latency:        287.3ms
-```
+`from config import` pulls `INGEST_TOKEN`, `REALM`, and `PARTICIPANT_ID` from
+the `.env` file or Replit Secrets you configured earlier.
+
+The `payload` is the metric datapoint. It has a metric name
+(`workshop.api.latency`), a value (`latency`), and a dimension
+(`participant_id`) that tags the datapoint as yours.
+
+`requests.post()` sends the datapoint to Splunk Observability Cloud's ingest
+endpoint. The `X-SF-TOKEN` header is how Splunk Observability Cloud authorizes
+the request. The fake latency value is enough for Exercise 1 because this step
+is only proving that credentials, connection, ingest, and participant tagging
+work.
 
 ### Step 3: Verify in Splunk Observability Cloud
 
 > 🔲 **Placeholder:** Step-by-step instructions for finding a metric in the O11y Metric Finder or Data Explorer — to be added once the workshop instance is provisioned. Attendees will look for `workshop.api.latency` filtered by their `participant_id`.
 
 When you find your metric, you're looking for `workshop.api.latency` filtered by your `participant_id`. If it's there, you're fully connected and ready to move on.
-
-<details>
-<summary><strong>What does this code do? (optional)</strong></summary>
-
-**The imports**
-The first few lines load tools we need. Think of `import` like opening an app before you use it — `requests` is how Python sends data over the internet, and `random` generates the fake latency value. `from config import` pulls your settings from the `.env` file you configured earlier — `INGEST_TOKEN`, `REALM`, and `PARTICIPANT_ID` are available throughout the script without repeating the setup code.
-
-**The payload**
-This is the metric itself — structured the way Splunk Observability Cloud expects to receive it. It has three parts: a name (`workshop.api.latency`), a value (your random latency number), and a dimension (`participant_id`) that tags the metric as yours.
-
-In Splunk Observability Cloud, dimensions are how you slice and filter metrics — by host, by service, by environment. In this workshop, `participant_id` is doing the same job. Every metric you send will carry it, which means your data stays identifiable even though we're all sharing the same Splunk Observability Cloud instance.
-
-**Sending it**
-`requests.post()` sends the payload to Splunk Observability Cloud's ingest endpoint — a URL built from your realm. The `X-SF-TOKEN` header is how Splunk Observability Cloud knows the request is authorized.
-
-**The response check**
-If Splunk Observability Cloud accepted the metric, it responds with status code `200` and the script prints your confirmation. Any other code means something went wrong — most likely a credential issue — and the script prints the error to help you diagnose it.
-
-**Why a fake latency value?**
-In Exercise 1 we just want to prove the pipeline works — credentials, connection, ingest. The value doesn't need to be meaningful yet. In Exercise 2 we'll replace this random number with a latency that's actually measured from your API.
-
-</details>
 
 ---
 
@@ -283,40 +373,6 @@ In Exercise 2, we'll replace the random value with something real — and that's
 
 In Exercise 1 you proved the pipeline works. Now let's make the data meaningful — and introduce something unexpected in our fleet.
 
-### Files at a glance
-
-#### `exercises/exercise2a.py` — Measure Real Latency
-
-This file replaces the fake latency from Exercise 1 with a real measurement of
-your API.
-
-```python
-start = time.time()
-response = requests.get("http://localhost:8000/hello", timeout=5)
-response.raise_for_status()
-latency_ms = (time.time() - start) * 1000
-```
-
-What to notice: the script records the time before and after the API call. The
-difference is the request latency. That measured value is then sent to Splunk
-Observability Cloud every 10 seconds.
-
-#### `exercises/exercise2b.py` — Compare The Fleet
-
-This file runs a SignalFlow program that groups everyone's latency by
-`participant_id`.
-
-```python
-program = """
-latency = data('workshop.api.latency').mean(over='1m').mean(by=['participant_id'])
-latency.publish('avg_latency_by_participant')
-"""
-```
-
-What to notice: this is the moment SignalFlow becomes useful. The script is not
-looking only at your data. It asks Splunk Observability Cloud to compute a
-live, grouped view of the whole workshop fleet so the outlier becomes visible.
-
 ### Step 1: Start sending real latency
 
 Your API responds to requests and measures how long each one takes.
@@ -327,12 +383,38 @@ Run the workflow `2 - Send latency metrics`.
 
 #### Splunk Show SSH/CLI or local Python
 
-Paste the following code into `exercises/exercise2a.py`, save it, then run this
-command from the repo root:
+If you are using Splunk Show SSH/CLI:
+
+Use the same terminal where you ran `exercises/exercise1.py`, then run:
 
 ```bash
 python exercises/exercise2a.py
 ```
+
+If you are using local Python on Mac/Linux:
+
+Use the same terminal where you ran `exercises/exercise1.py`, then run:
+
+```bash
+cd ~/workshops/signalflow101-conf26
+.venv/bin/python exercises/exercise2a.py
+```
+
+Expected terminal result:
+
+```
+Sending real latency metrics for participant-042...
+Press Ctrl+C to stop.
+
+Sent: 142.3ms
+Sent: 138.7ms
+Sent: 145.1ms
+```
+
+Leave this running. In Replit, leave `2 - Send latency metrics` running. In
+Splunk Show SSH/CLI or local Python, leave this terminal running.
+
+The contents of `exercises/exercise2a.py` are shown below for reference.
 
 ```python
 import sys
@@ -387,44 +469,24 @@ try:
         time.sleep(10)
 except requests.RequestException as error:
     print("\nCould not reach your API at http://localhost:8000/hello.")
-    print("Start the API workflow, or run: python workshop.py serve")
+    print("Start the API workflow, or run the API serve command from the guide.")
     print(f"Details: {error}")
 except KeyboardInterrupt:
     print("\nStopped. Head to the next terminal for Exercise 2b.")
 ```
 
-You should see output like:
+#### Interesting parts
 
-```
-Sending real latency metrics for participant-042...
-Press Ctrl+C to stop.
+`send_latency()` wraps the Splunk Observability Cloud ingest call in a function
+so the main loop stays readable: measure latency, send latency, wait 10 seconds.
 
-Sent: 142.3ms
-Sent: 138.7ms
-Sent: 145.1ms
-```
+`time.time()` captures the moment before and after the API call. The difference,
+converted to milliseconds, is the real round-trip latency for
+`http://localhost:8000/hello`.
 
-Leave this running. Open a second terminal or workflow for Step 2. In Replit, leave `2 - Send latency metrics` running and start `3 - View fleet latency` when instructed.
+`while True` keeps the script running until you stop it with **Ctrl+C**. This is
+why the next step needs another terminal: this script is your live metric sender.
 
-<details>
-<summary><strong>What does this code do? (optional)</strong></summary>
-
-**The `send_latency()` function**
-Rather than writing the ingest call directly in the loop, we've wrapped it in a function. A function is a named, reusable block of code — you define it once with `def` and call it by name whenever you need it. This keeps the loop readable and separates the "measure" step from the "send" step clearly.
-
-**Error handling**
-`send_latency()` checks the response status code and prints a warning if something goes wrong. Without this check, a failed send would be silent — the script would keep printing latency values while sending nothing. This version tells you immediately if your credentials or connection are the problem.
-
-**Measuring latency**
-`time.time()` captures the moment before the API call and again immediately after it returns. The difference — converted to milliseconds by multiplying by 1000 — is the real round-trip time for that request. This is exactly how production monitoring agents measure latency.
-
-**The loop**
-`while True` runs forever until you stop it with Ctrl+C. Every 10 seconds it measures a new latency value and sends it. The 10-second interval gives Splunk Observability Cloud enough data points for meaningful aggregations without flooding the ingest API.
-
-**The second terminal**
-`exercise2a.py` runs continuously, so it occupies the terminal. Opening a second terminal lets you run the next script alongside it without stopping the metric flow.
-
-</details>
 
 ### Step 2: Investigate the fleet
 
@@ -432,16 +494,52 @@ With everyone's metrics flowing, let's look at the whole picture.
 
 #### Replit
 
-Run the workflow `3 - View fleet latency`.
+Leave `2 - Send latency metrics` running, then run the workflow
+`3 - View fleet latency`.
 
 #### Splunk Show SSH/CLI or local Python
 
-In a second terminal, paste the following code into `exercises/exercise2b.py`,
-save it, then run this command from the repo root:
+If you are using Splunk Show SSH/CLI:
+
+Leave `exercises/exercise2a.py` running in the previous terminal. Open another
+terminal for the fleet query, then run:
 
 ```bash
 python exercises/exercise2b.py
 ```
+
+If you are using local Python on Mac/Linux:
+
+Leave `exercises/exercise2a.py` running in the previous terminal. Open another
+terminal for the fleet query, then run:
+
+```bash
+cd ~/workshops/signalflow101-conf26
+.venv/bin/python exercises/exercise2b.py
+```
+
+Expected terminal result:
+
+```
+--- Fleet Latency (top 15 of 128) ---
+participant-000                          847.3ms  ████████████████████████████████████████████████████████████
+participant-117                          224.8ms  ██████████████████████
+participant-042                          143.2ms  ██████████████
+...
+```
+
+One participant stands out. That's not a coincidence.
+
+Now open the workshop dashboard in Splunk Observability Cloud to see the same
+data visualized live:
+
+https://app.us1.observability.splunkcloud.com/#/dashboard/HOkNhxUAwAE?groupId=HOkNjAJA4AM
+
+In the dashboard group **SignalFlow 101 - .conf26**, open **SignalFlow 101 -
+Workshop Fleet** and look at **Fleet latency by participant**. The same outlier
+should stand out there.
+
+The contents of `exercises/exercise2b.py` are shown below for reference.
 
 ```python
 import sys
@@ -499,43 +597,18 @@ except KeyboardInterrupt:
     print("\nStopped.")
 ```
 
-You should see output like:
+#### Interesting parts
 
-```
---- Fleet Latency (top 15 of 128) ---
-participant-000                          847.3ms  ████████████████████████████████████████████████████████████
-participant-117                          224.8ms  ██████████████████████
-participant-042                          143.2ms  ██████████████
-...
-```
+The string assigned to `program` is a SignalFlow program. `data()` selects your
+metric stream, `.mean(over='1m')` computes a 1-minute average, and
+`.mean(by=['participant_id'])` keeps each participant separate.
 
-One participant stands out. That's not a coincidence.
+`stream_signalflow()` starts that SignalFlow computation through Splunk
+Observability Cloud's REST API and keeps the response open as Server-Sent
+Events. The script reads `data` events, uses metadata to map each internal
+`tsid` back to a `participant_id`, then prints a small console bar chart so the
+outlier is obvious even before you look at the dashboard.
 
-Now open the workshop dashboard in Splunk Observability Cloud to see the same data visualized live:
-
-https://app.us1.observability.splunkcloud.com/#/dashboard/HOkNhxUAwAE?groupId=HOkNjAJA4AM
-
-In the dashboard group **SignalFlow 101 - .conf26**, open **SignalFlow 101 - Workshop Fleet** and look at **Fleet latency by participant**. The same outlier should stand out there.
-
-<details>
-<summary><strong>What does this code do? (optional)</strong></summary>
-
-**The SignalFlow program**
-The string assigned to `program` is a SignalFlow program — the same language running behind every chart in Splunk Observability Cloud. `data()` selects your metric stream. `.mean(over='1m')` computes a 1-minute average, and `.mean(by=['participant_id'])` keeps each participant separate. `.publish()` makes the results available to read.
-
-**The SignalFlow REST API**
-`stream_signalflow()` uses `requests.post()` to start a SignalFlow computation through Splunk Observability Cloud's REST API. Unlike the earlier ingest calls, this response stays open and streams Server-Sent Events as SignalFlow computes new values.
-
-**Reading the stream**
-`stream_signalflow()` returns messages as they arrive from SignalFlow. We only care about `data` messages — those contain actual metric values. Each data message contains one or more time series identifiers (`tsid`) and their current values.
-
-**Getting the participant name**
-The `tsid` is an internal identifier — a short string that SignalFlow uses to track each time series. SignalFlow sends metadata messages that translate each `tsid` back into the dimensions we know — in this case, `participant_id`. That's how we connect a raw number to a participant alias.
-
-**The bar chart**
-Each `█` character represents 10ms of latency. It makes the outlier immediately obvious without needing to open a separate tool. The console output is a confidence check that your code is working — the workshop dashboard in Splunk Observability Cloud is the full visual.
-
-</details>
 
 ---
 
@@ -551,7 +624,7 @@ One participant — `participant-000` — is running significantly slower than e
 
 ## Exercise 3: Computing Apdex — Beyond What O11y Gives You
 
-> ⏱ **Timing:** This exercise is timeboxed to 15 minutes. Start the workflow or script early — the 5-minute rolling window means it needs a few minutes of data before scores appear. Use that time to read the intro and the code explainer.
+> ⏱ **Timing:** This exercise is timeboxed to 15 minutes. Start the workflow or script early — the 5-minute rolling window means it needs a few minutes of data before scores appear. Use that time to read the intro and the Interesting parts section.
 
 You've found the chaos-bot. Now let's quantify the problem with a metric that Splunk Observability Cloud doesn't provide out of the box.
 
@@ -577,39 +650,61 @@ Scores are interpreted as follows:
 | 0.50–0.69 | Poor |
 | Below 0.50 | Unacceptable |
 
-### File at a glance
-
-#### `exercises/exercise3.py` — Compute Apdex
-
-This file classifies the live latency stream into Apdex buckets and computes a
-score for each participant.
-
-```python
-T = 300
-T_tolerating = T * 4
-
-apdex = (satisfied + (tolerating / 2)) / total
-apdex.publish('apdex')
-```
-
-What to notice: SignalFlow is doing stream arithmetic. Instead of only showing
-raw latency, it computes a new score from the latency stream while data is still
-arriving.
-
 Splunk Observability Cloud can show you latency. It can't compute Apdex — at least not without SignalFlow.
+
+### Step 1: Compute Apdex
 
 #### Replit
 
-Run the workflow `4 - Compute Apdex`.
+Leave `2 - Send latency metrics` running. Stop `3 - View fleet latency`, or
+leave it alone and use another workflow slot, then run `4 - Compute Apdex`.
 
 #### Splunk Show SSH/CLI or local Python
 
-Paste the following code into `exercises/exercise3.py`, save it, then run this
-command from the repo root:
+If you are using Splunk Show SSH/CLI:
+
+Leave the real latency sender from Exercise 2a running. Stop the fleet latency
+script from Exercise 2b with **Ctrl+C**, or open another terminal for Apdex,
+then run:
 
 ```bash
 python exercises/exercise3.py
 ```
+
+If you are using local Python on Mac/Linux:
+
+Leave the real latency sender from Exercise 2a running. Stop the fleet latency
+script from Exercise 2b with **Ctrl+C**, or open another terminal for Apdex,
+then run:
+
+```bash
+cd ~/workshops/signalflow101-conf26
+.venv/bin/python exercises/exercise3.py
+```
+
+Expected terminal result:
+
+```
+--- Apdex Scores (lowest 15 of 128, T=300ms) ---
+participant-000                          0.52  Poor          ██████████
+participant-042                          0.96  Excellent     ███████████████████
+participant-117                          0.95  Excellent     ███████████████████
+...
+```
+
+It may take 2–3 minutes before scores appear. The computation needs enough data
+to fill the 5-minute rolling window. If you see no output yet, the script is
+working — just wait.
+
+The chaos-bot's Apdex score tells a clearer story than its raw latency alone.
+It's not just slow — by an industry-standard measure, it's delivering a poor
+experience.
+
+Return to the same workshop dashboard and look at **Apdex by participant**. The
+chaos-bot should now show a Poor or Unacceptable score while normal participants
+remain Excellent.
+
+The contents of `exercises/exercise3.py` are shown below for reference.
 
 ```python
 import sys
@@ -686,45 +781,21 @@ except KeyboardInterrupt:
     print("\nStopped.")
 ```
 
-> ⏳ **Note:** It may take 2–3 minutes before scores appear. The computation needs enough data to fill the 5-minute rolling window. If you see no output yet, the script is working — just wait.
+#### Interesting parts
 
-You should see output like:
+`T = 300` and `T_tolerating = T * 4` define the Apdex boundaries in
+milliseconds. Changing `T` changes the whole computation.
 
-```
---- Apdex Scores (lowest 15 of 128, T=300ms) ---
-participant-000                          0.52  Poor          ██████████
-participant-042                          0.96  Excellent     ███████████████████
-participant-117                          0.95  Excellent     ███████████████████
-...
-```
+The SignalFlow program turns each latency datapoint into counts: satisfied
+requests, tolerating requests, and total requests. It groups those counts by
+`participant_id`, sums them over a 5-minute window, then applies the Apdex
+formula: `(satisfied + (tolerating / 2)) / total`.
 
-The chaos-bot's Apdex score tells a clearer story than its raw latency alone. It's not just slow — by an industry-standard measure, it's delivering a poor experience.
+SignalFlow is doing stream arithmetic live. This could be spreadsheet math
+after the fact, but here it updates continuously as metrics arrive. The Python
+rating labels (`Excellent`, `Good`, `Poor`, and so on) are just display logic
+applied after SignalFlow returns each score.
 
-Return to the same workshop dashboard and look at **Apdex by participant**. The chaos-bot should now show a Poor or Unacceptable score while normal participants remain Excellent.
-
-<details>
-<summary><strong>What does this code do? (optional)</strong></summary>
-
-**The thresholds**
-`T = 300` and `T_tolerating = T * 4` define the Apdex boundaries in milliseconds. These are Python variables — they get substituted into the SignalFlow program string before it's sent to Splunk Observability Cloud. Changing `T` here changes the entire computation. This is a preview of the abstraction we'll build properly in Take-home Exercise 1.
-
-**The SignalFlow program**
-This is more involved than Exercise 2, but it follows the Apdex formula directly:
-
-- `data('workshop.api.latency', rollup='latest')` retrieves the latency stream while preserving the latest latency value in each rollup interval. That matters because we need to compare latency values against Apdex thresholds.
-- `latency.map(lambda x: 1 if x is not None and x < 300 else 0)` transforms each present data point: if the latency was under 300ms it becomes 1 (satisfied); otherwise 0. This is how SignalFlow counts requests that meet a condition.
-- `.sum(by=['participant_id']).sum(over='5m')` groups those 1s and 0s by participant, then adds them up over a 5-minute window. The result is a count of satisfied requests per participant over the last 5 minutes.
-- The same pattern produces `tolerating` — requests between 300ms and 1200ms.
-- `total` counts all requests regardless of latency.
-- The final line is the Apdex formula expressed as stream arithmetic: `(satisfied + (tolerating / 2)) / total`. SignalFlow handles the division of two streams natively.
-
-**Why this matters**
-Every line of this SignalFlow program could be a column in a spreadsheet or a query in a BI tool — computed after the fact, on historical data. SignalFlow computes it live, on a continuous stream, updating every few seconds. That's what makes it suited to observability rather than reporting.
-
-**The rating labels**
-These are standard Apdex ratings defined by the Apdex Alliance. They're computed in Python after SignalFlow returns the score — simple comparisons on the number we received, nothing to do with SignalFlow itself.
-
-</details>
 
 ---
 
@@ -761,7 +832,7 @@ Along the way we'll introduce a small but important idea: pulling repeated logic
 
 If you have a GitHub account, use your own username. If not, use a public GitHub username suggested by your instructor. The point is to measure a real downstream service with real network behavior.
 
-### Files at a glance
+### Python scripts at a glance
 
 #### `apdex.py` — Reuse The Apdex Formula
 
@@ -856,8 +927,7 @@ apdex.publish('apdex')
 
 This file doesn't do anything on its own — it defines the function so other scripts can import and use it.
 
-<details>
-<summary><strong>What is a function, and why does this matter? (optional)</strong></summary>
+#### Interesting parts: Functions
 
 **What a function is**
 A function is a named, reusable block of code. Instead of writing the same logic repeatedly, you write it once, give it a name, and call it by that name whenever you need it. `build_apdex_program()` is a function — you give it a metric name and it gives you back a complete SignalFlow program string.
@@ -881,7 +951,6 @@ program = build_apdex_program('workshop.api.latency')
 
 Those two lines replace the entire program string from Exercise 3 and produce identical results. You don't need to go back and change `exercise3.py` — it still works exactly as written. But this is what abstraction looks like in practice: the same computation, expressed more cleanly, reusable across any metric you choose.
 
-</details>
 
 ### Step 3: Add a new endpoint to your FastAPI
 
@@ -891,6 +960,8 @@ the repo root:
 ```bash
 python takehome/takehome1_api.py
 ```
+
+The contents of `takehome/takehome1_api.py` are shown below for reference.
 
 ```python
 import os
@@ -943,8 +1014,7 @@ Open the URL your environment provides for port `8001` and add `/github` to the 
 }
 ```
 
-<details>
-<summary><strong>What does this code do? (optional)</strong></summary>
+#### Interesting parts
 
 **The `/github` endpoint**
 `@app.get("/github")` adds a new route to the FastAPI application alongside the existing `/hello` route. When a browser or script calls this URL, the function beneath it runs. It calls the GitHub API, measures how long that takes, and returns the result along with the measured latency.
@@ -958,7 +1028,6 @@ The latency measurement is identical to what `exercise2a.py` does — capture th
 **`data.get("name")`**
 `.get()` is a safe way to read a value from a dictionary in Python. If the key doesn't exist — for example if a GitHub user hasn't set a display name — it returns `None` rather than crashing. This matters when calling external APIs you don't control.
 
-</details>
 
 ### Step 4: Send GitHub latency as a metric
 
@@ -968,6 +1037,8 @@ save it, then run it from the repo root:
 ```bash
 python takehome/takehome1_sender.py
 ```
+
+The contents of `takehome/takehome1_sender.py` are shown below for reference.
 
 ```python
 import os
@@ -1041,8 +1112,7 @@ Sent: 203.1ms  (github_username: sarahj)
 Sent: 191.8ms  (github_username: sarahj)
 ```
 
-<details>
-<summary><strong>What does this code do? (optional)</strong></summary>
+#### Interesting parts
 
 **The same ingest pattern**
 This is the same `requests.post()` call from Exercise 1 and Exercise 2a — just pointed at `workshop.github.latency` instead of `workshop.api.latency`. From Splunk Observability Cloud's perspective, this is a completely separate metric that can be charted, aggregated, and alerted on independently.
@@ -1059,7 +1129,6 @@ Like `exercise2a.py`, this script checks the response status code and prints a w
 **`time.sleep(10)`**
 Ten seconds between sends matches the interval in `exercise2a.py`. This gives Splunk Observability Cloud enough data points for meaningful aggregations while being respectful of GitHub's API rate limits for unauthenticated requests.
 
-</details>
 
 ### Step 5: Compute Apdex for your GitHub metric
 
@@ -1069,6 +1138,8 @@ save it, then run it from the repo root:
 ```bash
 python takehome/takehome1_apdex.py
 ```
+
+The contents of `takehome/takehome1_apdex.py` are shown below for reference.
 
 ```python
 import sys
@@ -1123,8 +1194,7 @@ except KeyboardInterrupt:
 
 You should see Apdex scores for `workshop.github.latency` — and unlike the synthetic API, these will vary based on real network conditions between your Python environment and GitHub's servers.
 
-<details>
-<summary><strong>What does this code do? (optional)</strong></summary>
+#### Interesting parts
 
 **`from apdex import build_apdex_program`**
 This line imports the function you created in Step 2. The short `ROOT` setup at
@@ -1137,7 +1207,6 @@ This single line replaces the entire SignalFlow program string from Exercise 3. 
 **Everything else is identical to Exercise 3**
 The SignalFlow REST call, the message loop, and the result printing are unchanged. Only the metric name changed. That's the practical value of the abstraction: write the computation once, apply it to anything.
 
-</details>
 
 ---
 
@@ -1157,7 +1226,7 @@ That means anything that can make an HTTP request can do what the UI does. Pytho
 
 In this exercise you'll create a detector programmatically using the REST API directly — no UI, no clicks. Then you'll trigger it intentionally and watch the alert fire in Splunk Observability Cloud.
 
-### Files at a glance
+### Python scripts at a glance
 
 #### `takehome/takehome2_detector.py` — Create A Detector By API
 
@@ -1191,6 +1260,8 @@ from the repo root:
 ```bash
 python takehome/takehome2_detector.py
 ```
+
+The contents of `takehome/takehome2_detector.py` are shown below for reference.
 
 ```python
 import sys
@@ -1272,8 +1343,7 @@ View it at:  https://app.us1.observability.splunkcloud.com/#/detector/v2/Ab1Cd2E
 
 Click that URL. Your detector is live in Splunk Observability Cloud — created entirely in code, visible in the UI, watching your metrics right now.
 
-<details>
-<summary><strong>What does this code do? (optional)</strong></summary>
+#### Interesting parts
 
 **The SignalFlow program**
 This is the same Apdex computation from Exercise 3, with two additions. `filter('participant_id', '{PARTICIPANT_ID}')` narrows the computation to just your metrics — unlike Exercise 3 which watched the whole fleet, this detector only watches you. The `detect(when(...))` call at the end is what makes this a detector rather than a computation — it defines the condition that triggers an alert.
@@ -1294,7 +1364,6 @@ This is the same HTTP call pattern from Exercise 1 — just pointed at `/v2/dete
 **Why not the SignalFlow client?**
 The SignalFlow Python client is optimized for running computations and streaming results. Creating and managing detectors, dashboards, and other O11y objects is done through the REST API directly. Both are valid Python. Both talk to Splunk Observability Cloud. They're different tools for different jobs, and both are just HTTP under the hood.
 
-</details>
 
 ### Step 2: Trigger the detector intentionally
 
@@ -1304,6 +1373,8 @@ Now let's make the alert fire. Open a second terminal, paste the following into
 ```bash
 python takehome/takehome2_spike.py
 ```
+
+The contents of `takehome/takehome2_spike.py` are shown below for reference.
 
 ```python
 import sys
@@ -1365,8 +1436,7 @@ Leave this running. Within a few minutes your Apdex score will drop below 0.85 a
 
 > ⏳ **Note:** The detector uses `lasting='5m'` — it won't fire until the condition has been true for 5 continuous minutes. Leave `takehome2_spike.py` running and check back after a few minutes.
 
-<details>
-<summary><strong>What does this code do? (optional)</strong></summary>
+#### Interesting parts
 
 **The hardcoded latency value**
 Unlike `exercise2a.py` which measured real latency, this script sends a fixed value of 1800ms — well above the 1200ms frustrated threshold. This is intentional. We're not measuring anything real here; we're injecting bad data to prove the detector works. In production this technique is called fault injection, and it's a standard way to validate that alerting is correctly configured before you need it in a real incident.
@@ -1380,7 +1450,6 @@ Normal senders use `time.sleep(10)`. This script uses 5 seconds — faster — b
 **The same ingest pattern, again**
 This is the third script in this workshop that sends metrics via `requests.post()` to the ingest endpoint. The pattern is identical every time — because it is identical. Once you know it, it works everywhere in Splunk Observability Cloud.
 
-</details>
 
 ### Step 3: Resolve the alert
 
@@ -1436,7 +1505,7 @@ For this exercise we'll define an SLO for your workshop API:
 
 We're using a 1-hour window rather than the production-standard 30 days because in a workshop environment you don't have 30 days of data. The math is identical — only the window changes.
 
-### Files at a glance
+### Python scripts at a glance
 
 #### `takehome/takehome3_slo.py` — Compute Burn Rate
 
@@ -1473,6 +1542,8 @@ the repo root:
 ```bash
 python takehome/takehome3_slo.py
 ```
+
+The contents of `takehome/takehome3_slo.py` are shown below for reference.
 
 ```python
 import sys
@@ -1563,8 +1634,7 @@ Burn rate:          BURNING TOO FAST - 200.00x
 
 A burn rate of 200x means you'd exhaust your entire hourly error budget in about 18 seconds.
 
-<details>
-<summary><strong>What does this code do? (optional)</strong></summary>
+#### Interesting parts
 
 **The SLO constants**
 `SLO_TARGET`, `ALLOWED_ERROR_RATE`, `WINDOW`, and `BURN_RATE_THRESHOLD` are defined at the top as Python variables — not inside the SignalFlow program. They're the parameters of your SLO commitment, the things you'd change when applying this to a different service or a stricter standard. Keeping them at the top makes them easy to find and adjust without reading through the rest of the code.
@@ -1586,7 +1656,6 @@ Healthy, elevated, and burning too fast map to real alerting tiers used in produ
 **Why frustrated and not satisfied**
 In the Apdex formula we counted satisfied and tolerating requests. Here we only count frustrated ones — requests over 1200ms — because the SLO is specifically about the worst-case experience. SignalFlow lets you express whatever definition fits your commitment.
 
-</details>
 
 ### Step 2: Create a burn rate detector
 
@@ -1597,6 +1666,8 @@ from the repo root:
 ```bash
 python takehome/takehome3_detector.py
 ```
+
+The contents of `takehome/takehome3_detector.py` are shown below for reference.
 
 ```python
 import sys
@@ -1683,8 +1754,7 @@ View it at:  https://app.us1.observability.splunkcloud.com/#/detector/v2/Xy9Gh3J
 
 Click the URL. Your burn rate detector is live — watching your error budget in real time, ready to fire the moment your service starts consuming it too fast.
 
-<details>
-<summary><strong>What does this code do? (optional)</strong></summary>
+#### Interesting parts
 
 **The `lasting='10m'` condition**
 In Take-home Exercise 2 the detector used `lasting='5m'`. Here we use 10 minutes. Burn rate can spike briefly and recover without indicating a real problem. Requiring the condition to persist for 10 minutes filters out transient spikes and ensures the alert represents a sustained trend. In production you'd tune this duration based on how quickly your team can respond and how much budget a 10-minute spike actually consumes.
@@ -1698,7 +1768,6 @@ This is the same `requests.post()` call to the detectors endpoint from Take-home
 **What you'd add for production**
 The `notifications` array is empty here for simplicity. In a real deployment you'd add your PagerDuty integration ID, your Slack webhook, or your email address. The detector you just created is one JSON field away from being fully production-ready.
 
-</details>
 
 ---
 
@@ -1769,7 +1838,33 @@ Use [docs/SPLUNK_SHOW.md](SPLUNK_SHOW.md) for the CLI setup path and commands.
 
 Use this path only if you already had Python working before the workshop. We will not troubleshoot laptop-specific Python, firewall, package manager, or IDE issues during the 60-minute session.
 
-From the repo folder, install dependencies with `pip install -r requirements.txt`, copy `.env.example` to `.env`, fill in the workshop values, and run the exercises from your terminal.
+Choose a parent folder where the repo should live, then clone the repo and
+create a virtual environment:
+
+```bash
+mkdir -p ~/workshops
+cd ~/workshops
+if [ ! -d signalflow101-conf26 ]; then git clone https://github.com/PKing70/signalflow101-conf26.git; fi
+cd signalflow101-conf26
+python -m venv .venv
+.venv/bin/python -c "import sys; print(sys.executable)"
+.venv/bin/python -m pip install -r requirements.txt
+[ -f .env ] || cp .env.example .env
+nano .env
+```
+
+Open `.env` in VS Code, another IDE, or any editor you already know. If you use
+`nano`, save with **Ctrl+O**, press **Enter**, then exit with **Ctrl+X**. Run
+the local exercises with `.venv/bin/python ...` from your terminal.
+
+If `pip` is configured to use a private package index and cannot find public
+packages such as `requests`, retry with:
+
+```bash
+.venv/bin/python -m pip install --index-url https://pypi.org/simple -r requirements.txt
+```
+
+If that is blocked, switch to Replit or Splunk Show SSH/CLI.
 
 ---
 

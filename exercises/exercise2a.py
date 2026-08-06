@@ -61,7 +61,7 @@ try:
         time.sleep(10)
 except requests.RequestException as error:
     print("\nCould not reach your API at http://localhost:8000/hello.")
-    print("Start the API workflow, or run: python workshop.py serve")
+    print("Start the API workflow, or run the API serve command from the guide.")
     print(f"Details: {error}")
 except KeyboardInterrupt:
     print("\nStopped. Head to the next terminal for Exercise 2b.")
