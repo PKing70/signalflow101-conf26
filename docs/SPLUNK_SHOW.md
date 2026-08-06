@@ -4,15 +4,45 @@ Use this path if your instructor provides access to the shared Splunk Show Pytho
 
 The exact SSH host, username, and login method will come from the workshop credential instructions. After you connect, you will run the exercises from a terminal.
 
+## Get The Workshop Files
+
+Your instructor will tell you whether the repo is already present in the shared
+Splunk Show Python environment.
+
+If the repo is already present, change into that folder. If not, clone it:
+
+```bash
+git clone https://github.com/PKing70/signalflow101-conf26.git
+cd signalflow101-conf26
+```
+
+If dependencies are not already installed in the Splunk Show environment, run:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
 ## Configure Workshop Values
 
 From the repo directory, create your `.env` file:
 
 ```bash
-cp .env.example .env
+[ -f .env ] || cp .env.example .env
 ```
 
-Edit `.env` and fill in the values from the workshop credential instructions:
+Open `.env` in a text editor. Use VS Code, another IDE, or any editor you
+already know. If you are working only in a terminal, `nano .env` opens it there.
+
+```bash
+nano .env
+```
+
+If you use `nano`, use the arrow keys to move around and replace the placeholder
+values with the values from the workshop credential instructions. When you are
+finished, press **Ctrl+O**, press **Enter** to write the file, then press
+**Ctrl+X** to exit.
+
+Your `.env` file should look like this after you edit it:
 
 ```text
 SPLUNK_REALM=us1

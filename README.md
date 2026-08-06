@@ -26,7 +26,45 @@ Use [docs/SPLUNK_SHOW.md](docs/SPLUNK_SHOW.md) if the workshop is running in the
 
 ### Existing Local Python
 
-Use your own Python environment only if it was already working before the workshop. We will not troubleshoot laptop-specific Python, firewall, package manager, or IDE issues during the 60-minute session. Copy `.env.example` to `.env`, fill in the workshop values, install `requirements.txt`, then follow `docs/EXERCISE_GUIDE.md`.
+Use your own Python environment only if it was already working before the workshop. We will not troubleshoot laptop-specific Python, firewall, package manager, or IDE issues during the 60-minute session.
+
+Choose where you want the workshop folder to live. The example below creates a
+parent folder called `workshops` in your home directory, then clones the repo
+inside it:
+
+```bash
+mkdir -p ~/workshops
+cd ~/workshops
+if [ ! -d signalflow101-conf26 ]; then git clone https://github.com/PKing70/signalflow101-conf26.git; fi
+cd signalflow101-conf26
+python -m venv .venv
+.venv/bin/python -c "import sys; print(sys.executable)"
+.venv/bin/python -m pip install -r requirements.txt
+[ -f .env ] || cp .env.example .env
+nano .env
+```
+
+Fill in `.env` with the workshop values using VS Code, another IDE, or any text
+editor you already know. If you use `nano`, save with **Ctrl+O**, press
+**Enter**, exit with **Ctrl+X**, then follow `docs/EXERCISE_GUIDE.md`.
+
+The `.venv/bin/python -c ...` command should print a path inside `.venv`.
+For local Python on Mac/Linux, use `.venv/bin/python` for the exercise
+commands in the guide. On Windows, use `.venv\Scripts\python` instead.
+
+If `pip` says it cannot find a package such as `requests`, your Python
+environment may be pointed at a private company package index. If your laptop
+is allowed to reach public PyPI, retry with:
+
+```bash
+.venv/bin/python -m pip install --index-url https://pypi.org/simple -r requirements.txt
+```
+
+If that is blocked by your laptop or network policy, use Replit or the Splunk
+Show SSH/CLI environment instead.
+
+Because these commands call `.venv/bin/python` directly, you do not need to
+activate the virtual environment first.
 
 For the workshop, each participant has their own development environment/login, but everyone sends data to the same Splunk Observability Cloud organization. The realm is shared, and `PARTICIPANT_ID` is what separates your metrics from everyone else's. Your instructor will tell you whether `SPLUNK_API_TOKEN` is a personal token from your Splunk O11y login or a shared workshop API token.
 

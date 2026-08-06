@@ -128,7 +128,7 @@ def wait_for_api(args):
     print(f"API did not become ready within {args.timeout} seconds.")
     if last_error:
         print(f"Last error: {last_error}")
-    print("Start the API workflow or run: python workshop.py serve")
+    print("Start the API workflow or run the API serve command from the guide.")
     return 1
 
 
