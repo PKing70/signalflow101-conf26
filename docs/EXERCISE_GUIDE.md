@@ -16,8 +16,8 @@ Everything you interact with in Splunk Observability Cloud is powered by SignalF
 - A browser
 - The workshop credentials sheet handed out at the start of the session
 - One supported Python environment:
-  - Replit
-  - The shared Splunk Show Python environment, accessed over SSH
+  - Replit, the recommended in-room path
+  - The shared Splunk Show Python environment, accessed over SSH, if Replit is blocked
   - Your own pre-existing Python environment
 
 If you use Replit or the Splunk Show environment, you do not need to install Python on your laptop. If you use your own Python environment, it should already be working before the workshop starts.
@@ -38,8 +38,9 @@ The take-home exercises at the end of this document go further: real downstream 
 
 ## How This Works
 
-Each exercise follows the same broad pattern, but what you run depends on your
-workshop environment:
+Each exercise follows the same broad pattern. Replit is the default attendee
+path; Splunk Show SSH/CLI is the fallback if Replit is blocked; local Python is
+only for attendees who already had it working before the workshop.
 
 1. **Replit:** run the named workflow. The code blocks show what the workflow
    runs; you do not need to paste them during the timed workshop.
@@ -59,124 +60,34 @@ miss anything required.
 
 ---
 
-## Getting Started: Your Workshop Credentials
+## Getting Started: Complete One Setup Path
 
-> 🔲 **Placeholder:** Splunk Show credential delivery instructions to be added once the workshop instance is provisioned. This section will include the QR code or URL for the credential page, login instructions, and where to find your token secret(s), realm, and participant alias.
+> 🔲 **Placeholder:** Workshop credential delivery instructions to be added once
+> the workshop instance is provisioned. This section will include the QR code or
+> URL for the credential page, login instructions, and where to find your token
+> secret(s), the `us1` realm value, and participant alias.
 
 For this workshop, your development environment/login is yours, but everyone sends data to the same Splunk Observability Cloud organization. Your `PARTICIPANT_ID` is what separates your metrics from everyone else's.
 
-Use the setup path chosen by your instructor:
+Before starting Exercise 1, complete exactly one setup guide and make sure its
+setup check passes:
 
-- **Replit:** add the workshop values in **Tools > Secrets**. See [`docs/REPLIT.md`](REPLIT.md) for the Replit workflow path.
-- **Splunk Show SSH/CLI:** connect to the shared Python environment and use a `.env` file. See [`docs/SPLUNK_SHOW.md`](SPLUNK_SHOW.md) for the CLI path.
-- **Your own Python environment:** use a `.env` file from the repo root. This path is only for attendees who already had Python working before the workshop.
+- **Replit, recommended:** follow [`REPLIT.md`](REPLIT.md).
+- **Splunk Show SSH/CLI, if Replit is blocked:** follow [`SPLUNK_SHOW.md`](SPLUNK_SHOW.md).
+- **Existing local Python, only if it already works:** follow [`LOCAL_PYTHON.md`](LOCAL_PYTHON.md).
 
-### Get the workshop files
+The setup guides are the source of truth for importing or cloning the repo,
+adding workshop values, and running the setup check. Come back here only after
+your chosen setup path is ready.
 
-Before any exercise command will work, your environment needs a copy of the
-workshop repo.
+You'll use these values during setup:
 
-#### Replit
-
-Import the workshop repo into Replit, then add the four required Secrets. Replit
-uses the files and workflows from the imported repo; you do not need to copy
-`workshop.py` or the exercise files by hand.
-
-#### Splunk Show SSH/CLI
-
-Your instructor will tell you whether the repo is already present in the shared
-Splunk Show Python environment. After you SSH in, either change into the
-provided repo folder or clone it:
-
-```bash
-git clone https://github.com/PKing70/signalflow101-conf26.git
-cd signalflow101-conf26
-```
-
-If the instructor says dependencies are not already installed, run:
-
-```bash
-python -m pip install -r requirements.txt
-```
-
-#### Local Python
-
-Use this path only if Python already works on your laptop. First choose where
-you want the workshop folder to live. The example below creates a parent folder
-called `workshops` in your home directory, then clones the repo inside it:
-
-```bash
-mkdir -p ~/workshops
-cd ~/workshops
-if [ ! -d signalflow101-conf26 ]; then git clone https://github.com/PKing70/signalflow101-conf26.git; fi
-cd signalflow101-conf26
-python -m venv .venv
-.venv/bin/python -c "import sys; print(sys.executable)"
-.venv/bin/python -m pip install -r requirements.txt
-```
-
-The `.venv/bin/python -c ...` command should print a path inside `.venv`.
-For local Python on Mac/Linux, use `.venv/bin/python` for the exercise
-commands below. On Windows, use `.venv\Scripts\python` instead.
-
-If `pip` reports that it cannot find a package such as `requests`, your Python
-environment may be pointed at a private company package index. If your laptop
-is allowed to reach public PyPI, retry with:
-
-```bash
-.venv/bin/python -m pip install --index-url https://pypi.org/simple -r requirements.txt
-```
-
-If that is blocked by your laptop or network policy, use Replit or the Splunk
-Show SSH/CLI environment instead. We will not troubleshoot local package-index
-or enterprise laptop policy issues during the timed workshop.
-
-Because these commands call `.venv/bin/python` directly, you do not need to
-activate the virtual environment first.
-
-If you already cloned or downloaded the repo, open that existing folder instead
-of cloning it again. If `git clone` says the destination path already exists,
-that means the repo folder is already there; `cd signalflow101-conf26` and keep
-going.
-
-You'll need these values:
-
-- The shared **realm** — for example, `us1` or `us0`
+- The shared **realm** — `us1`
 - The shared **ingest token secret** — used when Python sends metric datapoints
 - Your **API token secret** — used when Python runs SignalFlow queries
 - Your unique **participant ID** — an alias such as `participant-042`
 
-Your instructor will tell you whether the API token is copied from your own Splunk O11y login or provided as a shared workshop API token. If the credential sheet provides only one workshop token secret, use that same value for both token fields.
-
-If you are using Splunk Show SSH/CLI or your own Python environment, create
-your `.env` file if it does not already exist:
-
-```bash
-[ -f .env ] || cp .env.example .env
-```
-
-Then open `.env` in a text editor. Use VS Code, another IDE, or any editor you
-already know. If you are working only in a terminal, use `nano`:
-
-```bash
-nano .env
-```
-
-If you use `nano`, use the arrow keys to move around and replace the placeholder
-values. When you are finished, press **Ctrl+O**, press **Enter** to write the
-file, then press **Ctrl+X** to exit.
-
-Your `.env` file should look like this after you edit it:
-
-```
-SPLUNK_REALM=your-realm-here
-SPLUNK_INGEST_TOKEN=your-ingest-token-secret-here
-SPLUNK_API_TOKEN=your-api-token-secret-here
-PARTICIPANT_ID=participant-042
-```
-
-Every script in this workshop reads from `.env` automatically — you won't need
-to enter these values again.
+Your setup guide explains where to put these values for your environment.
 
 ---
 
@@ -186,7 +97,7 @@ to enter these values again.
 
 Your workshop environment can run a small API. Let's make sure everything is working — and prove that your Python environment can talk to Splunk Observability Cloud — before we go further.
 
-### Step 1: Visit your API
+### Step 1: Run your API
 
 #### Replit
 
@@ -199,6 +110,7 @@ If you are using Splunk Show SSH/CLI:
 Open one terminal for the API, then run:
 
 ```bash
+cd ~/signalflow101-conf26
 python workshop.py serve
 ```
 
@@ -207,6 +119,7 @@ If you are using local Python on Mac/Linux:
 Open one terminal for the API, then run:
 
 ```bash
+cd ~/workshops/signalflow101-conf26
 .venv/bin/python workshop.py serve
 ```
 
@@ -266,6 +179,7 @@ If you are using Splunk Show SSH/CLI:
 Leave the API command from Step 1 running. Open another terminal, then run:
 
 ```bash
+cd ~/signalflow101-conf26
 python exercises/exercise1.py
 ```
 
@@ -388,6 +302,7 @@ If you are using Splunk Show SSH/CLI:
 Use the same terminal where you ran `exercises/exercise1.py`, then run:
 
 ```bash
+cd ~/signalflow101-conf26
 python exercises/exercise2a.py
 ```
 
@@ -505,6 +420,7 @@ Leave `exercises/exercise2a.py` running in the previous terminal. Open another
 terminal for the fleet query, then run:
 
 ```bash
+cd ~/signalflow101-conf26
 python exercises/exercise2b.py
 ```
 
@@ -616,7 +532,11 @@ outlier is obvious even before you look at the dashboard.
 
 You wrote and executed a SignalFlow program directly — the same computation engine that powers every chart in Splunk Observability Cloud. But instead of clicking through the UI to build a chart, you expressed the computation in code, ran it from your workshop environment, and streamed the results in real time.
 
-One participant — `participant-000` — is running significantly slower than everyone else. In Exercise 3 we're going to quantify exactly how much slower, using a metric that Splunk Observability Cloud doesn't give you out of the box.
+One participant, `participant-000`, is running significantly slower than everyone else. That participant is a pre-seeded bot introduced before the workshop to create a controlled latency anomaly. Congratulations: you used Splunk Observability Cloud to spot an anomaly in a fleet of services, using a light form of [chaos engineering](https://en.wikipedia.org/wiki/Chaos_engineering).
+
+In Exercise 3 we're going to quantify exactly how much slower `participant-000`
+is, using a metric that Splunk Observability Cloud doesn't give you out of the
+box.
 
 > 🔵 **Checkpoint 2** — Look up when you reach this point. We'll discuss what you found, why one participant stands out, and what it means before moving on to Exercise 3.
 
@@ -668,6 +588,7 @@ script from Exercise 2b with **Ctrl+C**, or open another terminal for Apdex,
 then run:
 
 ```bash
+cd ~/signalflow101-conf26
 python exercises/exercise3.py
 ```
 
@@ -1810,61 +1731,13 @@ Your access tokens and realm are available in your Splunk Observability Cloud ac
 
 ### If you don't have a Splunk Observability Cloud org yet
 
-Splunk offers a free trial that gives you full access to Splunk Observability Cloud. You can sign up at:
+Splunk Observability Cloud Free Edition gives you an org without a paid
+subscription. You can sign up at:
 
-**[https://www.splunk.com/en_us/download/splunk-observability-cloud-free-trial.html](https://www.splunk.com/en_us/download/splunk-observability-cloud-free-trial.html)**
+**[https://www.splunk.com/en_us/download/infrastructure-monitoring.html](https://www.splunk.com/en_us/download/infrastructure-monitoring.html)**
 
-Once your trial is provisioned, find your token secret(s) and realm in the account settings and update your `.env` file as described above.
-
----
-
-## Appendix: Workshop Environment Options
-
-The workshop supports the following Python environments. All three connect to the same Splunk Observability Cloud instance using the same credentials.
-
-### Option 1: Replit
-
-Replit runs Python in your browser and provides named workflows for each timed in-room exercise step.
-
-Use [docs/REPLIT.md](REPLIT.md) for the current Replit setup path and workflow names.
-
-### Option 2: Splunk Show SSH/CLI
-
-The shared Splunk Show Python environment gives you a terminal without requiring a local Python install. Your instructor will provide SSH and login details.
-
-Use [docs/SPLUNK_SHOW.md](SPLUNK_SHOW.md) for the CLI setup path and commands.
-
-### Option 3: Your own Python environment
-
-Use this path only if you already had Python working before the workshop. We will not troubleshoot laptop-specific Python, firewall, package manager, or IDE issues during the 60-minute session.
-
-Choose a parent folder where the repo should live, then clone the repo and
-create a virtual environment:
-
-```bash
-mkdir -p ~/workshops
-cd ~/workshops
-if [ ! -d signalflow101-conf26 ]; then git clone https://github.com/PKing70/signalflow101-conf26.git; fi
-cd signalflow101-conf26
-python -m venv .venv
-.venv/bin/python -c "import sys; print(sys.executable)"
-.venv/bin/python -m pip install -r requirements.txt
-[ -f .env ] || cp .env.example .env
-nano .env
-```
-
-Open `.env` in VS Code, another IDE, or any editor you already know. If you use
-`nano`, save with **Ctrl+O**, press **Enter**, then exit with **Ctrl+X**. Run
-the local exercises with `.venv/bin/python ...` from your terminal.
-
-If `pip` is configured to use a private package index and cannot find public
-packages such as `requests`, retry with:
-
-```bash
-.venv/bin/python -m pip install --index-url https://pypi.org/simple -r requirements.txt
-```
-
-If that is blocked, switch to Replit or Splunk Show SSH/CLI.
+Once your Free Edition org is provisioned, find your token secret(s) and realm
+in the account settings and update your `.env` file as described above.
 
 ---
 

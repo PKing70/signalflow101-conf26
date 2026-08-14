@@ -1,6 +1,8 @@
 # Replit Setup
 
-Use this path if your instructor chooses Replit for the workshop, or if the shared Splunk Show Python environment is not available to you.
+Use this path for the default in-room workshop flow. If Replit is blocked by
+your laptop, browser, or company policy, use the Splunk Show SSH/CLI fallback in
+[`docs/SPLUNK_SHOW.md`](SPLUNK_SHOW.md).
 
 Replit runs Python in your browser. You do not need to install Python locally, but you do need a Replit account and your workshop credentials.
 
@@ -31,50 +33,27 @@ Important: copy token secrets/values, not token IDs. Token IDs identify the toke
 | Replit Secret | Value Source |
 |---|---|
 | `SPLUNK_REALM` | Everyone uses `us1` |
-| `SPLUNK_INGEST_TOKEN` | Provided in the workshop credential instructions, or copied from O11y **Settings > Access Tokens** if your account can view it |
-| `SPLUNK_API_TOKEN` | Provided in the workshop credential instructions, or copied from your O11y user profile/API access token page |
-| `PARTICIPANT_ID` | Provided in your workshop email or credential page, for example `participant-345` |
+| `SPLUNK_INGEST_TOKEN` | Workshop credential instructions |
+| `SPLUNK_API_TOKEN` | Workshop credential instructions |
+| `PARTICIPANT_ID` | Workshop credential instructions, for example `participant-345` |
+
+If the credential sheet provides only one workshop token secret, use that same
+value for both `SPLUNK_INGEST_TOKEN` and `SPLUNK_API_TOKEN`.
 
 Do not paste secrets into Python files, chat windows, screenshots, or the public repo.
 
 The example `participant-345` is only an example. Use the exact `PARTICIPANT_ID` assigned to you.
 
-## Run The Workshop Workflows
+## Verify Setup
 
-Replit's UI changes frequently. The most reliable way to open Workflows is:
+Run the setup check before starting the exercises. Replit's UI changes
+frequently. The most reliable way to open Workflows is:
 
 1. Press **Cmd+K** on Mac or **Ctrl+K** on Windows.
 2. Search for `Workflows`.
 3. Choose **Workflows** from the results.
-
-You should see these workflows:
-
-| Workflow | What it does |
-|---|---|
-| `0 - Check setup` | Verifies packages and required workshop values |
-| `1 - Start API` | Starts your personal FastAPI service on port 8000 |
-| `1a - Send first metric` | Sends one synthetic latency metric for Exercise 1 |
-| `2 - Send latency metrics` | Measures your API and sends latency to Splunk O11y |
-| `3 - View fleet latency` | Runs the SignalFlow fleet query |
-| `4 - Compute Apdex` | Runs the SignalFlow Apdex query |
-| `In-room - API + sender` | Starts the API and sender together |
-
-Recommended in-room flow:
-
-1. Run `0 - Check setup`.
-2. Press **Cmd+K** or **Ctrl+K**, search for `Console`, and open **Console** to see the workflow output.
-3. Run `1 - Start API`.
-4. Press **Cmd+K** or **Ctrl+K**, search for `Preview`, and open **Preview**.
-5. If Preview opens to `/`, add `/hello` to the path. You should see JSON with your `participant_id`.
-6. Run `1a - Send first metric` when Exercise 1 asks you to send one metric.
-7. Run `2 - Send latency metrics` and leave it running.
-8. Run `3 - View fleet latency` when the instructor asks you to investigate the fleet.
-9. Stop `3 - View fleet latency` before starting the next query.
-10. Run `4 - Compute Apdex` when the instructor asks you to compute Apdex.
-
-After Exercise 1, `In-room - API + sender` is a shortcut that starts the API and latency sender together for Exercise 2. Use the separate workflows if you want clearer output while learning the flow.
-
-The long-running workflows print continuously. Stop them with the Replit Stop button or `Ctrl+C` in the console.
+4. Run `0 - Check setup`.
+5. Press **Cmd+K** or **Ctrl+K**, search for `Console`, and open **Console** to see the workflow output.
 
 Expected setup check output:
 
@@ -98,99 +77,15 @@ Workshop values:
 Ready. Start the API, then start sending latency metrics.
 ```
 
-Expected `/hello` output:
-
-```json
-{
-  "participant_id": "participant-345",
-  "message": "hello from participant-345",
-  "simulated_processing_ms": 105.5
-}
-```
-
-Expected first metric output:
-
-```text
-Metric sent successfully.
-participant_id: participant-345
-latency:        287.3ms
-```
-
-Expected sender output:
-
-```text
-API is reachable.
-{
-  "participant_id": "participant-345",
-  "message": "hello from participant-345",
-  "simulated_processing_ms": 92.3
-}
-Sending real latency metrics for participant-345...
-Press Ctrl+C to stop.
-
-Sent: 93.7ms
-Sent: 112.0ms
-```
-
-Expected fleet output:
-
-```text
---- Fleet Latency (top 2 of 2) ---
-participant-1                               129.2ms  ████████████
-participant-345                              96.1ms  █████████
-```
-
-Expected Apdex output:
-
-```text
---- Apdex Scores (lowest 2 of 2, T=300ms) ---
-participant-345                          1.00  Excellent     ████████████████████
-participant-1                            1.00  Excellent     ████████████████████
-```
-
-## Shell Fallback
-
-If the Workflows pane is unavailable, use the Shell. Keep long-running commands
-open while you run the next command in another shell.
-
-Check setup:
-
-```bash
-python workshop.py check
-```
-
-Terminal 1:
-
-```bash
-python workshop.py serve
-```
-
-Terminal 2:
-
-```bash
-python exercises/exercise1.py
-python workshop.py send
-```
-
-Terminal 3:
-
-```bash
-python workshop.py fleet
-python workshop.py apdex
-```
-
-Stop `python workshop.py fleet` before running `python workshop.py apdex`.
+After setup passes, go to [`docs/EXERCISE_GUIDE.md`](EXERCISE_GUIDE.md). The
+exercise guide tells you which Replit workflow to run for each timed step.
 
 ## Troubleshooting
 
 **Setup check says values are missing:** Open **Tools > Secrets** and confirm the names match exactly. Replit Secrets are case-sensitive.
 
-**API does not start:** Run `python workshop.py install`, then run `python workshop.py serve` again.
-
-**Sender cannot reach `localhost:8000`:** Start `1 - Start API` first. If using the shell, keep the API command running in one shell and run the sender in a second shell.
-
-**Preview shows `{"detail":"Not Found"}`:** The API is running, but Preview opened a path the API does not use. Add `/hello` to the Preview path.
-
 **You see `participant-unconfigured`:** `PARTICIPANT_ID` is missing or still set to a placeholder. Set it to your assigned alias, such as `participant-042`.
 
-**The workflows do not appear:** Replit sometimes needs a workspace reload after importing `.replit`. Reload the browser tab or restart the workspace, then press **Cmd+K** or **Ctrl+K** and search for `Workflows` again.
+**The setup workflow does not appear:** Replit sometimes needs a workspace
+reload after importing `.replit`. Reload the browser tab or restart the
+workspace, then press **Cmd+K** or **Ctrl+K** and search for `Workflows` again.
