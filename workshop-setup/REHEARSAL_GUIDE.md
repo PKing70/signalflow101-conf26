@@ -340,7 +340,7 @@ python workshop.py apdex
 Open the workshop dashboard:
 
 ```text
-https://app.us1.observability.splunkcloud.com/#/dashboard/HOkNhxUAwAE?groupId=HOkNjAJA4AM
+https://app.us1.observability.splunkcloud.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA
 ```
 
 In dashboard group `SignalFlow 101 - .conf26`, open
