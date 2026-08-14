@@ -1,25 +1,29 @@
 # Splunk Show SSH/CLI Setup
 
-Use this path if your instructor provides access to the shared Splunk Show Python environment.
+Use this fallback path if Replit is blocked by your laptop, browser, or company
+policy, or if your instructor tells you to use the shared Splunk Show Python
+environment.
 
-The exact SSH host, username, and login method will come from the workshop credential instructions. After you connect, you will run the exercises from a terminal.
+The exact SSH host, Web SSH URL, username, and login method will come from the
+workshop credential instructions. After you connect, you will run the exercises
+from a terminal in the browser or from your own SSH client.
 
 ## Get The Workshop Files
 
-Your instructor will tell you whether the repo is already present in the shared
-Splunk Show Python environment.
+The workshop Show environment is intended to have the repo and Python
+dependencies preloaded.
 
-If the repo is already present, change into that folder. If not, clone it:
+After you sign in, start here:
+
+```bash
+cd ~/signalflow101-conf26
+```
+
+If `cd ~/signalflow101-conf26` says the folder does not exist, clone the repo:
 
 ```bash
 git clone https://github.com/PKing70/signalflow101-conf26.git
 cd signalflow101-conf26
-```
-
-If dependencies are not already installed in the Splunk Show environment, run:
-
-```bash
-python -m pip install -r requirements.txt
 ```
 
 ## Configure Workshop Values
@@ -52,37 +56,25 @@ PARTICIPANT_ID=<your assigned alias>
 ```
 
 Use token secrets, not token IDs. Your participant ID should look like `participant-042`.
+If the credential sheet provides only one workshop token secret, use that same
+value for both `SPLUNK_INGEST_TOKEN` and `SPLUNK_API_TOKEN`.
 
-## Run The CLI Flow
+## Verify Setup
 
-Check your setup:
+Before starting the exercises, check your setup:
 
 ```bash
+cd ~/signalflow101-conf26
 python workshop.py check
 ```
 
-Start your API:
+If `python workshop.py check` says packages are missing, install them, then run
+the setup check again:
 
 ```bash
-python workshop.py serve
+python -m pip install -r requirements.txt
+python workshop.py check
 ```
 
-Open a second terminal for the one-shot metric and sender:
-
-```bash
-python exercises/exercise1.py
-python workshop.py send
-```
-
-Open a third terminal for the queries:
-
-```bash
-python workshop.py fleet
-python workshop.py apdex
-```
-
-Stop `python workshop.py fleet` before running `python workshop.py apdex`.
-
-Stop long-running commands with `Ctrl+C`.
-
-If your instructor provides a URL or port-forwarding instructions for your API, add `/hello` to that URL to view the API response.
+After setup passes, go to [`docs/EXERCISE_GUIDE.md`](EXERCISE_GUIDE.md). The
+exercise guide tells you which CLI command to run for each timed step.
