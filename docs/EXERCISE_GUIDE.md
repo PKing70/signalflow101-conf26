@@ -65,9 +65,9 @@ miss anything required.
 > 🔲 **Placeholder:** Workshop credential delivery instructions to be added once
 > the workshop instance is provisioned. This section will include the QR code or
 > URL for the credential page, login instructions, and where to find your token
-> secret(s), the `us1` realm value, and participant alias.
+> secret(s), the `us1` realm value, and participant ID.
 
-For this workshop, your development environment/login is yours, but everyone sends data to the same Splunk Observability Cloud organization. Your `PARTICIPANT_ID` is what separates your metrics from everyone else's.
+For this workshop, your development environment/login is yours, but everyone sends data to the same Splunk Observability Cloud organization. Your `PARTICIPANT_ID` is a string assigned by workshop staff, not something copied from O11y or Splunk Show. It is what separates your metrics from everyone else's.
 
 Before starting Exercise 1, complete exactly one setup guide and make sure its
 setup check passes:
@@ -85,7 +85,7 @@ You'll use these values during setup:
 - The shared **realm** — `us1`
 - The shared **ingest token secret** — used when Python sends metric datapoints
 - Your **API token secret** — used when Python runs SignalFlow queries
-- Your unique **participant ID** — an alias such as `participant-042`
+- Your unique **participant ID** — assigned by workshop staff, such as `participant-042`
 
 Your setup guide explains where to put these values for your environment.
 
@@ -449,7 +449,7 @@ One participant stands out. That's not a coincidence.
 Now open the workshop dashboard in Splunk Observability Cloud to see the same
 data visualized live:
 
-https://app.us1.observability.splunkcloud.com/#/dashboard/HOkNhxUAwAE?groupId=HOkNjAJA4AM
+https://app.us1.observability.splunkcloud.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA
 
 In the dashboard group **SignalFlow 101 - .conf26**, open **SignalFlow 101 -
 Workshop Fleet** and look at **Fleet latency by participant**. The same outlier

@@ -35,14 +35,15 @@ Important: copy token secrets/values, not token IDs. Token IDs identify the toke
 | `SPLUNK_REALM` | Everyone uses `us1` |
 | `SPLUNK_INGEST_TOKEN` | Workshop credential instructions |
 | `SPLUNK_API_TOKEN` | Workshop credential instructions |
-| `PARTICIPANT_ID` | Workshop credential instructions, for example `participant-345` |
+| `PARTICIPANT_ID` | Assigned by workshop staff, for example `participant-345` |
 
 If the credential sheet provides only one workshop token secret, use that same
 value for both `SPLUNK_INGEST_TOKEN` and `SPLUNK_API_TOKEN`.
 
 Do not paste secrets into Python files, chat windows, screenshots, or the public repo.
 
-The example `participant-345` is only an example. Use the exact `PARTICIPANT_ID` assigned to you.
+The example `participant-345` is only an example. `PARTICIPANT_ID` is not copied
+from O11y or Splunk Show; use the exact value assigned to you by workshop staff.
 
 ## Verify Setup
 

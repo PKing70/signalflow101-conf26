@@ -17,7 +17,7 @@ only if it was already working before the workshop.
 The supported workshop paths are:
 
 1. **Replit** — browser-based Python with repo-defined workflows.
-2. **Splunk Show Python environment** — fallback SSH/Web SSH terminal on the shared workshop host.
+2. **Splunk Show Python environment** — fallback SSH terminal on the shared workshop host.
 3. **Your own Python environment** — only if you already had Python working before the workshop.
 
 ### Replit
@@ -26,13 +26,13 @@ Use [docs/REPLIT.md](docs/REPLIT.md) for the default attendee setup path. Replit
 
 ### Splunk Show SSH/CLI
 
-Use [docs/SPLUNK_SHOW.md](docs/SPLUNK_SHOW.md) if Replit is blocked or your instructor tells you to use the shared Splunk Show Python environment. Your instructor will provide SSH/Web SSH login details. This path uses `.env` for workshop values and terminal commands such as `python workshop.py check`.
+Use [docs/SPLUNK_SHOW.md](docs/SPLUNK_SHOW.md) if Replit is blocked or your instructor tells you to use the shared Splunk Show Python environment. This path uses `.env` for workshop values and terminal commands such as `python workshop.py check`.
 
 ### Existing Local Python
 
 Use [docs/LOCAL_PYTHON.md](docs/LOCAL_PYTHON.md) only if your own Python environment was already working before the workshop. We will not troubleshoot laptop-specific Python, firewall, package manager, or IDE issues during the 60-minute session.
 
-For the workshop, each participant has their own development environment/login, but everyone sends data to the same Splunk Observability Cloud organization in realm `us1`. `PARTICIPANT_ID` is what separates your metrics from everyone else's. The workshop credential instructions provide the token secrets and participant alias.
+For the workshop, each participant has their own development environment/login, but everyone sends data to the same Splunk Observability Cloud organization in realm `us1`. `PARTICIPANT_ID` is assigned by workshop staff and separates your metrics from everyone else's. The workshop credential instructions provide the token secrets and participant ID.
 
 ---
 

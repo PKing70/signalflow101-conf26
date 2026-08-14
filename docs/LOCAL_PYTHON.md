@@ -63,12 +63,13 @@ Your `.env` file should look like this after you edit it:
 
 ```text
 SPLUNK_REALM=us1
-SPLUNK_INGEST_TOKEN=<token secret>
-SPLUNK_API_TOKEN=<token secret>
-PARTICIPANT_ID=<your assigned alias>
+SPLUNK_INGEST_TOKEN=<workshop ingest token secret>
+SPLUNK_API_TOKEN=<workshop API token secret>
+PARTICIPANT_ID=<participant ID assigned by workshop staff>
 ```
 
-Use token secrets, not token IDs. Your participant ID should look like
+Use token secrets, not token IDs. Your participant ID is not copied from O11y or
+Splunk Show; it is assigned by the workshop staff and should look like
 `participant-042`.
 If the credential sheet provides only one workshop token secret, use that same
 value for both `SPLUNK_INGEST_TOKEN` and `SPLUNK_API_TOKEN`.
