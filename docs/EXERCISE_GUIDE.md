@@ -123,6 +123,15 @@ cd ~/workshops/signalflow101-conf26
 .venv/bin/python workshop.py serve
 ```
 
+If you are using local Python on Windows PowerShell:
+
+Open one terminal for the API, then run:
+
+```powershell
+Set-Location "$HOME\workshops\signalflow101-conf26"
+.\.venv\Scripts\python workshop.py serve
+```
+
 Leave this API terminal running for the rest of the timed exercises.
 
 If your instructor provides a URL or port-forwarding instructions, open that URL
@@ -190,6 +199,15 @@ Leave the API command from Step 1 running. Open another terminal, then run:
 ```bash
 cd ~/workshops/signalflow101-conf26
 .venv/bin/python exercises/exercise1.py
+```
+
+If you are using local Python on Windows PowerShell:
+
+Leave the API command from Step 1 running. Open another terminal, then run:
+
+```powershell
+Set-Location "$HOME\workshops\signalflow101-conf26"
+.\.venv\Scripts\python exercises\exercise1.py
 ```
 
 Expected terminal result:
@@ -315,6 +333,15 @@ cd ~/workshops/signalflow101-conf26
 .venv/bin/python exercises/exercise2a.py
 ```
 
+If you are using local Python on Windows PowerShell:
+
+Use the same terminal where you ran `exercises\exercise1.py`, then run:
+
+```powershell
+Set-Location "$HOME\workshops\signalflow101-conf26"
+.\.venv\Scripts\python exercises\exercise2a.py
+```
+
 Expected terminal result:
 
 ```
@@ -432,6 +459,16 @@ terminal for the fleet query, then run:
 ```bash
 cd ~/workshops/signalflow101-conf26
 .venv/bin/python exercises/exercise2b.py
+```
+
+If you are using local Python on Windows PowerShell:
+
+Leave `exercises\exercise2a.py` running in the previous terminal. Open another
+terminal for the fleet query, then run:
+
+```powershell
+Set-Location "$HOME\workshops\signalflow101-conf26"
+.\.venv\Scripts\python exercises\exercise2b.py
 ```
 
 Expected terminal result:
@@ -603,6 +640,17 @@ cd ~/workshops/signalflow101-conf26
 .venv/bin/python exercises/exercise3.py
 ```
 
+If you are using local Python on Windows PowerShell:
+
+Leave the real latency sender from Exercise 2a running. Stop the fleet latency
+script from Exercise 2b with **Ctrl+C**, or open another terminal for Apdex,
+then run:
+
+```powershell
+Set-Location "$HOME\workshops\signalflow101-conf26"
+.\.venv\Scripts\python exercises\exercise3.py
+```
+
 Expected terminal result:
 
 ```
@@ -740,6 +788,11 @@ The take-home exercises do not include prebuilt Replit workflows. If you use
 Replit for the take-home path, use the Shell or Console to run the commands
 shown. Splunk Show SSH/CLI and local Python users use the same terminal
 commands from the repo root.
+
+In the take-home command blocks, `python ...` means the Python command for your
+environment. In Splunk Show SSH/CLI and Replit Shell, use `python ...` as shown.
+For local Python on Mac/Linux, use `.venv/bin/python ...`. For local Python on
+Windows PowerShell, use `.\.venv\Scripts\python ...`.
 
 ---
 
