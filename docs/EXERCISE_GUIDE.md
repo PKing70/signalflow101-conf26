@@ -17,7 +17,7 @@ Everything you interact with in Splunk Observability Cloud is powered by SignalF
 - The workshop credentials sheet handed out at the start of the session
 - One supported Python environment:
   - Replit, the recommended in-room path
-  - The shared Splunk Show Python environment, accessed over SSH, if Replit is blocked
+  - The Splunk Show Python environment, accessed over SSH, if Replit is blocked
   - Your own pre-existing Python environment
 
 If you use Replit or the Splunk Show environment, you do not need to install Python on your laptop. If you use your own Python environment, it should already be working before the workshop starts.
@@ -28,7 +28,7 @@ If you use Replit or the Splunk Show environment, you do not need to install Pyt
 
 By the end of this workshop you will have:
 
-- A personal API endpoint running in the cloud, sending real metrics into our shared Splunk Observability Cloud instance
+- A personal API endpoint running in the cloud, sending real metrics into our shared Splunk Observability Cloud organization
 - SignalFlow programs that investigate a live fleet-wide latency anomaly and identify the culprit
 - An Apdex score — a custom SLO metric computed in SignalFlow that Splunk Observability Cloud doesn't give you out of the box
 
@@ -1706,7 +1706,7 @@ This is the full arc of what SignalFlow as an API makes possible. The chaos-bot 
 
 ## Running These Exercises on Your Own Instance
 
-The workshop used a shared Splunk Observability Cloud instance provisioned via Splunk Show. Once you're back at your desk, you can run these exercises — or build on them — against your own instance.
+The workshop used a shared Splunk Observability Cloud organization provisioned for the event. Once you're back at your desk, you can run these exercises — or build on them — against your own instance.
 
 ### If you already have a Splunk Observability Cloud org
 
