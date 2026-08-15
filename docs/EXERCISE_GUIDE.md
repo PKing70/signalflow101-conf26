@@ -449,7 +449,7 @@ One participant stands out. That's not a coincidence.
 Now open the workshop dashboard in Splunk Observability Cloud to see the same
 data visualized live:
 
-https://app.us1.observability.splunkcloud.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA
+https://app.us1.signalfx.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA
 
 In the dashboard group **SignalFlow 101 - .conf26**, open **SignalFlow 101 -
 Workshop Fleet** and look at **Fleet latency by participant**. The same outlier
