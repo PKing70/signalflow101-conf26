@@ -43,19 +43,41 @@ The detailed version of each step follows.
 
 ## Start From A Local Checkout
 
+On Windows, open **Windows Terminal**. If it is not already using PowerShell,
+open a **PowerShell** tab. The Windows commands below assume PowerShell syntax.
+
 If this is a new local checkout:
+
+Mac/Linux:
 
 ```bash
 git clone https://github.com/PKing70/signalflow101-conf26.git
 cd signalflow101-conf26
 ```
 
+Windows PowerShell:
+
+```powershell
+git clone https://github.com/PKing70/signalflow101-conf26.git
+Set-Location signalflow101-conf26
+```
+
 If the repo already exists locally:
+
+Mac/Linux:
 
 ```bash
 cd /path/to/signalflow101-conf26
 git switch main
-git pull
+git pull --ff-only origin main
+```
+
+Windows PowerShell:
+
+```powershell
+Set-Location "C:\path\to\signalflow101-conf26"
+git switch main
+git pull --ff-only origin main
 ```
 
 If `git pull` reports local changes, stop and use a fresh clone in another
@@ -311,6 +333,13 @@ SPLUNK_INGEST_TOKEN=<token secret>
 SPLUNK_API_TOKEN=<token secret>
 PARTICIPANT_ID=participant-777
 ```
+
+The commands below use `python`, which is correct inside Splunk Show SSH/CLI.
+For a local participant simulation, run the same scripts with the repo virtual
+environment instead:
+
+- Mac/Linux: replace `python` with `.venv/bin/python`
+- Windows PowerShell: replace `python` with `.\.venv\Scripts\python`
 
 Run:
 
