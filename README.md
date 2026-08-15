@@ -17,7 +17,7 @@ only if it was already working before the workshop.
 The supported workshop paths are:
 
 1. **Replit** — browser-based Python with repo-defined workflows.
-2. **Splunk Show Python environment** — fallback SSH terminal on the shared workshop host.
+2. **Splunk Show Python environment** — fallback SSH terminal on your assigned workshop instance.
 3. **Your own Python environment** — only if you already had Python working before the workshop.
 
 ### Replit
@@ -26,7 +26,7 @@ Use [docs/REPLIT.md](docs/REPLIT.md) for the default attendee setup path. Replit
 
 ### Splunk Show SSH/CLI
 
-Use [docs/SPLUNK_SHOW.md](docs/SPLUNK_SHOW.md) if Replit is blocked or your instructor tells you to use the shared Splunk Show Python environment. This path uses `.env` for workshop values and terminal commands such as `python workshop.py check`.
+Use [docs/SPLUNK_SHOW.md](docs/SPLUNK_SHOW.md) if Replit is blocked or your instructor tells you to use the Splunk Show Python environment. This path uses `.env` for workshop values and terminal commands such as `python workshop.py check`.
 
 ### Existing Local Python
 

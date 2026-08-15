@@ -1,11 +1,11 @@
 # Splunk Show SSH/CLI Setup
 
 Use this fallback path if Replit is blocked by your laptop, browser, or company
-policy, or if your instructor tells you to use the shared Splunk Show Python
+policy, or if your instructor tells you to use the Splunk Show Python
 environment.
 
 You will use the email address you registered with to retrieve your Splunk Show
-password, then SSH to the shared workshop host.
+password, then SSH to your assigned workshop instance.
 
 ## Sign In To Splunk Show
 
@@ -26,12 +26,14 @@ After you connect, you will run the exercises from that SSH terminal.
 ## Get The Workshop Files
 
 The workshop Show environment is intended to have the repo and Python
-dependencies preloaded.
+dependencies preloaded. Each attendee gets a separate Show instance, so it is
+safe to sync your copy of the repo before you start.
 
 After you connect over SSH, start here:
 
 ```bash
 cd ~/signalflow101-conf26
+git pull --ff-only origin main
 ```
 
 If `cd ~/signalflow101-conf26` says the folder does not exist, clone the repo:
@@ -39,7 +41,12 @@ If `cd ~/signalflow101-conf26` says the folder does not exist, clone the repo:
 ```bash
 git clone https://github.com/PKing70/signalflow101-conf26.git
 cd signalflow101-conf26
+git pull --ff-only origin main
 ```
+
+If `git pull --ff-only origin main` reports local changes, stop and ask the
+instructor for help before continuing. The workshop files should match the
+latest version in GitHub.
 
 ## Configure Workshop Values
 
@@ -82,6 +89,7 @@ Before starting the exercises, check your setup:
 
 ```bash
 cd ~/signalflow101-conf26
+git pull --ff-only origin main
 python workshop.py check
 ```
 

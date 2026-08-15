@@ -295,7 +295,15 @@ participant.
 ## CLI Fallback For Participant Simulation
 
 If you are rehearsing without Replit, use a second terminal or environment with
-all four participant values configured:
+all four participant values configured. If that environment is Splunk Show
+SSH/CLI, sync the repo first so the rehearsal matches the latest GitHub content:
+
+```bash
+cd ~/signalflow101-conf26
+git pull --ff-only origin main
+```
+
+Then confirm the participant values in `.env`:
 
 ```text
 SPLUNK_REALM=us1
