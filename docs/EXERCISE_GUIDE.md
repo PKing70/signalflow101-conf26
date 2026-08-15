@@ -84,7 +84,7 @@ You'll use these values during setup:
 
 - The shared **realm** — `us1`
 - The shared **ingest token secret** — used when Python sends metric datapoints
-- Your **API token secret** — used when Python runs SignalFlow queries
+- The shared **API token secret** — used when Python runs SignalFlow queries
 - Your unique **participant ID** — assigned by workshop staff, such as `participant-042`
 
 Your setup guide explains where to put these values for your environment.
