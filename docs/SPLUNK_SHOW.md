@@ -11,11 +11,12 @@ password, then SSH to your assigned workshop instance.
 
 1. Go to [https://show.splunk.com/](https://show.splunk.com/).
 2. Sign in with the email address you used to register for this workshop.
-3. Find your Splunk Show password.
+3. Find your Splunk Show password and SSH connection command.
 4. Open Terminal, Windows Terminal, PowerShell, or another SSH-capable terminal.
    On Windows, open **Windows Terminal**. If it is not already using
    PowerShell, open a **PowerShell** tab.
-5. Connect to the workshop host:
+5. Connect to your assigned workshop instance using the SSH command shown in
+   Splunk Show. It will look similar to this:
 
 ```bash
 ssh -p 2222 splunk@100.53.232.167
