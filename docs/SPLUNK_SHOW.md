@@ -26,6 +26,8 @@ ssh -p 2222 splunk@100.53.232.167
 
 After you connect, you will run the exercises from that SSH terminal.
 
+![Screenshot of Splunk Show in Terminal](images/Splunk-Show.png)
+
 ## Get The Workshop Files
 
 The workshop Show environment is intended to have the repo and Python

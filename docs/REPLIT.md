@@ -23,6 +23,8 @@ If you already imported the repo earlier, use Replit's Git tools to pull the lat
 
 In Replit, use **Secrets**. Replit may already show a secret named `SESSION_SECRET`. Leave it alone. You will add four more secrets for this workshop.
 
+![Screenshot of where to find Secrets in Replit](images/Replit-Secrets-Setup.png)
+
 1. From the left side of Replit, open **Tools**.
 2. Choose **Secrets**.
 3. Choose **+ New Secret**.
