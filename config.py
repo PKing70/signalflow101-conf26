@@ -31,8 +31,8 @@ _PLACEHOLDERS = {
 
 # Validate on import so every script fails fast with a clear message
 _missing = [k for k, v in {
-    "SPLUNK_INGEST_TOKEN or SPLUNK_ACCESS_TOKEN": INGEST_TOKEN,
-    "SPLUNK_API_TOKEN or SPLUNK_ACCESS_TOKEN": API_TOKEN,
+    "SPLUNK_INGEST_TOKEN with INGEST scope": INGEST_TOKEN,
+    "SPLUNK_API_TOKEN with API scope": API_TOKEN,
     "SPLUNK_REALM": REALM,
     "PARTICIPANT_ID": PARTICIPANT_ID,
 }.items() if not v or v in _PLACEHOLDERS]
@@ -42,5 +42,6 @@ if _missing:
         f"\n\nMissing required workshop values: {', '.join(_missing)}\n"
         "In Replit, add them in Tools > Secrets.\n"
         "In Splunk Show SSH/CLI or local Python, copy .env.example to .env and fill it in.\n"
+        "Use the ingest token for SPLUNK_INGEST_TOKEN and the API token for SPLUNK_API_TOKEN.\n"
         "Your PARTICIPANT_ID should look like participant-042, not an email address.\n"
     )

@@ -12,6 +12,21 @@ import json
 import requests
 
 
+def _raise_for_status_with_hint(response, realm):
+    if response.status_code in {401, 403}:
+        message = (
+            f"SignalFlow request failed with HTTP {response.status_code}.\n"
+            "Check SPLUNK_API_TOKEN. It must be a token value/secret with the "
+            f"API authorization scope for realm {realm}.\n"
+            "If Exercise 1 or 2a can send metrics but Exercise 2b fails, your "
+            "SPLUNK_INGEST_TOKEN is probably working but SPLUNK_API_TOKEN is "
+            "missing, stale, or set to the ingest token by mistake."
+        )
+        raise requests.HTTPError(message, response=response)
+
+    response.raise_for_status()
+
+
 def stream_signalflow(
     program_text,
     token,
@@ -46,7 +61,7 @@ def stream_signalflow(
         stream=True,
         timeout=(10, read_timeout),
     ) as response:
-        response.raise_for_status()
+        _raise_for_status_with_hint(response, realm)
 
         metadata_by_tsid = {}
         event_name = None

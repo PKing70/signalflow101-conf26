@@ -27,6 +27,8 @@ from config import API_TOKEN, REALM, PARTICIPANT_ID
 from signalflow_rest import stream_signalflow
 
 DISPLAY_LIMIT = 15
+SIGNALFLOW_RESOLUTION_MS = 10000
+SIGNALFLOW_MAX_DELAY_MS = 30000
 
 T = 300            # Satisfied threshold in ms
 T_tolerating = T * 4  # 1200ms — frustrated threshold
@@ -45,7 +47,14 @@ apdex.publish('apdex')
 results = {}
 
 try:
-    for event_name, payload, metadata in stream_signalflow(program, API_TOKEN, REALM):
+    print("Waiting for SignalFlow Apdex data. Fresh metrics can take 30-60 seconds to appear...")
+    for event_name, payload, metadata in stream_signalflow(
+        program,
+        API_TOKEN,
+        REALM,
+        resolution=SIGNALFLOW_RESOLUTION_MS,
+        max_delay=SIGNALFLOW_MAX_DELAY_MS,
+    ):
         if event_name != "data":
             continue
 

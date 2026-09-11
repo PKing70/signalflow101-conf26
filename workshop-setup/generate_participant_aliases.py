@@ -1,5 +1,5 @@
 """
-Generate participant aliases for credential distribution.
+Generate participant aliases for workshop handout distribution.
 
 Usage:
     python workshop-setup/generate_participant_aliases.py --count 200

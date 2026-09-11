@@ -97,25 +97,27 @@ notepad .env
 ```
 
 If you use `nano`, use the arrow keys to move around and replace the placeholder
-values with the values from the workshop credential instructions. When you are
-finished, press **Ctrl+O**, press **Enter** to write the file, then press
-**Ctrl+X** to exit. If you use Notepad, edit the values, save, and close the
-file.
+values. Copy the ingest and API token values from Splunk Observability Cloud
+after signing in; see [`docs/O11Y.md`](O11Y.md). When you are finished, press
+**Ctrl+O**, press **Enter** to write the file, then press **Ctrl+X** to exit. If
+you use Notepad, edit the values, save, and close the file.
 
 Your `.env` file should look like this after you edit it:
 
 ```text
 SPLUNK_REALM=us1
-SPLUNK_INGEST_TOKEN=<workshop ingest token secret>
-SPLUNK_API_TOKEN=<workshop API token secret>
+SPLUNK_INGEST_TOKEN=<workshop ingest token value copied from O11y>
+SPLUNK_API_TOKEN=<workshop API token value copied from O11y>
 PARTICIPANT_ID=<participant ID assigned by workshop staff>
 ```
 
-Use token secrets, not token IDs. Your participant ID is not copied from O11y or
-Splunk Show; it is assigned by the workshop staff and should look like
+Use token values/secrets, not token IDs. Your participant ID is not copied from
+O11y or Splunk Show; it is assigned by the workshop staff and should look like
 `participant-042`.
-If the credential sheet provides only one workshop token secret, use that same
-value for both `SPLUNK_INGEST_TOKEN` and `SPLUNK_API_TOKEN`.
+Use the ingest token value for `SPLUNK_INGEST_TOKEN` and the API token value for
+`SPLUNK_API_TOKEN`. If you accidentally use the ingest token for both, Exercise
+1 and Exercise 2a might send metrics, but Exercise 2b will fail with an
+unauthorized SignalFlow error.
 
 ## Run The Exercises
 
@@ -123,3 +125,5 @@ Follow [`docs/EXERCISE_GUIDE.md`](EXERCISE_GUIDE.md).
 
 For local Python on Mac/Linux, use `.venv/bin/python` for the exercise commands
 in the guide. On Windows PowerShell, use `.\.venv\Scripts\python` instead.
+Use [`docs/O11Y.md`](O11Y.md) when the exercise guide tells you to verify your
+metrics in Splunk Observability Cloud.

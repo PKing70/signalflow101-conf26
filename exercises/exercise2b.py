@@ -22,6 +22,8 @@ from config import API_TOKEN, REALM, PARTICIPANT_ID
 from signalflow_rest import stream_signalflow
 
 DISPLAY_LIMIT = 15
+SIGNALFLOW_RESOLUTION_MS = 10000
+SIGNALFLOW_MAX_DELAY_MS = 30000
 
 program = """
 latency = data('workshop.api.latency').mean(over='1m').mean(by=['participant_id'])
@@ -31,7 +33,14 @@ latency.publish('avg_latency_by_participant')
 results = {}
 
 try:
-    for event_name, payload, metadata in stream_signalflow(program, API_TOKEN, REALM):
+    print("Waiting for SignalFlow fleet data. Fresh metrics can take 30-60 seconds to appear...")
+    for event_name, payload, metadata in stream_signalflow(
+        program,
+        API_TOKEN,
+        REALM,
+        resolution=SIGNALFLOW_RESOLUTION_MS,
+        max_delay=SIGNALFLOW_MAX_DELAY_MS,
+    ):
         if event_name != "data":
             continue
 

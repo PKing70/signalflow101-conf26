@@ -51,4 +51,9 @@ if response.status_code == 200:
     print(f"latency:        {latency:.1f}ms")
 else:
     print(f"Something went wrong: {response.status_code}")
+    if response.status_code in {401, 403}:
+        print(
+            "Check SPLUNK_INGEST_TOKEN. It must be a token value/secret with "
+            f"the INGEST authorization scope for realm {REALM}."
+        )
     print(response.text)
