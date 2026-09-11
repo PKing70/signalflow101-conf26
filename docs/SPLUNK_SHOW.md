@@ -7,6 +7,10 @@ environment.
 You will use the email address you registered with to retrieve your Splunk Show
 password, then SSH to your assigned workshop instance.
 
+Splunk Show SSH is only your Python terminal for the exercises. You will still
+use Splunk Observability Cloud in your browser to view the shared workshop
+dashboard.
+
 ## Sign In To Splunk Show
 
 1. Go to [https://show.splunk.com/](https://show.splunk.com/).
@@ -19,7 +23,7 @@ password, then SSH to your assigned workshop instance.
    Splunk Show. It will look similar to this:
 
 ```bash
-ssh -p 2222 splunk@100.53.232.167
+ssh -p 2222 splunk@<your-show-host>
 ```
 
 6. Enter your Splunk Show password when prompted.
@@ -83,8 +87,10 @@ PARTICIPANT_ID=<participant ID assigned by workshop staff>
 Use token secrets, not token IDs. Your participant ID is not copied from O11y or
 Splunk Show; it is assigned by the workshop staff and should look like
 `participant-042`.
-If the credential sheet provides only one workshop token secret, use that same
-value for both `SPLUNK_INGEST_TOKEN` and `SPLUNK_API_TOKEN`.
+Use the ingest token value for `SPLUNK_INGEST_TOKEN` and the API token value for
+`SPLUNK_API_TOKEN`. If you accidentally use the ingest token for both, Exercise
+1 and Exercise 2a might send metrics, but Exercise 2b will fail with an
+unauthorized SignalFlow error.
 
 ## Verify Setup
 
@@ -106,3 +112,5 @@ python workshop.py check
 
 After setup passes, go to [`docs/EXERCISE_GUIDE.md`](EXERCISE_GUIDE.md). The
 exercise guide tells you which CLI command to run for each timed step.
+Use [`docs/O11Y.md`](O11Y.md) when the exercise guide tells you to verify your
+metrics in Splunk Observability Cloud.

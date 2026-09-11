@@ -82,8 +82,8 @@ def check_setup(_args):
     api_token = values["SPLUNK_API_TOKEN"] or values["SPLUNK_ACCESS_TOKEN"]
     checks = [
         ("SPLUNK_REALM", values["SPLUNK_REALM"]),
-        ("SPLUNK_INGEST_TOKEN or SPLUNK_ACCESS_TOKEN", ingest_token),
-        ("SPLUNK_API_TOKEN or SPLUNK_ACCESS_TOKEN", api_token),
+        ("SPLUNK_INGEST_TOKEN with INGEST scope", ingest_token),
+        ("SPLUNK_API_TOKEN with API scope", api_token),
         ("PARTICIPANT_ID", values["PARTICIPANT_ID"]),
     ]
 
@@ -101,6 +101,7 @@ def check_setup(_args):
 
     if packages_ok and values_ok:
         print("\nReady. Start the API, then start sending latency metrics.")
+        print("Note: this setup check verifies presence, not live token authorization.")
         return 0
 
     print("\nNot ready yet.")

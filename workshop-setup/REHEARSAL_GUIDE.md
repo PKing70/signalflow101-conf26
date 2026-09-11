@@ -15,8 +15,13 @@ No Codex setup is required.
 Before starting, the reviewer needs:
 
 - The repo URL: `https://github.com/PKing70/signalflow101-conf26`.
-- Access to the shared Splunk O11y organization.
-- The workshop dashboard URL.
+- Access to the shared Splunk O11y organization, **Observability Workshop
+  AMER**.
+- The shared attendee O11y account, **Workshop Attendee**
+  (`dev1942signalflow101@gmail.com`), after its password has been set.
+- The attendee team, **DEV1942-signalflow101**.
+- The workshop dashboard URL:
+  `https://app.us1.observability.splunkcloud.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA`.
 - Token secrets for `SPLUNK_INGEST_TOKEN` and `SPLUNK_API_TOKEN`.
 - The realm, currently `us1`.
 - A rehearsal participant ID outside the real attendee range, such as
@@ -130,6 +135,8 @@ For the participant simulation:
 - `PARTICIPANT_ID`
 
 Use token secrets, not token IDs.
+Use an `INGEST` scoped token for `SPLUNK_INGEST_TOKEN` and an `API` scoped
+token for `SPLUNK_API_TOKEN`.
 
 For rehearsal and screenshots, use a participant ID outside the real attendee
 assignment range, such as `participant-777` or `participant-345`. Do not use a
@@ -245,8 +252,8 @@ Use these rehearsal values:
 | Replit Secret | Rehearsal Value |
 |---|---|
 | `SPLUNK_REALM` | `us1` |
-| `SPLUNK_INGEST_TOKEN` | workshop ingest token secret |
-| `SPLUNK_API_TOKEN` | workshop API token secret |
+| `SPLUNK_INGEST_TOKEN` | workshop ingest token secret with `INGEST` authorization scope |
+| `SPLUNK_API_TOKEN` | workshop API token secret with `API` authorization scope |
 | `PARTICIPANT_ID` | `participant-777` or another non-attendee test ID |
 
 Then run these workflows:
@@ -297,6 +304,8 @@ Sent: 112.0ms
 Expected fleet output after the chaos-bot has run for a few minutes:
 
 ```text
+Waiting for SignalFlow fleet data. Fresh metrics can take 30-60 seconds to appear...
+
 --- Fleet Latency (top 2 of 2) ---
 participant-000                              847.3ms  ████████████████████████████████████████████████████████████
 participant-777                               96.1ms  █████████
@@ -305,6 +314,8 @@ participant-777                               96.1ms  ████████�
 Expected Apdex output after the chaos-bot has run for a few minutes:
 
 ```text
+Waiting for SignalFlow Apdex data. Fresh metrics can take 30-60 seconds to appear...
+
 --- Apdex Scores (lowest 2 of 2, T=300ms) ---
 participant-000                          0.52  Poor          ██████████
 participant-777                          1.00  Excellent     ████████████████████
@@ -377,7 +388,7 @@ python workshop.py apdex
 Open the workshop dashboard:
 
 ```text
-https://app.us1.signalfx.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA
+https://app.us1.observability.splunkcloud.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA
 ```
 
 In dashboard group `SignalFlow 101 - .conf26`, open

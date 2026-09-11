@@ -44,7 +44,14 @@ def send_latency(latency_ms):
         json=payload
     )
     if response.status_code != 200:
-        print(f"Warning: metric send failed ({response.status_code}) - check your workshop credentials")
+        print(f"Warning: metric send failed ({response.status_code}).")
+        if response.status_code in {401, 403}:
+            print(
+                "Check SPLUNK_INGEST_TOKEN. It must be a token value/secret "
+                f"with the INGEST authorization scope for realm {REALM}."
+            )
+        else:
+            print("Check your workshop credentials and network connection.")
 
 
 print(f"Sending real latency metrics for {PARTICIPANT_ID}...")

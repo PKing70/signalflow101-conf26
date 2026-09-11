@@ -36,7 +36,9 @@ PLACEHOLDERS = {
 if not REALM or REALM in PLACEHOLDERS:
     raise EnvironmentError("SPLUNK_REALM must be set in .env")
 if not API_TOKEN or API_TOKEN in PLACEHOLDERS:
-    raise EnvironmentError("SPLUNK_API_TOKEN or SPLUNK_ACCESS_TOKEN must be set in .env")
+    raise EnvironmentError(
+        "SPLUNK_API_TOKEN with API authorization scope must be set in .env"
+    )
 
 API_URL = f"https://api.{REALM}.observability.splunkcloud.com/v2"
 HEADERS = {

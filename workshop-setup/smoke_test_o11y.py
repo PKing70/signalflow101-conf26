@@ -28,6 +28,8 @@ except OSError as error:
 from signalflow_rest import stream_signalflow  # noqa: E402
 
 METRIC_NAME = "workshop.api.latency"
+SIGNALFLOW_RESOLUTION_MS = 10000
+SIGNALFLOW_MAX_DELAY_MS = 30000
 
 
 def splunk_string(value):
@@ -65,13 +67,8 @@ def signalflow_program(run_id):
     participant = splunk_string(PARTICIPANT_ID)
     run = splunk_string(run_id)
     return f"""
-latency = data('{METRIC_NAME}',
-    filter={{
-        'participant_id': '{participant}',
-        'source': 'smoke-test',
-        'test_run_id': '{run}',
-    }},
-    rollup='latest')
+filter_ = filter('participant_id', '{participant}') and filter('source', 'smoke-test') and filter('test_run_id', '{run}')
+latency = data('{METRIC_NAME}', filter=filter_, rollup='latest')
 latency.publish('smoke_latency')
 """
 
@@ -98,8 +95,8 @@ def read_back(timeout_seconds, latency_ms, run_id):
                 program,
                 API_TOKEN,
                 REALM,
-                resolution=10000,
-                max_delay=1000,
+                resolution=SIGNALFLOW_RESOLUTION_MS,
+                max_delay=SIGNALFLOW_MAX_DELAY_MS,
                 read_timeout=remaining,
             )
             for event_name, payload, metadata in events:
@@ -132,12 +129,12 @@ def print_token_hint(stage, response):
         if stage == "Ingest":
             print("Check that the token has the INGEST authorization scope.")
         else:
-            print("Check that the token has the API authorization scope and a Power or Admin role.")
+            print("Check that SPLUNK_API_TOKEN has the API authorization scope and is not the ingest token.")
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--timeout", type=int, default=45)
+    parser.add_argument("--timeout", type=int, default=120)
     parser.add_argument("--latency-ms", type=float, default=123.4)
     args = parser.parse_args()
 

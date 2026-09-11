@@ -34,6 +34,11 @@ Use [docs/LOCAL_PYTHON.md](docs/LOCAL_PYTHON.md) only if your own Python environ
 
 For the workshop, each participant has their own development environment/login, but everyone sends data to the same Splunk Observability Cloud organization in realm `us1`. `PARTICIPANT_ID` is assigned by workshop staff and separates your metrics from everyone else's. The workshop credential instructions provide the token secrets and participant ID.
 
+Use [docs/O11Y.md](docs/O11Y.md) for Splunk Observability Cloud sign-in,
+dashboard navigation, and metric verification. The shared attendee O11y account
+is named **Workshop Attendee** and uses `dev1942signalflow101@gmail.com`;
+workshop staff provide the password separately.
+
 ---
 
 ## Repository Structure
@@ -76,6 +81,7 @@ signalflow101-conf26/
 │
 └── docs/
     ├── EXERCISE_GUIDE.md            ← full exercise document
+    ├── O11Y.md                      ← O11y sign-in and dashboard guide
     ├── REPLIT.md                    ← Replit setup guide
     ├── SPLUNK_SHOW.md               ← Splunk Show SSH/CLI setup guide
     ├── LOCAL_PYTHON.md              ← existing local Python setup guide

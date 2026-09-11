@@ -14,7 +14,9 @@ Everything you interact with in Splunk Observability Cloud is powered by SignalF
 ## What You'll Need
 
 - A browser
-- The workshop credentials sheet handed out at the start of the session
+- The workshop credentials sheet handed out at the start of the session,
+  including your Splunk Observability Cloud sign-in instructions, workshop
+  token values, and participant ID
 - One supported Python environment:
   - Replit, the recommended in-room path
   - The Splunk Show Python environment, accessed over SSH, if Replit is blocked
@@ -62,12 +64,17 @@ miss anything required.
 
 ## Getting Started: Complete One Setup Path
 
-> 🔲 **Placeholder:** Workshop credential delivery instructions to be added once
-> the workshop instance is provisioned. This section will include the QR code or
-> URL for the credential page, login instructions, and where to find your token
-> secret(s), the `us1` realm value, and participant ID.
+For this workshop, your development environment/login is yours, but everyone
+sends data to the same Splunk Observability Cloud organization. Sign in to the
+shared workshop O11y organization using the instructions from the workshop
+credentials sheet. The shared attendee O11y account is named **Workshop
+Attendee** and uses `dev1942signalflow101@gmail.com`; use the password provided
+by workshop staff. If O11y asks you to choose a team, use
+**DEV1942-signalflow101**.
 
-For this workshop, your development environment/login is yours, but everyone sends data to the same Splunk Observability Cloud organization. Your `PARTICIPANT_ID` is a string assigned by workshop staff, not something copied from O11y or Splunk Show. It is what separates your metrics from everyone else's.
+Your `PARTICIPANT_ID` is a string assigned by workshop staff, not something
+copied from O11y or Splunk Show. It is what separates your metrics from everyone
+else's.
 
 Before starting Exercise 1, complete exactly one setup guide and make sure its
 setup check passes:
@@ -75,6 +82,8 @@ setup check passes:
 - **Replit, recommended:** follow [`REPLIT.md`](REPLIT.md).
 - **Splunk Show SSH/CLI, if Replit is blocked:** follow [`SPLUNK_SHOW.md`](SPLUNK_SHOW.md).
 - **Existing local Python, only if it already works:** follow [`LOCAL_PYTHON.md`](LOCAL_PYTHON.md).
+- **Splunk Observability Cloud dashboard:** follow [`O11Y.md`](O11Y.md) when
+  you need to sign in, open the dashboard, or find your metrics.
 
 The setup guides are the source of truth for importing or cloning the repo,
 adding workshop values, and running the setup check. Come back here only after
@@ -83,11 +92,20 @@ your chosen setup path is ready.
 You'll use these values during setup:
 
 - The shared **realm** — `us1`
-- The shared **ingest token secret** — used when Python sends metric datapoints
-- The shared **API token secret** — used when Python runs SignalFlow queries
+- The shared **ingest token secret** — used when Python sends metric datapoints;
+  this token must have `INGEST` authorization scope
+- The shared **API token secret** — used when Python runs SignalFlow queries;
+  this token must have `API` authorization scope
 - Your unique **participant ID** — assigned by workshop staff, such as `participant-042`
 
 Your setup guide explains where to put these values for your environment.
+The ingest token and API token are different values. If the ingest token is
+accidentally used for both fields, Exercise 1 and Exercise 2a can send metrics,
+but Exercise 2b will fail when it tries to run SignalFlow.
+
+You will use Splunk Observability Cloud in your browser during the checkpoint
+steps. The workshop dashboard group is **SignalFlow 101 - .conf26**, and the
+dashboard is **SignalFlow 101 - Workshop Fleet**.
 
 ---
 
@@ -283,7 +301,33 @@ work.
 
 ### Step 3: Verify in Splunk Observability Cloud
 
-> 🔲 **Placeholder:** Step-by-step instructions for finding a metric in the O11y Metric Finder or Data Explorer — to be added once the workshop instance is provisioned. Attendees will look for `workshop.api.latency` filtered by their `participant_id`.
+Open Splunk Observability Cloud in your browser:
+
+```text
+https://app.us1.observability.splunkcloud.com/
+```
+
+Sign in using the O11y instructions from your workshop credential sheet. The
+shared attendee O11y account is named **Workshop Attendee** and uses
+`dev1942signalflow101@gmail.com`; use the password provided by workshop staff.
+If asked to choose an organization, choose **Observability Workshop AMER**. If
+asked to choose a team, choose **DEV1942-signalflow101**.
+
+To open the workshop dashboard:
+
+1. Open **Dashboards**.
+2. Search for `SignalFlow`.
+3. Under **Custom dashboard groups**, open **SignalFlow 101 - .conf26**.
+4. Open **SignalFlow 101 - Workshop Fleet**.
+
+You can also use the direct dashboard URL:
+
+```text
+https://app.us1.observability.splunkcloud.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA
+```
+
+If the direct URL lands on the sign-in page, sign in first, then open the URL
+again.
 
 When you find your metric, you're looking for `workshop.api.latency` filtered by your `participant_id`. If it's there, you're fully connected and ready to move on.
 
@@ -474,6 +518,8 @@ Set-Location "$HOME\workshops\signalflow101-conf26"
 Expected terminal result:
 
 ```
+Waiting for SignalFlow fleet data. Fresh metrics can take 30-60 seconds to appear...
+
 --- Fleet Latency (top 15 of 128) ---
 participant-000                          847.3ms  ████████████████████████████████████████████████████████████
 participant-117                          224.8ms  ██████████████████████
@@ -486,7 +532,7 @@ One participant stands out. That's not a coincidence.
 Now open the workshop dashboard in Splunk Observability Cloud to see the same
 data visualized live:
 
-https://app.us1.signalfx.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA
+https://app.us1.observability.splunkcloud.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA
 
 In the dashboard group **SignalFlow 101 - .conf26**, open **SignalFlow 101 -
 Workshop Fleet** and look at **Fleet latency by participant**. The same outlier
@@ -506,6 +552,8 @@ from config import API_TOKEN, REALM, PARTICIPANT_ID
 from signalflow_rest import stream_signalflow
 
 DISPLAY_LIMIT = 15
+SIGNALFLOW_RESOLUTION_MS = 10000
+SIGNALFLOW_MAX_DELAY_MS = 30000
 
 program = """
 latency = data('workshop.api.latency').mean(over='1m').mean(by=['participant_id'])
@@ -515,7 +563,14 @@ latency.publish('avg_latency_by_participant')
 results = {}
 
 try:
-    for event_name, payload, metadata in stream_signalflow(program, API_TOKEN, REALM):
+    print("Waiting for SignalFlow fleet data. Fresh metrics can take 30-60 seconds to appear...")
+    for event_name, payload, metadata in stream_signalflow(
+        program,
+        API_TOKEN,
+        REALM,
+        resolution=SIGNALFLOW_RESOLUTION_MS,
+        max_delay=SIGNALFLOW_MAX_DELAY_MS,
+    ):
         if event_name != "data":
             continue
 
@@ -654,6 +709,8 @@ Set-Location "$HOME\workshops\signalflow101-conf26"
 Expected terminal result:
 
 ```
+Waiting for SignalFlow Apdex data. Fresh metrics can take 30-60 seconds to appear...
+
 --- Apdex Scores (lowest 15 of 128, T=300ms) ---
 participant-000                          0.52  Poor          ██████████
 participant-042                          0.96  Excellent     ███████████████████
@@ -687,6 +744,8 @@ from config import API_TOKEN, REALM, PARTICIPANT_ID
 from signalflow_rest import stream_signalflow
 
 DISPLAY_LIMIT = 15
+SIGNALFLOW_RESOLUTION_MS = 10000
+SIGNALFLOW_MAX_DELAY_MS = 30000
 
 T = 300           # Satisfied threshold in ms
 T_tolerating = T * 4  # 1200ms — frustrated threshold
@@ -705,7 +764,14 @@ apdex.publish('apdex')
 results = {}
 
 try:
-    for event_name, payload, metadata in stream_signalflow(program, API_TOKEN, REALM):
+    print("Waiting for SignalFlow Apdex data. Fresh metrics can take 30-60 seconds to appear...")
+    for event_name, payload, metadata in stream_signalflow(
+        program,
+        API_TOKEN,
+        REALM,
+        resolution=SIGNALFLOW_RESOLUTION_MS,
+        max_delay=SIGNALFLOW_MAX_DELAY_MS,
+    ):
         if event_name != "data":
             continue
 
@@ -1795,4 +1861,4 @@ in the account settings and update your `.env` file as described above.
 ---
 
 *SignalFlow 101: Build Your First App for Splunk Observability Cloud — .conf26*
-*Exercise Guide v0.1 — Pre-production draft. Placeholders to be resolved against live Splunk Show instance.*
+*Exercise Guide v0.2 — DEV1942 workshop draft.*

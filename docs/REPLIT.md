@@ -4,7 +4,11 @@ Use this path for the default in-room workshop flow. If Replit is blocked by
 your laptop, browser, or company policy, use the Splunk Show SSH/CLI fallback in
 [`docs/SPLUNK_SHOW.md`](SPLUNK_SHOW.md).
 
-Replit runs Python in your browser. You do not need to install Python locally, but you do need a Replit account and your workshop credentials.
+Replit runs Python in your browser. You do not need to install Python locally,
+but you do need a Replit account and your workshop credentials. Your Replit
+credentials, Splunk Observability Cloud login, and workshop token values are
+different things. Do not paste O11y passwords or token secrets into the Replit
+Agent chat.
 
 ## Start From The Workshop Repo
 
@@ -33,12 +37,14 @@ Important: copy token secrets/values, not token IDs. Token IDs identify the toke
 | Replit Secret | Value Source |
 |---|---|
 | `SPLUNK_REALM` | Everyone uses `us1` |
-| `SPLUNK_INGEST_TOKEN` | Workshop credential instructions |
-| `SPLUNK_API_TOKEN` | Workshop credential instructions |
+| `SPLUNK_INGEST_TOKEN` | Workshop credential instructions; this token must have `INGEST` authorization scope |
+| `SPLUNK_API_TOKEN` | Workshop credential instructions; this token must have `API` authorization scope |
 | `PARTICIPANT_ID` | Assigned by workshop staff, for example `participant-345` |
 
-If the credential sheet provides only one workshop token secret, use that same
-value for both `SPLUNK_INGEST_TOKEN` and `SPLUNK_API_TOKEN`.
+Use the ingest token value for `SPLUNK_INGEST_TOKEN` and the API token value for
+`SPLUNK_API_TOKEN`. If you accidentally use the ingest token for both, Exercise
+1 and Exercise 2a might send metrics, but Exercise 2b will fail with an
+unauthorized SignalFlow error.
 
 Do not paste secrets into Python files, chat windows, screenshots, or the public repo.
 
@@ -71,15 +77,18 @@ Packages:
 
 Workshop values:
   OK      SPLUNK_REALM
-  OK      SPLUNK_INGEST_TOKEN or SPLUNK_ACCESS_TOKEN
-  OK      SPLUNK_API_TOKEN or SPLUNK_ACCESS_TOKEN
+  OK      SPLUNK_INGEST_TOKEN with INGEST scope
+  OK      SPLUNK_API_TOKEN with API scope
   OK      PARTICIPANT_ID
 
 Ready. Start the API, then start sending latency metrics.
+Note: this setup check verifies presence, not live token authorization.
 ```
 
 After setup passes, go to [`docs/EXERCISE_GUIDE.md`](EXERCISE_GUIDE.md). The
 exercise guide tells you which Replit workflow to run for each timed step.
+Use [`docs/O11Y.md`](O11Y.md) when the exercise guide tells you to verify your
+metrics in Splunk Observability Cloud.
 
 ## Troubleshooting
 
