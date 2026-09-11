@@ -22,7 +22,7 @@ The supported workshop paths are:
 
 ### Replit
 
-Use [docs/REPLIT.md](docs/REPLIT.md) for the default attendee setup path. Replit uses **Secrets** for `SPLUNK_REALM` (`us1`), token secrets, and `PARTICIPANT_ID`. After setup, the exercise guide tells you which named workflow to run for each timed step.
+Use [docs/REPLIT.md](docs/REPLIT.md) for the default attendee setup path. Replit uses **Secrets** for `SPLUNK_REALM` (`us1`), O11y token values, and `PARTICIPANT_ID`. After setup, the exercise guide tells you which named workflow to run for each timed step.
 
 ### Splunk Show SSH/CLI
 
@@ -32,12 +32,16 @@ Use [docs/SPLUNK_SHOW.md](docs/SPLUNK_SHOW.md) if Replit is blocked or your inst
 
 Use [docs/LOCAL_PYTHON.md](docs/LOCAL_PYTHON.md) only if your own Python environment was already working before the workshop. We will not troubleshoot laptop-specific Python, firewall, package manager, or IDE issues during the 60-minute session.
 
-For the workshop, each participant has their own development environment/login, but everyone sends data to the same Splunk Observability Cloud organization in realm `us1`. `PARTICIPANT_ID` is assigned by workshop staff and separates your metrics from everyone else's. The workshop credential instructions provide the token secrets and participant ID.
+For the workshop, each participant has their own development environment/login,
+but everyone sends data to the same Splunk Observability Cloud organization in
+realm `us1`. `PARTICIPANT_ID` is assigned by workshop staff and separates your
+metrics from everyone else's.
 
 Use [docs/O11Y.md](docs/O11Y.md) for Splunk Observability Cloud sign-in,
-dashboard navigation, and metric verification. The shared attendee O11y account
-is named **Workshop Attendee** and uses `dev1942signalflow101@gmail.com`;
-workshop staff provide the password separately.
+dashboard navigation, token lookup, and metric verification. The workshop
+handout provides links to the repo, Splunk Show, and the workshop O11y
+organization. It does not print token values; after signing in to O11y, copy
+the current ingest and API token values from **Settings > Access Tokens**.
 
 ---
 
@@ -95,7 +99,7 @@ signalflow101-conf26/
 
 The workshop uses a shared instance provisioned via Splunk Show. To run these exercises against your own instance after the workshop:
 
-1. Open `.env` and replace the workshop values with your own token secrets and realm
+1. Open `.env` and replace the workshop values with your own token values and realm
 2. Your ingest token: **Settings → Access Tokens** in the O11y UI, with ingest authorization scope
 3. Your API token: your user API access token, or an access token with API authorization scope
 4. Your realm: **Settings → My Profile** in the O11y UI

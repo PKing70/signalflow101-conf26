@@ -7,16 +7,14 @@ This document is for the instructor. Attendees do not need to read this.
 ## Before the Conference (1–2 weeks out)
 
 - [ ] Provision Splunk Show workshop instance
-- [ ] Confirm realm, ingest token, API token, and participant alias distribution method (QR / URL)
+- [ ] Confirm workshop handout/QR distribution method for the repo URL, Splunk
+      Show URL, O11y workshop URL, and participant aliases
 - [x] Create the Splunk Observability Cloud attendee team
       `DEV1942-signalflow101`
-- [x] Invite the shared attendee O11y account
-      `dev1942signalflow101@gmail.com` and add it to the attendee team
-- [x] Accept the shared attendee O11y invitation as **Workshop Attendee**
-- [ ] Record the shared attendee O11y password only in the private credential
-      distribution material
-- [ ] Verify the shared attendee O11y account can open the workshop dashboard:
+- [ ] Verify an attendee-level O11y account can open the workshop dashboard:
       `https://app.us1.observability.splunkcloud.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA`
+- [ ] Verify attendees can copy the current Ingest Token and API Token values
+      from O11y **Settings > Access Tokens**
 - [ ] Generate participant aliases:
       ```
       python workshop-setup/generate_participant_aliases.py --count 200
@@ -47,9 +45,10 @@ This document is for the instructor. Attendees do not need to read this.
 - [ ] Confirm Apdex score for chaos-bot is Poor (~0.50–0.55)
 - [ ] Confirm Apdex scores for normal (clean) metrics are Excellent (~0.95+)
 - [ ] If SWIPE/O11y tokens were regenerated, update every rehearsal
-      environment, Replit Secrets, credential sheet, and chaos-bot `.env`
-      before testing again
-- [ ] Prepare credential distribution (print sheets / QR code slide ready)
+      environment, Replit Secrets, and chaos-bot `.env` before testing again;
+      the handout should still point attendees to O11y to copy the current
+      token values
+- [ ] Prepare workshop handout / QR code slide ready
 - [ ] Test Replit import from a fresh account to verify attendee experience
 - [ ] Test Splunk Show SSH/CLI login from a fresh participant account
 - [ ] Run the instructor rehearsal once more from `workshop-setup/REHEARSAL_GUIDE.md`
@@ -58,7 +57,7 @@ This document is for the instructor. Attendees do not need to read this.
 
 - [ ] Chaos bot is running and anomalous in the dashboard
 - [ ] Workshop dashboard is visible and loading
-- [ ] Credential sheets / QR codes ready for distribution
+- [ ] Workshop handouts / QR codes ready for distribution
 - [ ] Slide deck loaded and presenting correctly
 - [ ] Spare laptop with exercise doc open as instructor reference
 

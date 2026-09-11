@@ -14,9 +14,8 @@ Everything you interact with in Splunk Observability Cloud is powered by SignalF
 ## What You'll Need
 
 - A browser
-- The workshop credentials sheet handed out at the start of the session,
-  including your Splunk Observability Cloud sign-in instructions, workshop
-  token values, and participant ID
+- The workshop handout, including links to this GitHub repo, Splunk Show,
+  Splunk Observability Cloud, and your assigned `PARTICIPANT_ID`
 - One supported Python environment:
   - Replit, the recommended in-room path
   - The Splunk Show Python environment, accessed over SSH, if Replit is blocked
@@ -66,11 +65,8 @@ miss anything required.
 
 For this workshop, your development environment/login is yours, but everyone
 sends data to the same Splunk Observability Cloud organization. Sign in to the
-shared workshop O11y organization using the instructions from the workshop
-credentials sheet. The shared attendee O11y account is named **Workshop
-Attendee** and uses `dev1942signalflow101@gmail.com`; use the password provided
-by workshop staff. If O11y asks you to choose a team, use
-**DEV1942-signalflow101**.
+workshop O11y organization using the link and instructions from the workshop
+handout. If O11y asks you to choose a team, use **DEV1942-signalflow101**.
 
 Your `PARTICIPANT_ID` is a string assigned by workshop staff, not something
 copied from O11y or Splunk Show. It is what separates your metrics from everyone
@@ -92,13 +88,17 @@ your chosen setup path is ready.
 You'll use these values during setup:
 
 - The shared **realm** — `us1`
-- The shared **ingest token secret** — used when Python sends metric datapoints;
-  this token must have `INGEST` authorization scope
-- The shared **API token secret** — used when Python runs SignalFlow queries;
-  this token must have `API` authorization scope
+- The shared **ingest token value** — copied from O11y **Settings > Access
+  Tokens** and used when Python sends metric datapoints; this token must have
+  `INGEST` authorization scope
+- The shared **API token value** — copied from O11y **Settings > Access
+  Tokens** and used when Python runs SignalFlow queries; this token must have
+  `API` authorization scope
 - Your unique **participant ID** — assigned by workshop staff, such as `participant-042`
 
-Your setup guide explains where to put these values for your environment.
+Your setup guide explains where to put these values for your environment. The
+workshop handout gives you links and your participant ID; it does not print
+token values.
 The ingest token and API token are different values. If the ingest token is
 accidentally used for both fields, Exercise 1 and Exercise 2a can send metrics,
 but Exercise 2b will fail when it tries to run SignalFlow.
@@ -307,10 +307,8 @@ Open Splunk Observability Cloud in your browser:
 https://app.us1.observability.splunkcloud.com/
 ```
 
-Sign in using the O11y instructions from your workshop credential sheet. The
-shared attendee O11y account is named **Workshop Attendee** and uses
-`dev1942signalflow101@gmail.com`; use the password provided by workshop staff.
-If asked to choose an organization, choose **Observability Workshop AMER**. If
+Sign in using the O11y link and instructions from your workshop handout. If
+asked to choose an organization, choose **Observability Workshop AMER**. If
 asked to choose a team, choose **DEV1942-signalflow101**.
 
 To open the workshop dashboard:
@@ -438,7 +436,7 @@ def send_latency(latency_ms):
         json=payload
     )
     if response.status_code != 200:
-        print(f"Warning: metric send failed ({response.status_code}) - check your workshop credentials")
+        print(f"Warning: metric send failed ({response.status_code}) - check your workshop values")
 
 print(f"Sending real latency metrics for {PARTICIPANT_ID}...")
 print("Press Ctrl+C to stop.\n")
@@ -1134,7 +1132,7 @@ while True:
     )
 
     if response.status_code != 200:
-        print(f"Warning: metric send failed ({response.status_code}) - check your workshop credentials")
+        print(f"Warning: metric send failed ({response.status_code}) - check your workshop values")
     else:
         print(f"Sent: {latency_ms:.1f}ms  (github_username: {GITHUB_USERNAME})")
 
@@ -1461,7 +1459,7 @@ while True:
     )
 
     if response.status_code != 200:
-        print(f"Warning: metric send failed ({response.status_code}) - check your workshop credentials")
+        print(f"Warning: metric send failed ({response.status_code}) - check your workshop values")
     else:
         print(f"Sent: {latency_ms}ms (frustrated request)")
 
@@ -1855,7 +1853,7 @@ subscription. You can sign up at:
 
 **[https://www.splunk.com/en_us/download/infrastructure-monitoring.html](https://www.splunk.com/en_us/download/infrastructure-monitoring.html)**
 
-Once your Free Edition org is provisioned, find your token secret(s) and realm
+Once your Free Edition org is provisioned, find your token values and realm
 in the account settings and update your `.env` file as described above.
 
 ---

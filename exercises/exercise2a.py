@@ -51,7 +51,7 @@ def send_latency(latency_ms):
                 f"with the INGEST authorization scope for realm {REALM}."
             )
         else:
-            print("Check your workshop credentials and network connection.")
+            print("Check your workshop values and network connection.")
 
 
 print(f"Sending real latency metrics for {PARTICIPANT_ID}...")

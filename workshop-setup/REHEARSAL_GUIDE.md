@@ -17,12 +17,12 @@ Before starting, the reviewer needs:
 - The repo URL: `https://github.com/PKing70/signalflow101-conf26`.
 - Access to the shared Splunk O11y organization, **Observability Workshop
   AMER**.
-- The shared attendee O11y account, **Workshop Attendee**
-  (`dev1942signalflow101@gmail.com`), after its password has been set.
+- An attendee-level O11y account for testing the participant view.
 - The attendee team, **DEV1942-signalflow101**.
 - The workshop dashboard URL:
   `https://app.us1.observability.splunkcloud.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA`.
-- Token secrets for `SPLUNK_INGEST_TOKEN` and `SPLUNK_API_TOKEN`.
+- Access to O11y **Settings > Access Tokens** so the reviewer can copy the
+  workshop ingest and API token values.
 - The realm, currently `us1`.
 - A rehearsal participant ID outside the real attendee range, such as
   `participant-777`.
@@ -32,7 +32,7 @@ Then:
 
 1. Clone or update the repo.
 2. Create a local `.env` file for the chaos-bot with `SPLUNK_REALM=us1` and
-   `SPLUNK_INGEST_TOKEN=<token secret>`.
+   `SPLUNK_INGEST_TOKEN=<token value copied from O11y>`.
 3. Create the repo-local Python environment and install dependencies.
 4. Start the chaos-bot locally.
 5. In Replit, import the same repo or pull the latest `main`, add the four
@@ -134,7 +134,7 @@ For the participant simulation:
 - `SPLUNK_API_TOKEN`
 - `PARTICIPANT_ID`
 
-Use token secrets, not token IDs.
+Use token values/secrets from O11y **Settings > Access Tokens**, not token IDs.
 Use an `INGEST` scoped token for `SPLUNK_INGEST_TOKEN` and an `API` scoped
 token for `SPLUNK_API_TOKEN`.
 
@@ -177,7 +177,7 @@ For the chaos-bot, `.env` only needs the ingest values:
 
 ```text
 SPLUNK_REALM=us1
-SPLUNK_INGEST_TOKEN=<token secret>
+SPLUNK_INGEST_TOKEN=<token value copied from O11y>
 ```
 
 The chaos-bot ignores `PARTICIPANT_ID` and always sends as `participant-000`.
@@ -252,8 +252,8 @@ Use these rehearsal values:
 | Replit Secret | Rehearsal Value |
 |---|---|
 | `SPLUNK_REALM` | `us1` |
-| `SPLUNK_INGEST_TOKEN` | workshop ingest token secret with `INGEST` authorization scope |
-| `SPLUNK_API_TOKEN` | workshop API token secret with `API` authorization scope |
+| `SPLUNK_INGEST_TOKEN` | workshop ingest token value copied from O11y with `INGEST` authorization scope |
+| `SPLUNK_API_TOKEN` | workshop API token value copied from O11y with `API` authorization scope |
 | `PARTICIPANT_ID` | `participant-777` or another non-attendee test ID |
 
 Then run these workflows:
@@ -340,8 +340,8 @@ Then confirm the participant values in `.env`:
 
 ```text
 SPLUNK_REALM=us1
-SPLUNK_INGEST_TOKEN=<token secret>
-SPLUNK_API_TOKEN=<token secret>
+SPLUNK_INGEST_TOKEN=<token value copied from O11y>
+SPLUNK_API_TOKEN=<token value copied from O11y>
 PARTICIPANT_ID=participant-777
 ```
 
@@ -423,8 +423,8 @@ For a clean reviewer or video-capture pass:
 ## Troubleshooting
 
 **`participant-000` is missing:** Confirm the chaos-bot is still running, the
-realm is `us1`, the ingest token is a token secret, and the bot has had at
-least one minute to send data.
+realm is `us1`, the ingest token is a token value copied from O11y, and the bot
+has had at least one minute to send data.
 
 **The test participant is missing:** Confirm the participant sender is still
 running, `PARTICIPANT_ID` is set to the test ID, and the Replit Secrets or
