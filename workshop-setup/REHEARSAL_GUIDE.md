@@ -35,8 +35,9 @@ Then:
    `SPLUNK_INGEST_TOKEN=<token value copied from O11y>`.
 3. Create the repo-local Python environment and install dependencies.
 4. Start the chaos-bot locally.
-5. In Replit, import the same repo or pull the latest `main`, add the four
-   workshop values in Secrets, and run the attendee workflows in order:
+5. In Replit, import the same repo or pull the latest `main`, follow
+   `docs/EXERCISES_REPLIT.md` to add the four workshop values in Secrets, and
+   run the attendee workflows in order:
    `0 - Check setup`, `1 - Start API`, `1a - Send first metric`,
    `2 - Send latency metrics`, `3 - View fleet latency`, and
    `4 - Compute Apdex`.
@@ -245,7 +246,7 @@ checking Apdex so the 5-minute SignalFlow window has enough samples.
 
 ## Step 2: Run The Participant Simulation In Replit
 
-Follow the attendee path in `docs/REPLIT.md`.
+Follow the attendee path in `docs/EXERCISES_REPLIT.md`.
 
 Use these rehearsal values:
 

@@ -24,7 +24,7 @@ This document is for the instructor. Attendees do not need to read this.
       python workshop-setup/smoke_test_o11y.py
       ```
 - [x] Run `workshop-setup/build_dashboards.py` to create/update the workshop dashboard
-- [x] Record the dashboard URL in `docs/EXERCISE_GUIDE.md`
+- [x] Record the dashboard URL in the path-specific attendee guides under `docs/`
 - [ ] Complete the instructor rehearsal in `workshop-setup/REHEARSAL_GUIDE.md`
 - [ ] Generate participant aliases from `participant-001` through expected room capacity
 - [ ] Confirm SignalFlow REST/SSE execution works from Replit
