@@ -10,38 +10,27 @@ This repository contains everything you need for the SignalFlow 101 workshop. Yo
 
 ## Get Started (Attendees)
 
-Replit is the recommended in-room path. Use Splunk Show SSH/CLI if Replit is
-blocked by your laptop, browser, or company policy. Use your own local Python
-only if it was already working before the workshop.
+Choose one path and stay in that guide for the whole workshop. Each guide
+includes setup, Splunk Observability Cloud token lookup, Exercise 1, Exercise 2,
+Exercise 3, and the take-home exercises for that environment.
 
 The supported workshop paths are:
 
-1. **Replit** — browser-based Python with repo-defined workflows.
-2. **Splunk Show Python environment** — fallback SSH terminal on your assigned workshop instance.
-3. **Your own Python environment** — only if you already had Python working before the workshop.
+1. **[Replit](docs/EXERCISES_REPLIT.md)** — recommended in-room path; browser-based Python with repo-defined workflows.
+2. **[Splunk Show SSH](docs/EXERCISES_SPLUNK_SHOW.md)** — use this if Replit is blocked by your laptop, browser, or company policy.
+3. **[Local Python](docs/EXERCISES_LOCAL.md)** — use this only if Python was already working on your laptop before the workshop.
 
-### Replit
-
-Use [docs/REPLIT.md](docs/REPLIT.md) for the default attendee setup path. Replit uses **Secrets** for `SPLUNK_REALM` (`us1`), O11y token values, and `PARTICIPANT_ID`. After setup, the exercise guide tells you which named workflow to run for each timed step.
-
-### Splunk Show SSH/CLI
-
-Use [docs/SPLUNK_SHOW.md](docs/SPLUNK_SHOW.md) if Replit is blocked or your instructor tells you to use the Splunk Show Python environment. This path uses `.env` for workshop values and terminal commands such as `python workshop.py check`.
-
-### Existing Local Python
-
-Use [docs/LOCAL_PYTHON.md](docs/LOCAL_PYTHON.md) only if your own Python environment was already working before the workshop. We will not troubleshoot laptop-specific Python, firewall, package manager, or IDE issues during the 60-minute session.
+Do not try to merge instructions across files. Pick the one environment you are
+using and keep reading that guide.
 
 For the workshop, each participant has their own development environment/login,
 but everyone sends data to the same Splunk Observability Cloud organization in
 realm `us1`. `PARTICIPANT_ID` is assigned by workshop staff and separates your
 metrics from everyone else's.
 
-Use [docs/O11Y.md](docs/O11Y.md) for Splunk Observability Cloud sign-in,
-dashboard navigation, token lookup, and metric verification. The workshop
-handout provides links to the repo, Splunk Show, and the workshop O11y
-organization. It does not print token values; after signing in to O11y, copy
-the current ingest and API token values from **Settings > Access Tokens**.
+The workshop handout provides links to the repo, Splunk Show, and the workshop
+O11y organization. It does not print token values; after signing in to O11y,
+copy the current ingest and API token values from **Settings > Access Tokens**.
 
 ---
 
@@ -84,11 +73,10 @@ signalflow101-conf26/
 │   └── INSTRUCTOR_NOTES.md         ← day-of setup checklist
 │
 └── docs/
-    ├── EXERCISE_GUIDE.md            ← full exercise document
-    ├── O11Y.md                      ← O11y sign-in and dashboard guide
-    ├── REPLIT.md                    ← Replit setup guide
-    ├── SPLUNK_SHOW.md               ← Splunk Show SSH/CLI setup guide
-    ├── LOCAL_PYTHON.md              ← existing local Python setup guide
+    ├── EXERCISE_GUIDE.md            ← path picker for old links
+    ├── EXERCISES_REPLIT.md          ← complete Replit attendee guide
+    ├── EXERCISES_SPLUNK_SHOW.md     ← complete Splunk Show SSH attendee guide
+    ├── EXERCISES_LOCAL.md           ← complete local Python attendee guide
     ├── signalflow101_conf26.pptx    ← slide deck (working draft)
     └── signalflow101_conf26.pdf     ← PDF export for easy viewing
 ```
