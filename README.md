@@ -83,4 +83,4 @@ signalflow101-conf26/
 
 ---
 
-*© 2025 Splunk Inc. · SignalFlow 101 · .conf26*
+*© 2026 · DEV1942 SignalFlow 101 · .conf26*
