@@ -16,9 +16,9 @@ Exercise 3, and the take-home exercises for that environment.
 
 The supported workshop paths are:
 
-1. **[Replit](docs/EXERCISES_REPLIT.md)** — recommended in-room path; browser-based Python with repo-defined workflows.
-2. **[Splunk Show SSH](docs/EXERCISES_SPLUNK_SHOW.md)** — use this if Replit is blocked by your laptop, browser, or company policy.
-3. **[Local Python](docs/EXERCISES_LOCAL.md)** — use this only if Python was already working on your laptop before the workshop.
+1. **[Replit](docs/EXERCISES_REPLIT.md)** — recommended in-room path; browser-based Python with repo-defined workflows. Visual, easy, and fun! Not every IT department allows Replit, so we have fallback paths below.
+2. **[Splunk Show SSH](docs/EXERCISES_SPLUNK_SHOW.md)** — the exact same code as Replit, but running from a hosted Linux instance command line. Choose this if you like old-school, command-line experiences, or if Replit is blocked by your laptop, browser, or policy.
+3. **[Local Python](docs/EXERCISES_LOCAL.md)** — use this if you already code in Python on your laptop. It runs the exact same code as the other paths. We won't have time to set up your Python installation or IDE during the workshop, and we might not be familiar with your environment if you have questions.
 
 Do not try to merge instructions across files. Pick the one environment you are
 using and keep reading that guide.
@@ -80,20 +80,6 @@ signalflow101-conf26/
     ├── signalflow101_conf26.pptx    ← slide deck (working draft)
     └── signalflow101_conf26.pdf     ← PDF export for easy viewing
 ```
-
----
-
-## Running on Your Own Splunk Observability Cloud Instance
-
-The workshop uses a shared instance provisioned via Splunk Show. To run these exercises against your own instance after the workshop:
-
-1. Open `.env` and replace the workshop values with your own token values and realm
-2. Your ingest token: **Settings → Access Tokens** in the O11y UI, with ingest authorization scope
-3. Your API token: your user API access token, or an access token with API authorization scope
-4. Your realm: **Settings → My Profile** in the O11y UI
-5. Use any unique `PARTICIPANT_ID` value, such as `participant-042`
-
-Don't have an instance yet? [Start Splunk Observability Cloud Free Edition](https://www.splunk.com/en_us/download/infrastructure-monitoring.html).
 
 ---
 
