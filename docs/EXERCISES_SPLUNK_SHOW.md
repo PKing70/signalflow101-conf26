@@ -1791,15 +1791,14 @@ The workshop used a shared Splunk Observability Cloud organization provisioned f
 
 ### If you already have a Splunk Observability Cloud org
 
-Open your `.env` file and replace the workshop values with your own:
+If your Splunk Show instance is still available, SSH into it and go to the repo directory:
 
-```
-SPLUNK_ACCESS_TOKEN=your-own-access-token
-SPLUNK_REALM=your-own-realm
-PARTICIPANT_ID=participant-042
+```bash
+cd ~/signalflow101-conf26
+nano .env
 ```
 
-If you are using the split-token setup, use this format instead:
+Replace the workshop values with values from your own Splunk Observability Cloud org:
 
 ```
 SPLUNK_REALM=your-own-realm
@@ -1808,7 +1807,9 @@ SPLUNK_API_TOKEN=your-own-api-token-secret
 PARTICIPANT_ID=participant-042
 ```
 
-Your access tokens and realm are available in your Splunk Observability Cloud account under **Settings → Access Tokens** and **Settings → My Profile** respectively. Everything else stays the same — the scripts, the SignalFlow programs, and the detector definitions all work against any Splunk Observability Cloud org without modification.
+If you have one token secret with both ingest and API authorization scopes, use that same token secret for both `SPLUNK_INGEST_TOKEN` and `SPLUNK_API_TOKEN`.
+
+Your access tokens and realm are available in your Splunk Observability Cloud account under **Settings > Access Tokens** and **Settings > My Profile** respectively. Everything else stays the same — the scripts, the SignalFlow programs, and the detector definitions all work against any Splunk Observability Cloud org without modification.
 
 ### If you don't have a Splunk Observability Cloud org yet
 

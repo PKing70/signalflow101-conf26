@@ -1747,24 +1747,18 @@ The workshop used a shared Splunk Observability Cloud organization provisioned f
 
 ### If you already have a Splunk Observability Cloud org
 
-Replace the workshop Replit Secrets with values from your own Splunk Observability Cloud org:
+In Replit, open **Tools > Secrets** and replace the workshop secret values with values from your own Splunk Observability Cloud org:
 
-```
-SPLUNK_ACCESS_TOKEN=your-own-access-token
-SPLUNK_REALM=your-own-realm
-PARTICIPANT_ID=participant-042
-```
+| Replit Secret | Value |
+| --- | --- |
+| `SPLUNK_REALM` | Your realm, such as `us1` |
+| `SPLUNK_INGEST_TOKEN` | Your ingest token secret |
+| `SPLUNK_API_TOKEN` | Your API token secret |
+| `PARTICIPANT_ID` | Any unique value, such as `participant-042` |
 
-If you are using the split-token setup, use this format instead:
+If you have one token secret with both ingest and API authorization scopes, use that same token secret for both `SPLUNK_INGEST_TOKEN` and `SPLUNK_API_TOKEN`.
 
-```
-SPLUNK_REALM=your-own-realm
-SPLUNK_INGEST_TOKEN=your-own-ingest-token-secret
-SPLUNK_API_TOKEN=your-own-api-token-secret
-PARTICIPANT_ID=participant-042
-```
-
-Your access tokens and realm are available in your Splunk Observability Cloud account under **Settings → Access Tokens** and **Settings → My Profile** respectively. Everything else stays the same — the scripts, the SignalFlow programs, and the detector definitions all work against any Splunk Observability Cloud org without modification.
+Your access tokens and realm are available in your Splunk Observability Cloud account under **Settings > Access Tokens** and **Settings > My Profile** respectively. Everything else stays the same — the scripts, the SignalFlow programs, and the detector definitions all work against any Splunk Observability Cloud org without modification.
 
 ### If you don't have a Splunk Observability Cloud org yet
 
@@ -1774,7 +1768,7 @@ subscription. You can sign up at:
 **[https://www.splunk.com/en_us/download/infrastructure-monitoring.html](https://www.splunk.com/en_us/download/infrastructure-monitoring.html)**
 
 Once your Free Edition org is provisioned, find your token values and realm
-in the account settings and update your `.env` file as described above.
+in the account settings and update your Replit Secrets as described above.
 
 ---
 
