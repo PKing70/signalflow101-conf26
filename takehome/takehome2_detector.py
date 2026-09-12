@@ -39,7 +39,7 @@ detect(when(apdex < 0.85, lasting='5m')).publish('Apdex below Good threshold')
 detector = {
     "name": f"Apdex Monitor — {PARTICIPANT_ID}",
     "description": "Fires when Apdex score drops below 0.85 (Good threshold) for 5 minutes",
-    "signalFlowText": signalflow_program,
+    "programText": signalflow_program,
     "rules": [
         {
             "name": "Apdex degraded",
@@ -51,10 +51,7 @@ detector = {
             "parameterizedBody": "Apdex score has dropped below 0.85 for {{participant_id}}. Current score: {{value}}"
         }
     ],
-    "programOptions": {
-        "minimumResolution": 0,
-        "maxDelay": 0
-    }
+    "tags": ["signalflow101", "takehome"]
 }
 
 response = requests.post(

@@ -1001,7 +1001,10 @@ def github_profile():
     }
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    try:
+        uvicorn.run(app, host="0.0.0.0", port=8001)
+    except KeyboardInterrupt:
+        print("\nStopped.")
 ```
 
 Open the URL your environment provides for port `8001` and add `/github` to the URL. You should see something like:
@@ -1295,7 +1298,7 @@ detect(when(apdex < 0.85, lasting='5m')).publish('Apdex below Good threshold')
 detector = {
     "name": f"Apdex Monitor — {PARTICIPANT_ID}",
     "description": "Fires when Apdex score drops below 0.85 (Good threshold) for 5 minutes",
-    "signalFlowText": signalflow_program,
+    "programText": signalflow_program,
     "rules": [
         {
             "name": "Apdex degraded",
@@ -1307,10 +1310,7 @@ detector = {
             "parameterizedBody": "Apdex score has dropped below 0.85 for {{participant_id}}. Current score: {{value}}"
         }
     ],
-    "programOptions": {
-        "minimumResolution": 0,
-        "maxDelay": 0
-    }
+    "tags": ["signalflow101", "takehome"]
 }
 
 response = requests.post(
@@ -1354,7 +1354,7 @@ This is the same Apdex computation from Exercise 3, with two additions. `filter(
 This JSON structure is exactly what the O11y UI constructs when you click through the detector builder. Every field maps to something you've seen in the UI:
 - `name` and `description` — what you type in the first screen
 - `rules` — the alert conditions tab, including severity and notification targets
-- `signalFlowText` — the SignalFlow tab that most users never open
+- `programText` — the SignalFlow tab that most users never open
 - `notifications` — empty here, but this is where you'd add email, PagerDuty, Slack, and so on
 
 **The detector ID**
@@ -1706,7 +1706,7 @@ detect(when(burn_rate > {BURN_RATE_THRESHOLD}, lasting='10m')).publish('SLO burn
 detector = {
     "name": f"SLO Burn Rate — {PARTICIPANT_ID}",
     "description": f"Fires when error budget burn rate exceeds {BURN_RATE_THRESHOLD}x for 10 minutes",
-    "signalFlowText": signalflow_program,
+    "programText": signalflow_program,
     "rules": [
         {
             "name": "Burn rate exceeded",
@@ -1718,10 +1718,7 @@ detector = {
             "parameterizedBody": f"Current burn rate has exceeded {BURN_RATE_THRESHOLD}x. Your error budget is being consumed faster than sustainable. Investigate immediately."
         }
     ],
-    "programOptions": {
-        "minimumResolution": 0,
-        "maxDelay": 0
-    }
+    "tags": ["signalflow101", "takehome"]
 }
 
 response = requests.post(
