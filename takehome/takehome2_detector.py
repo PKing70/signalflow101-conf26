@@ -1,6 +1,6 @@
 """
-Take-home Exercise 2: Build a Detector That Pages You — Step 1
---------------------------------------------------------------
+Take-home Exercise 2: Build a Detector You Can Trigger — Step 1
+---------------------------------------------------------------
 Creates an Apdex detector via the Splunk O11y REST API.
 The detector fires when your Apdex score drops below 0.85
 (Good threshold) for 5 continuous minutes.

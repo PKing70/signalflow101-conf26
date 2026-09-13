@@ -24,7 +24,7 @@ PARTICIPANT_ID = os.getenv("PARTICIPANT_ID")
 
 if not GITHUB_USERNAME:
     raise EnvironmentError(
-        "GITHUB_USERNAME is not set. Add it in Replit Secrets or .env before running this script."
+        "GITHUB_USERNAME is not set. Add it in Replit Secrets, environment variables, or .env before running this script."
     )
 
 app = FastAPI()
