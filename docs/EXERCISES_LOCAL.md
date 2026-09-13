@@ -32,7 +32,7 @@ By the end of this workshop you will have:
 - SignalFlow programs that investigate a live fleet-wide latency anomaly and identify the culprit
 - An Apdex score — a custom SLO metric computed in SignalFlow that Splunk Observability Cloud doesn't give you out of the box
 
-The take-home exercises at the end of this document go further: real downstream latency measurement, programmatic detector creation, and a full SLO error budget burn rate — all in Python, all against your own Splunk Observability Cloud instance.
+The take-home exercises at the end of this document go further: real downstream latency measurement, programmatic detector creation, and SLO burn-rate analysis. They can run against the workshop O11y org during the event; the final section explains how to point the same files at your own org later.
 
 ---
 
@@ -907,11 +907,9 @@ That's what SignalFlow as an API unlocks. The UI gives you a powerful set of bui
 
 ## Beyond the Workshop
 
-The following exercises are designed to be completed at your own pace — during the workshop if you finish early, or on your own afterward. They build directly on everything you've done in the main exercises. There's no instructor pacing and no checkpoint pressure.
+The following exercises are self-paced. They build on the main workshop but are not part of the timed 60-minute flow.
 
-Each take-home exercise includes a timing estimate — not because you're racing, but so you know roughly what you're getting into before you start.
-
-For the take-home exercises, run the commands from the repo root. On Mac/Linux, use `.venv/bin/python ...` anywhere the guide shows `python ...`. On Windows PowerShell, use `.\.venv\Scripts\python ...`.
+The files already exist in the repo. Run the commands from the repo root, then use the code listings to understand what each script does. On Mac/Linux, use `.venv/bin/python ...` anywhere the guide shows `python ...`. On Windows PowerShell, use `.\.venv\Scripts\python ...`.
 
 ---
 
@@ -987,21 +985,25 @@ Add your GitHub username to your `.env` file:
 GITHUB_USERNAME=your-github-username-here
 ```
 
-### Step 2: Create a reusable Apdex function
+### Step 2: Review the reusable Apdex function
 
-In Exercise 3 you wrote the Apdex formula directly into your script. That works fine for one metric. Now that we're computing Apdex for a second metric, it makes sense to write the formula once and reuse it.
+In Exercise 3 you wrote the Apdex formula directly into the script. That works for one metric. Now that we're computing Apdex for a second metric, the repo uses a reusable function.
 
-Open the root-level file `apdex.py`, or create it if needed, and paste the
-following code into it:
+The repo already includes the root-level file `apdex.py`. You do not need to create it. Read it, then notice how the next scripts import it:
 
 ```python
-def build_apdex_program(metric_name, t=300, window='5m'):
-    """
-    Builds a SignalFlow program that computes Apdex for any metric.
+"""
+Reusable Apdex SignalFlow program builder.
+"""
 
-    metric_name: the Splunk O11y metric to analyze
-    t:           the satisfied threshold in milliseconds (default 300ms)
-    window:      the rolling time window for the computation (default 5 minutes)
+
+def build_apdex_program(metric_name, t=300, window="5m"):
+    """
+    Build a SignalFlow program that computes Apdex for any latency metric.
+
+    metric_name: Splunk O11y metric to analyze
+    t: satisfied threshold in milliseconds
+    window: rolling time window for the computation
     """
     t_tolerating = t * 4
     return f"""
@@ -1043,16 +1045,27 @@ Those two lines replace the entire program string from Exercise 3 and produce id
 
 ### Step 3: Add a new endpoint to your FastAPI
 
-Paste the following into `takehome/takehome1_api.py`, save it, then run it from
-the repo root:
+Run the existing `takehome/takehome1_api.py` from the repo root:
 
 ```bash
 python takehome/takehome1_api.py
 ```
 
-The contents of `takehome/takehome1_api.py` are shown below for reference.
+The file is already in the repo. Its contents are shown below for reference.
 
 ```python
+"""
+Take-home Exercise 1: Make Your API Interesting — Step 3
+---------------------------------------------------------
+Adds a /github endpoint to your FastAPI that calls GitHub's
+public user API and measures real downstream latency.
+
+Runs on port 8001 alongside the original API on port 8000.
+Visit port 8001 in your browser-based Python environment, then add /github.
+
+Requires GITHUB_USERNAME in Replit Secrets, environment variables, or .env.
+"""
+
 import os
 import time
 import requests
@@ -1063,12 +1076,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 GITHUB_USERNAME = os.getenv("GITHUB_USERNAME")
+PARTICIPANT_ID = os.getenv("PARTICIPANT_ID")
+
+if not GITHUB_USERNAME:
+    raise EnvironmentError(
+        "GITHUB_USERNAME is not set. Add it in Replit Secrets, environment variables, or .env before running this script."
+    )
 
 app = FastAPI()
 
+
 @app.get("/hello")
 def hello():
-    return {"participant": os.getenv("PARTICIPANT_ID")}
+    return {"participant": PARTICIPANT_ID}
+
 
 @app.get("/github")
 def github_profile():
@@ -1087,8 +1108,12 @@ def github_profile():
         "downstream_latency_ms": round(latency_ms, 1)
     }
 
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    try:
+        uvicorn.run(app, host="0.0.0.0", port=8001)
+    except KeyboardInterrupt:
+        print("\nStopped.")
 ```
 
 Open the URL your environment provides for port `8001` and add `/github` to the URL. You should see something like:
@@ -1120,16 +1145,25 @@ The latency measurement is identical to what `exercise2a.py` does — capture th
 
 ### Step 4: Send GitHub latency as a metric
 
-Open a second terminal, paste the following into `takehome/takehome1_sender.py`,
-save it, then run it from the repo root:
+Open a second terminal and run the existing `takehome/takehome1_sender.py` from the repo root:
 
 ```bash
 python takehome/takehome1_sender.py
 ```
 
-The contents of `takehome/takehome1_sender.py` are shown below for reference.
+The file is already in the repo. Its contents are shown below for reference.
 
 ```python
+"""
+Take-home Exercise 1: Make Your API Interesting — Step 4
+---------------------------------------------------------
+Measures real latency to the GitHub API and sends it as
+workshop.github.latency to Splunk Observability Cloud.
+
+Run in a second terminal while takehome1_api.py is running.
+Press Ctrl+C to stop.
+"""
+
 import os
 import sys
 import time
@@ -1149,45 +1183,53 @@ load_dotenv()
 GITHUB_USERNAME = os.getenv("GITHUB_USERNAME")
 INGEST_URL = f"https://ingest.{REALM}.observability.splunkcloud.com/v2/datapoint"
 
+if not GITHUB_USERNAME:
+    raise EnvironmentError(
+        "GITHUB_USERNAME is not set. Add it in Replit Secrets, environment variables, or .env before running this script."
+    )
+
 print(f"Sending GitHub latency metrics for {PARTICIPANT_ID}...")
 print("Press Ctrl+C to stop.\n")
 
-while True:
-    start = time.time()
-    requests.get(
-        f"https://api.github.com/users/{GITHUB_USERNAME}",
-        headers={"Accept": "application/vnd.github.v3+json"}
-    )
-    latency_ms = (time.time() - start) * 1000
+try:
+    while True:
+        start = time.time()
+        requests.get(
+            f"https://api.github.com/users/{GITHUB_USERNAME}",
+            headers={"Accept": "application/vnd.github.v3+json"}
+        )
+        latency_ms = (time.time() - start) * 1000
 
-    payload = {
-        "gauge": [
-            {
-                "metric": "workshop.github.latency",
-                "value": latency_ms,
-                "dimensions": {
-                    "participant_id": PARTICIPANT_ID,
-                    "github_username": GITHUB_USERNAME
+        payload = {
+            "gauge": [
+                {
+                    "metric": "workshop.github.latency",
+                    "value": latency_ms,
+                    "dimensions": {
+                        "participant_id": PARTICIPANT_ID,
+                        "github_username": GITHUB_USERNAME
+                    }
                 }
-            }
-        ]
-    }
+            ]
+        }
 
-    response = requests.post(
-        INGEST_URL,
-        headers={
-            "Content-Type": "application/json",
-            "X-SF-TOKEN": INGEST_TOKEN
-        },
-        json=payload
-    )
+        response = requests.post(
+            INGEST_URL,
+            headers={
+                "Content-Type": "application/json",
+                "X-SF-TOKEN": INGEST_TOKEN
+            },
+            json=payload
+        )
 
-    if response.status_code != 200:
-        print(f"Warning: metric send failed ({response.status_code}) - check your workshop values")
-    else:
-        print(f"Sent: {latency_ms:.1f}ms  (github_username: {GITHUB_USERNAME})")
+        if response.status_code != 200:
+            print(f"Warning: metric send failed ({response.status_code}) - check your workshop values")
+        else:
+            print(f"Sent: {latency_ms:.1f}ms  (github_username: {GITHUB_USERNAME})")
 
-    time.sleep(10)
+        time.sleep(10)
+except KeyboardInterrupt:
+    print("\nStopped.")
 ```
 
 You should see output like:
@@ -1221,16 +1263,25 @@ Ten seconds between sends matches the interval in `exercise2a.py`. This gives Sp
 
 ### Step 5: Compute Apdex for your GitHub metric
 
-Open a third terminal, paste the following into `takehome/takehome1_apdex.py`,
-save it, then run it from the repo root:
+Open a third terminal and run the existing `takehome/takehome1_apdex.py` from the repo root:
 
 ```bash
 python takehome/takehome1_apdex.py
 ```
 
-The contents of `takehome/takehome1_apdex.py` are shown below for reference.
+The file is already in the repo. Its contents are shown below for reference.
 
 ```python
+"""
+Take-home Exercise 1: Make Your API Interesting — Step 5
+---------------------------------------------------------
+Computes Apdex for workshop.github.latency using the reusable
+build_apdex_program() function from apdex.py.
+
+Note: wait 2–3 minutes before scores appear — the computation
+needs enough data to fill the 5-minute rolling window.
+"""
+
 import sys
 from pathlib import Path
 
@@ -1305,15 +1356,13 @@ You instrumented a real downstream dependency and applied Apdex to it with a sin
 
 ---
 
-## Take-home Exercise 2: Build a Detector That Pages You
+## Take-home Exercise 2: Build a Detector You Can Trigger
 
 > ⏱ **Estimated time:** 20–30 minutes. The `lasting='5m'` condition on the detector means you'll need to leave the spike script running for several minutes before the alert fires.
 
-Every detector you've ever created in Splunk Observability Cloud — every threshold, every alert condition, every notification rule — was created by making REST API calls. The UI you normally use is a convenient front end for those same calls.
+Detectors are API objects. The O11y UI is one way to create them; Python can create the same objects by sending JSON to the REST API.
 
-That means anything that can make an HTTP request can do what the UI does. Python can. curl can. Terraform can. A CI/CD pipeline can. A bash script running on a cron job can. Splunk Observability Cloud isn't a web application with an API bolted on — it's an API platform with a web application built on top of it. The UI and your Python scripts have exactly equal access to everything the platform can do.
-
-In this exercise you'll create a detector programmatically using the REST API directly — no UI, no clicks. Then you'll trigger it intentionally and watch the alert fire in Splunk Observability Cloud.
+In this exercise you'll create a detector programmatically, trigger it with intentionally bad data, and watch it fire in Splunk Observability Cloud.
 
 ### Python scripts at a glance
 
@@ -1335,7 +1384,7 @@ This file sends intentionally bad latency values for your participant ID so the
 detector has something to alert on.
 
 ```python
-latency = random.uniform(1500, 2500)
+latency_ms = 1800
 ```
 
 What to notice: the detector is watching real metric data. To test it, you do
@@ -1343,16 +1392,26 @@ not call the detector directly; you send data that violates its condition.
 
 ### Step 1: Create the detector
 
-Paste the following into `takehome/takehome2_detector.py`, save it, then run it
-from the repo root:
+Run the existing `takehome/takehome2_detector.py` from the repo root:
 
 ```bash
 python takehome/takehome2_detector.py
 ```
 
-The contents of `takehome/takehome2_detector.py` are shown below for reference.
+The file is already in the repo. Its contents are shown below for reference.
 
 ```python
+"""
+Take-home Exercise 2: Build a Detector You Can Trigger — Step 1
+---------------------------------------------------------------
+Creates an Apdex detector via the Splunk O11y REST API.
+The detector fires when your Apdex score drops below 0.85
+(Good threshold) for 5 continuous minutes.
+
+After running, click the URL in the output to see your detector
+live in the Splunk Observability Cloud UI.
+"""
+
 import sys
 from pathlib import Path
 
@@ -1367,7 +1426,8 @@ from config import API_TOKEN, REALM, PARTICIPANT_ID
 API_URL = f"https://api.{REALM}.observability.splunkcloud.com"
 
 # The SignalFlow program that powers this detector.
-# This is identical to what the UI generates when you build a detector manually.
+# Identical to what the UI generates when you build a detector manually —
+# this is just expressing it directly in code.
 signalflow_program = f"""
 latency = data('workshop.api.latency',
     filter=filter('participant_id', '{PARTICIPANT_ID}'),
@@ -1382,7 +1442,7 @@ detect(when(apdex < 0.85, lasting='5m')).publish('Apdex below Good threshold')
 detector = {
     "name": f"Apdex Monitor — {PARTICIPANT_ID}",
     "description": "Fires when Apdex score drops below 0.85 (Good threshold) for 5 minutes",
-    "signalFlowText": signalflow_program,
+    "programText": signalflow_program,
     "rules": [
         {
             "name": "Apdex degraded",
@@ -1394,10 +1454,7 @@ detector = {
             "parameterizedBody": "Apdex score has dropped below 0.85 for {{participant_id}}. Current score: {{value}}"
         }
     ],
-    "programOptions": {
-        "minimumResolution": 0,
-        "maxDelay": 0
-    }
+    "tags": ["signalflow101", "takehome"]
 }
 
 response = requests.post(
@@ -1441,7 +1498,7 @@ This is the same Apdex computation from Exercise 3, with two additions. `filter(
 This JSON structure is exactly what the O11y UI constructs when you click through the detector builder. Every field maps to something you've seen in the UI:
 - `name` and `description` — what you type in the first screen
 - `rules` — the alert conditions tab, including severity and notification targets
-- `signalFlowText` — the SignalFlow tab that most users never open
+- `programText` — the SignalFlow tab that most users never open
 - `notifications` — empty here, but this is where you'd add email, PagerDuty, Slack, and so on
 
 **The detector ID**
@@ -1456,16 +1513,28 @@ The SignalFlow Python client is optimized for running computations and streaming
 
 ### Step 2: Trigger the detector intentionally
 
-Now let's make the alert fire. Open a second terminal, paste the following into
-`takehome/takehome2_spike.py`, save it, then run it from the repo root:
+Now make the alert fire. Open a second terminal and run the existing `takehome/takehome2_spike.py` from the repo root:
 
 ```bash
 python takehome/takehome2_spike.py
 ```
 
-The contents of `takehome/takehome2_spike.py` are shown below for reference.
+The file is already in the repo. Its contents are shown below for reference.
 
 ```python
+"""
+Take-home Exercise 2: Build a Detector You Can Trigger — Step 2
+---------------------------------------------------------------
+Sends artificially high latency values to trigger your Apdex detector.
+
+Every data point is 1800ms — well above the 1200ms frustrated threshold —
+so Apdex drops to zero immediately. The detector fires after the condition
+persists for 5 minutes (lasting='5m').
+
+Leave this running and watch for the alert in Splunk Observability Cloud.
+Press Ctrl+C to stop, then restart exercise2a.py to resolve the alert.
+"""
+
 import sys
 import time
 from pathlib import Path
@@ -1483,45 +1552,48 @@ INGEST_URL = f"https://ingest.{REALM}.observability.splunkcloud.com/v2/datapoint
 print(f"Sending high-latency metrics for {PARTICIPANT_ID}...")
 print("This will trigger your Apdex detector. Press Ctrl+C to stop.\n")
 
-while True:
-    # Simulate frustrated requests — well above the 1200ms threshold.
-    # Every data point lands in the frustrated bucket, dropping Apdex to zero.
-    latency_ms = 1800
+try:
+    while True:
+        # Simulate frustrated requests — well above the 1200ms threshold.
+        # Every data point lands in the frustrated bucket, dropping Apdex to zero.
+        latency_ms = 1800
 
-    payload = {
-        "gauge": [
-            {
-                "metric": "workshop.api.latency",
-                "value": latency_ms,
-                "dimensions": {
-                    "participant_id": PARTICIPANT_ID
+        payload = {
+            "gauge": [
+                {
+                    "metric": "workshop.api.latency",
+                    "value": latency_ms,
+                    "dimensions": {
+                        "participant_id": PARTICIPANT_ID
+                    }
                 }
-            }
-        ]
-    }
+            ]
+        }
 
-    response = requests.post(
-        INGEST_URL,
-        headers={
-            "Content-Type": "application/json",
-            "X-SF-TOKEN": INGEST_TOKEN
-        },
-        json=payload
-    )
+        response = requests.post(
+            INGEST_URL,
+            headers={
+                "Content-Type": "application/json",
+                "X-SF-TOKEN": INGEST_TOKEN
+            },
+            json=payload
+        )
 
-    if response.status_code != 200:
-        print(f"Warning: metric send failed ({response.status_code}) - check your workshop values")
-    else:
-        print(f"Sent: {latency_ms}ms (frustrated request)")
+        if response.status_code != 200:
+            print(f"Warning: metric send failed ({response.status_code}) - check your workshop values")
+        else:
+            print(f"Sent: {latency_ms}ms (frustrated request)")
 
-    # Sending every 5 seconds — faster than normal — to fill the detection
-    # window with frustrated requests as quickly as possible.
-    time.sleep(5)
+        # Sending every 5 seconds — faster than normal — to fill the detection
+        # window with frustrated requests as quickly as possible.
+        time.sleep(5)
+except KeyboardInterrupt:
+    print("\nStopped. Restart exercise2a.py to resolve the alert.")
 ```
 
 Leave this running. Within a few minutes your Apdex score will drop below 0.85 and your detector will fire.
 
-> 🔲 **Placeholder:** O11y Alerts navigation steps — to be added once the workshop instance is provisioned.
+Open the detector URL printed in Step 1, or use **Alerts > Detectors** in O11y. To watch the alert state change, use **Alerts > Active Alerts**.
 
 > ⏳ **Note:** The detector uses `lasting='5m'` — it won't fire until the condition has been true for 5 continuous minutes. Leave `takehome2_spike.py` running and check back after a few minutes.
 
@@ -1544,17 +1616,17 @@ This is the third script in this workshop that sends metrics via `requests.post(
 
 Stop `takehome2_spike.py` with Ctrl+C, then restart `exercise2a.py` to resume sending normal latency metrics. Within a few minutes your Apdex score will recover above 0.85 and the alert will clear automatically.
 
-Watch the detector transition from alerting to resolved in the O11y UI. This is the full alert lifecycle — trigger, notify, resolve — created and managed entirely through the API.
+Watch the detector transition from alerting to resolved in the O11y UI. This is the full alert lifecycle: trigger, investigate, recover, clear.
+
+Cleanup: the detector remains in O11y until you delete it. In the shared workshop org, delete your take-home detector when you're done: open the detector URL from Step 1, use the actions menu, and choose **Delete**.
 
 ---
 
 **What just happened?**
 
-You created a production-grade detector without touching the Splunk Observability Cloud UI. The detector is powered by the same SignalFlow computation from Exercise 3, extended with a `detect()` condition. It will keep watching your metrics and firing alerts for as long as it exists in your O11y instance.
+You created a detector without using the detector builder. The detector is powered by the same Apdex computation from Exercise 3, extended with a `detect()` condition and wrapped in a REST API payload.
 
-The code that created it is a template. Change the metric name, adjust the threshold, add a notification target — and you have a detector for any service in your infrastructure. A team managing many microservices could run a script like this once per service, creating consistent, version-controlled detectors across their fleet in seconds.
-
-That's what it means for Splunk Observability Cloud to be an API platform. The UI is one way in. Python is another. curl is another. Terraform is another. They all speak the same language — HTTP and JSON — and they all have equal access to everything the platform can do.
+The script is a template: change the metric, threshold, severity, or notification target and you have a repeatable detector for another service.
 
 ---
 
@@ -1616,7 +1688,7 @@ This file creates a detector that alerts when the burn rate is too high for too
 long.
 
 ```python
-detect(when(burn_rate > 2.0, lasting='10m')).publish('Burn rate above 2x')
+detect(when(burn_rate > 2.0, lasting='10m')).publish('SLO burn rate exceeded')
 ```
 
 What to notice: this is the same detector pattern from Take-home Exercise 2,
@@ -1625,16 +1697,34 @@ threshold.
 
 ### Step 1: Compute your burn rate
 
-Paste the following into `takehome/takehome3_slo.py`, save it, then run it from
-the repo root:
+Run the existing `takehome/takehome3_slo.py` from the repo root:
 
 ```bash
 python takehome/takehome3_slo.py
 ```
 
-The contents of `takehome/takehome3_slo.py` are shown below for reference.
+The file is already in the repo. Its contents are shown below for reference.
 
 ```python
+"""
+Take-home Exercise 3: The SLO Error Budget — Step 1
+----------------------------------------------------
+Computes error budget burn rate for your workshop API using SignalFlow.
+
+SLO:    99.5% of requests must complete under 300ms (satisfied)
+Window: 1 hour rolling (production standard is 30 days — same math)
+Alert:  2x burn rate means you'll exhaust your budget in half the window
+
+Burn rate = current_error_rate / allowed_error_rate
+  1.0x = consuming budget at exactly the sustainable pace
+  2.0x = consuming it twice as fast — alert threshold
+  0.5x = well within budget
+
+Note: uses a 1-hour window. If you haven't been sending metrics for
+close to an hour, results will reflect a partial window — still valid,
+just keep that context in mind.
+"""
+
 import sys
 from pathlib import Path
 
@@ -1645,10 +1735,10 @@ if str(ROOT) not in sys.path:
 from config import API_TOKEN, REALM, PARTICIPANT_ID
 from signalflow_rest import stream_signalflow
 
-SLO_TARGET = 0.995              # 99.5% of requests must be satisfied
+SLO_TARGET = 0.995               # 99.5% of requests must be satisfied
 ALLOWED_ERROR_RATE = 1 - SLO_TARGET  # 0.005
-WINDOW = '1h'                   # Rolling window for the computation
-BURN_RATE_THRESHOLD = 2.0       # Alert when burning budget twice as fast as sustainable
+WINDOW = '1h'                    # Rolling computation window
+BURN_RATE_THRESHOLD = 2.0        # Alert when burning twice as fast as sustainable
 
 program = f"""
 latency = data('workshop.api.latency',
@@ -1748,17 +1838,25 @@ In the Apdex formula we counted satisfied and tolerating requests. Here we only 
 
 ### Step 2: Create a burn rate detector
 
-Now let's make Splunk Observability Cloud watch this for you automatically.
-Paste the following into `takehome/takehome3_detector.py`, save it, then run it
-from the repo root:
+Now make Splunk Observability Cloud watch this automatically. Run the existing `takehome/takehome3_detector.py` from the repo root:
 
 ```bash
 python takehome/takehome3_detector.py
 ```
 
-The contents of `takehome/takehome3_detector.py` are shown below for reference.
+The file is already in the repo. Its contents are shown below for reference.
 
 ```python
+"""
+Take-home Exercise 3: The SLO Error Budget — Step 2
+----------------------------------------------------
+Creates a burn rate detector via the Splunk O11y REST API.
+Fires when error budget burn rate exceeds 2x for 10 minutes.
+
+Uses Critical severity — a sustained 2x burn rate is more serious
+than Apdex dropping below Good threshold (which used Warning).
+"""
+
 import sys
 from pathlib import Path
 
@@ -1793,7 +1891,7 @@ detect(when(burn_rate > {BURN_RATE_THRESHOLD}, lasting='10m')).publish('SLO burn
 detector = {
     "name": f"SLO Burn Rate — {PARTICIPANT_ID}",
     "description": f"Fires when error budget burn rate exceeds {BURN_RATE_THRESHOLD}x for 10 minutes",
-    "signalFlowText": signalflow_program,
+    "programText": signalflow_program,
     "rules": [
         {
             "name": "Burn rate exceeded",
@@ -1805,10 +1903,7 @@ detector = {
             "parameterizedBody": f"Current burn rate has exceeded {BURN_RATE_THRESHOLD}x. Your error budget is being consumed faster than sustainable. Investigate immediately."
         }
     ],
-    "programOptions": {
-        "minimumResolution": 0,
-        "maxDelay": 0
-    }
+    "tags": ["signalflow101", "takehome"]
 }
 
 response = requests.post(
@@ -1841,7 +1936,9 @@ ID:          Xy9Gh3JkLmN
 View it at:  https://app.us1.observability.splunkcloud.com/#/detector/v2/Xy9Gh3JkLmN
 ```
 
-Click the URL. Your burn rate detector is live — watching your error budget in real time, ready to fire the moment your service starts consuming it too fast.
+Click the URL. Your burn-rate detector is live.
+
+Cleanup: this detector remains in O11y until you delete it. In the shared workshop org, delete your take-home detector when you're done: open the detector URL, use the actions menu, and choose **Delete**.
 
 #### Interesting parts
 

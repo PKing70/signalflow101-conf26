@@ -24,7 +24,7 @@ PARTICIPANT_ID = os.getenv("PARTICIPANT_ID")
 
 if not GITHUB_USERNAME:
     raise EnvironmentError(
-        "GITHUB_USERNAME is not set. Add it in Replit Secrets or .env before running this script."
+        "GITHUB_USERNAME is not set. Add it in Replit Secrets, environment variables, or .env before running this script."
     )
 
 app = FastAPI()
@@ -54,4 +54,7 @@ def github_profile():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    try:
+        uvicorn.run(app, host="0.0.0.0", port=8001)
+    except KeyboardInterrupt:
+        print("\nStopped.")

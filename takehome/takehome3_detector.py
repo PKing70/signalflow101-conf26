@@ -42,7 +42,7 @@ detect(when(burn_rate > {BURN_RATE_THRESHOLD}, lasting='10m')).publish('SLO burn
 detector = {
     "name": f"SLO Burn Rate — {PARTICIPANT_ID}",
     "description": f"Fires when error budget burn rate exceeds {BURN_RATE_THRESHOLD}x for 10 minutes",
-    "signalFlowText": signalflow_program,
+    "programText": signalflow_program,
     "rules": [
         {
             "name": "Burn rate exceeded",
@@ -54,10 +54,7 @@ detector = {
             "parameterizedBody": f"Current burn rate has exceeded {BURN_RATE_THRESHOLD}x. Your error budget is being consumed faster than sustainable. Investigate immediately."
         }
     ],
-    "programOptions": {
-        "minimumResolution": 0,
-        "maxDelay": 0
-    }
+    "tags": ["signalflow101", "takehome"]
 }
 
 response = requests.post(

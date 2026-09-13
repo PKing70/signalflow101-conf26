@@ -1,6 +1,6 @@
 """
-Take-home Exercise 2: Build a Detector That Pages You — Step 2
---------------------------------------------------------------
+Take-home Exercise 2: Build a Detector You Can Trigger — Step 2
+---------------------------------------------------------------
 Sends artificially high latency values to trigger your Apdex detector.
 
 Every data point is 1800ms — well above the 1200ms frustrated threshold —

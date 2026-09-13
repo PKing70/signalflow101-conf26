@@ -29,7 +29,7 @@ INGEST_URL = f"https://ingest.{REALM}.observability.splunkcloud.com/v2/datapoint
 
 if not GITHUB_USERNAME:
     raise EnvironmentError(
-        "GITHUB_USERNAME not set in .env — add it before running this script."
+        "GITHUB_USERNAME is not set. Add it in Replit Secrets, environment variables, or .env before running this script."
     )
 
 print(f"Sending GitHub latency metrics for {PARTICIPANT_ID}...")
