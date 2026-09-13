@@ -156,17 +156,17 @@ def run_script(script_path):
 def send_latency(args):
     if wait_for_api(args) != 0:
         return 1
-    run_script("exercises/exercise2a.py")
+    run_script("exercises-python/exercise2a.py")
     return 0
 
 
 def view_fleet(_args):
-    run_script("exercises/exercise2b.py")
+    run_script("exercises-python/exercise2b.py")
     return 0
 
 
 def compute_apdex(_args):
-    run_script("exercises/exercise3.py")
+    run_script("exercises-python/exercise3.py")
     return 0
 
 

@@ -78,22 +78,22 @@ Your Python environment needs exactly these four values:
 | Value | What To Use |
 |---|---|
 | `SPLUNK_REALM` | `us1` |
-| `SPLUNK_INGEST_TOKEN` | The **Token Secret** copied from `DEV1942-INGEST` |
-| `SPLUNK_API_TOKEN` | The **Token Secret** copied from `DEV1942-API` |
+| `SPLUNK_INGEST_TOKEN` | The **Token Secret** copied from `Signalflow101_INGEST` |
+| `SPLUNK_API_TOKEN` | The **Token Secret** copied from `Signalflow101_API` |
 | `PARTICIPANT_ID` | Your assigned participant ID from the handout, such as `participant-042` |
 
 To copy the token secrets:
 
-1. In Splunk Observability Cloud, open **Settings**.
+1. In **Splunk Observability Cloud**, open **Settings**.
 2. Open **Access Tokens**.
-3. Search by name for `DEV1942-INGEST`.
-4. Select the `DEV1942-INGEST` token name.
-5. Click the copy button for **Token Secret**. Paste that clipboard value into
-   `SPLUNK_INGEST_TOKEN` in your local `.env` file.
-6. Return to **Access Tokens** and search by name for `DEV1942-API`.
-7. Select the `DEV1942-API` token name.
-8. Click the copy button for **Token Secret**. Paste that clipboard value into
-   `SPLUNK_API_TOKEN` in your local `.env` file.
+3. Search by name for `Signalflow101_INGEST`.
+4. Select the `Signalflow101_INGEST` token name.
+5. Click the copy button for **Token Secret**. You will paste that clipboard
+   value into `SPLUNK_INGEST_TOKEN` in your local `.env` file.
+6. Return to **Access Tokens** and search by name for `Signalflow101_API`.
+7. Select the `Signalflow101_API` token name.
+8. Click the copy button for **Token Secret**. You will paste that clipboard
+   value into `SPLUNK_API_TOKEN` in your local `.env` file.
 
 Use token secrets, not token IDs. Token IDs identify tokens inside O11y; Python
 needs the Token Secret values to authenticate. If the UI shows masked values,
@@ -120,7 +120,7 @@ again.
 
 You can also find it from the O11y UI:
 
-1. Open **Dashboards**.
+1. In **Splunk Observability Cloud**, open **Dashboards**.
 2. Search for `SignalFlow`.
 3. Under **Custom dashboard groups**, open **SignalFlow 101 - .conf26**.
 4. Open **SignalFlow 101 - Workshop Fleet**.
@@ -224,8 +224,8 @@ Your `.env` file should look like this after you edit it:
 
 ```text
 SPLUNK_REALM=us1
-SPLUNK_INGEST_TOKEN=<Token Secret copied from DEV1942-INGEST>
-SPLUNK_API_TOKEN=<Token Secret copied from DEV1942-API>
+SPLUNK_INGEST_TOKEN=<Token Secret copied from Signalflow101_INGEST>
+SPLUNK_API_TOKEN=<Token Secret copied from Signalflow101_API>
 PARTICIPANT_ID=<participant ID assigned by workshop staff>
 ```
 
@@ -330,7 +330,7 @@ Leave the API command from Step 1 running. Open another terminal, then run:
 
 ```bash
 cd ~/workshops/signalflow101-conf26
-.venv/bin/python exercises/exercise1.py
+.venv/bin/python exercises-python/exercise1.py
 ```
 
 On Windows PowerShell:
@@ -339,7 +339,7 @@ Leave the API command from Step 1 running. Open another terminal, then run:
 
 ```powershell
 Set-Location "$HOME\workshops\signalflow101-conf26"
-.\.venv\Scripts\python exercises\exercise1.py
+.\.venv\Scripts\python exercises-python\exercise1.py
 ```
 
 Expected terminal result:
@@ -350,7 +350,7 @@ participant_id: participant-042
 latency:        287.3ms
 ```
 
-The contents of `exercises/exercise1.py` are shown below for reference.
+The main code in `exercises-python/exercise1.py` is shown below for reference.
 
 ```python
 import random
@@ -467,20 +467,20 @@ Your API responds to requests and measures how long each one takes.
 
 On Mac/Linux:
 
-Use the same terminal where you ran `exercises/exercise1.py`, then run:
+Use the same terminal where you ran `exercises-python/exercise1.py`, then run:
 
 ```bash
 cd ~/workshops/signalflow101-conf26
-.venv/bin/python exercises/exercise2a.py
+.venv/bin/python exercises-python/exercise2a.py
 ```
 
 On Windows PowerShell:
 
-Use the same terminal where you ran `exercises\exercise1.py`, then run:
+Use the same terminal where you ran `exercises-python\exercise1.py`, then run:
 
 ```powershell
 Set-Location "$HOME\workshops\signalflow101-conf26"
-.\.venv\Scripts\python exercises\exercise2a.py
+.\.venv\Scripts\python exercises-python\exercise2a.py
 ```
 
 Expected terminal result:
@@ -496,7 +496,7 @@ Sent: 145.1ms
 
 Leave this terminal running.
 
-The contents of `exercises/exercise2a.py` are shown below for reference.
+The main code in `exercises-python/exercise2a.py` is shown below for reference.
 
 ```python
 import sys
@@ -554,7 +554,7 @@ except requests.RequestException as error:
     print("Start the API workflow, or run the API serve command from the guide.")
     print(f"Details: {error}")
 except KeyboardInterrupt:
-    print("\nStopped. Head to the next terminal for Exercise 2b.")
+    print("\nStopped. Head to Exercise 2b.")
 ```
 
 #### Interesting parts
@@ -576,22 +576,22 @@ With everyone's metrics flowing, let's look at the whole picture.
 
 On Mac/Linux:
 
-Leave `exercises/exercise2a.py` running in the previous terminal. Open another
+Leave `exercises-python/exercise2a.py` running in the previous terminal. Open another
 terminal for the fleet query, then run:
 
 ```bash
 cd ~/workshops/signalflow101-conf26
-.venv/bin/python exercises/exercise2b.py
+.venv/bin/python exercises-python/exercise2b.py
 ```
 
 On Windows PowerShell:
 
-Leave `exercises\exercise2a.py` running in the previous terminal. Open another
+Leave `exercises-python\exercise2a.py` running in the previous terminal. Open another
 terminal for the fleet query, then run:
 
 ```powershell
 Set-Location "$HOME\workshops\signalflow101-conf26"
-.\.venv\Scripts\python exercises\exercise2b.py
+.\.venv\Scripts\python exercises-python\exercise2b.py
 ```
 
 Expected terminal result:
@@ -617,7 +617,7 @@ In the dashboard group **SignalFlow 101 - .conf26**, open **SignalFlow 101 -
 Workshop Fleet** and look at **Fleet latency by participant**. The same outlier
 should stand out there.
 
-The contents of `exercises/exercise2b.py` are shown below for reference.
+The main code in `exercises-python/exercise2b.py` is shown below for reference.
 
 ```python
 import sys
@@ -753,7 +753,7 @@ then run:
 
 ```bash
 cd ~/workshops/signalflow101-conf26
-.venv/bin/python exercises/exercise3.py
+.venv/bin/python exercises-python/exercise3.py
 ```
 
 On Windows PowerShell:
@@ -764,7 +764,7 @@ then run:
 
 ```powershell
 Set-Location "$HOME\workshops\signalflow101-conf26"
-.\.venv\Scripts\python exercises\exercise3.py
+.\.venv\Scripts\python exercises-python\exercise3.py
 ```
 
 Expected terminal result:
@@ -791,7 +791,7 @@ Return to the same workshop dashboard and look at **Apdex by participant**. The
 chaos-bot should now show a Poor or Unacceptable score while normal participants
 remain Excellent.
 
-The contents of `exercises/exercise3.py` are shown below for reference.
+The main code in `exercises-python/exercise3.py` is shown below for reference.
 
 ```python
 import sys
@@ -1160,7 +1160,7 @@ Take-home Exercise 1: Make Your API Interesting — Step 4
 Measures real latency to the GitHub API and sends it as
 workshop.github.latency to Splunk Observability Cloud.
 
-Run in a second terminal while takehome1_api.py is running.
+Run in a separate command session while takehome1_api.py is running.
 Press Ctrl+C to stop.
 """
 

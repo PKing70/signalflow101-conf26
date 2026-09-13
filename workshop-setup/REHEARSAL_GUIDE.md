@@ -368,7 +368,7 @@ python workshop.py serve
 In terminal 2:
 
 ```bash
-python exercises/exercise1.py
+python exercises-python/exercise1.py
 python workshop.py send
 ```
 

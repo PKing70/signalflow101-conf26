@@ -48,7 +48,7 @@ signalflow101-conf26/
 ├── apdex.py                         ← reusable Apdex SignalFlow program builder
 ├── .env.example                     ← credential template — copy to .env
 │
-├── exercises/                       ← in-workshop exercise scripts
+├── exercises-python/                ← in-workshop Python scripts, not attendee docs
 │   ├── exercise1.py                 ← send your first metric
 │   ├── exercise2a.py                ← send real measured latency
 │   ├── exercise2b.py                ← investigate the fleet with SignalFlow

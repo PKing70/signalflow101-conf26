@@ -4,7 +4,7 @@ Exercise 2b: Investigate the Fleet
 Runs a SignalFlow program that computes 1-minute average latency
 for every participant in the workshop, sorted by latency descending.
 
-Run this in a second terminal while exercise2a.py is still running.
+Run this separately while exercise2a.py is still running.
 One participant will stand out. That's not a coincidence.
 
 Then open the Fleet Dashboard in Splunk Observability Cloud to see
