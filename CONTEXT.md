@@ -113,7 +113,7 @@ signalflow101-conf26/
 ├── requirements.txt
 ├── .env.example                 ← copy to .env, never commit .env
 ├── .gitignore
-├── exercises/
+├── exercises-python/
 │   ├── exercise1.py             ← send fake latency, verify pipeline
 │   ├── exercise2a.py            ← send real measured latency (continuous)
 │   ├── exercise2b.py            ← SignalFlow fleet investigation

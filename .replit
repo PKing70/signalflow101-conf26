@@ -61,7 +61,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python exercises/exercise1.py"
+args = "python exercises-python/exercise1.py"
 
 [[workflows.workflow]]
 name = "2 - Send latency metrics"

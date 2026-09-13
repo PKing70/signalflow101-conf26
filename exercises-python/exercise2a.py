@@ -4,7 +4,7 @@ Exercise 2a: Start Sending Real Latency
 Measures real round-trip latency to your workshop API and sends it
 as a metric every 10 seconds.
 
-Leave this running and open a second terminal for Exercise 2b.
+Leave this running and start Exercise 2b separately.
 Press Ctrl+C to stop.
 """
 
@@ -71,4 +71,4 @@ except requests.RequestException as error:
     print("Start the API workflow, or run the API serve command from the guide.")
     print(f"Details: {error}")
 except KeyboardInterrupt:
-    print("\nStopped. Head to the next terminal for Exercise 2b.")
+    print("\nStopped. Head to Exercise 2b.")

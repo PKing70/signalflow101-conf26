@@ -4,7 +4,7 @@ Take-home Exercise 1: Make Your API Interesting — Step 4
 Measures real latency to the GitHub API and sends it as
 workshop.github.latency to Splunk Observability Cloud.
 
-Run in a second terminal while takehome1_api.py is running.
+Run in a separate command session while takehome1_api.py is running.
 Press Ctrl+C to stop.
 """
 

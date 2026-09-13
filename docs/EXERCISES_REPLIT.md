@@ -34,8 +34,8 @@ The take-home exercises at the end of this document go further: real downstream 
 
 This is the Replit version of the workshop. Stay in this file for setup,
 Exercise 1, Exercise 2, Exercise 3, and the take-home exercises. When an exercise
-tells you to run something, use the named Replit workflow or the Replit Shell as
-shown here.
+tells you to run something, use the named Replit workflow. Use the **Console**
+tool tab to read workflow output.
 
 To stop a running workflow, use the Replit Stop button.
 
@@ -73,22 +73,22 @@ Your Python environment needs exactly these four values:
 | Value | What To Use |
 |---|---|
 | `SPLUNK_REALM` | `us1` |
-| `SPLUNK_INGEST_TOKEN` | The **Token Secret** copied from `DEV1942-INGEST` |
-| `SPLUNK_API_TOKEN` | The **Token Secret** copied from `DEV1942-API` |
+| `SPLUNK_INGEST_TOKEN` | The **Token Secret** copied from `Signalflow101_INGEST` |
+| `SPLUNK_API_TOKEN` | The **Token Secret** copied from `Signalflow101_API` |
 | `PARTICIPANT_ID` | Your assigned participant ID from the handout, such as `participant-042` |
 
 To copy the token secrets:
 
-1. In Splunk Observability Cloud, open **Settings**.
+1. In **Splunk Observability Cloud**, open **Settings**.
 2. Open **Access Tokens**.
-3. Search by name for `DEV1942-INGEST`.
-4. Select the `DEV1942-INGEST` token name.
-5. Click the copy button for **Token Secret**. Paste that clipboard value into
-   `SPLUNK_INGEST_TOKEN` in Replit Secrets.
-6. Return to **Access Tokens** and search by name for `DEV1942-API`.
-7. Select the `DEV1942-API` token name.
-8. Click the copy button for **Token Secret**. Paste that clipboard value into
-   `SPLUNK_API_TOKEN` in Replit Secrets.
+3. Search by name for `Signalflow101_INGEST`.
+4. Select the `Signalflow101_INGEST` token name.
+5. Click the copy button for **Token Secret**. You will paste that clipboard
+   value into `SPLUNK_INGEST_TOKEN` in Replit Secrets.
+6. Return to **Access Tokens** and search by name for `Signalflow101_API`.
+7. Select the `Signalflow101_API` token name.
+8. Click the copy button for **Token Secret**. You will paste that clipboard
+   value into `SPLUNK_API_TOKEN` in Replit Secrets.
 
 Use token secrets, not token IDs. Token IDs identify tokens inside O11y; Python
 needs the Token Secret values to authenticate. If the UI shows masked values,
@@ -115,7 +115,7 @@ again.
 
 You can also find it from the O11y UI:
 
-1. Open **Dashboards**.
+1. In **Splunk Observability Cloud**, open **Dashboards**.
 2. Search for `SignalFlow`.
 3. Under **Custom dashboard groups**, open **SignalFlow 101 - .conf26**.
 4. Open **SignalFlow 101 - Workshop Fleet**.
@@ -126,26 +126,32 @@ staff.
 
 ## Step 0A: Start From The Workshop Repo
 
+In **Replit**:
+
 1. Sign in to Replit and go to your Replit home: [https://replit.com/~](https://replit.com/~).
 2. Choose **Import code or design**.
 3. Under **Import to Replit**, choose **GitHub**.
 4. Under **Import from GitHub**, enter the workshop repo URL: `https://github.com/PKing70/signalflow101-conf26`.
 5. Confirm the suggested Repl name is `signalflow101-conf26` and that you are the owner, then choose **Import from GitHub**.
 6. Wait for Replit to finish importing the project.
-7. When the project opens, Replit may show an Agent panel asking what you want to do with the project. Close the Agent panel with **X** or ignore it. Do not paste workshop secrets into the Agent chat.
-8. The right side may say **Your app is not running**. That is expected. You are in the right place.
+7. When the project opens, Replit may show an Agent panel asking what you want to
+   do with the project. Close the Agent panel with **X**, or drag its divider to
+   the left so you can focus on the project panes. We are not using the Agent in
+   this workshop.
+8. Do not paste workshop secrets into the Agent chat.
+9. The right side may say **Your app is not running**. That is expected. You are in the right place.
 
 If you already imported the repo earlier, use Replit's Git tools to pull the latest `main` branch before continuing.
 
 ## Step 0B: Add Your Workshop Values In Replit Secrets
 
-In Replit, use **Secrets**. Replit may already show a secret named
+In **Replit**, use **Secrets**. Replit may already show a secret named
 `SESSION_SECRET`. Leave it alone. You will add four more secrets for this
 workshop.
 
 ![Screenshot of where to find Secrets in Replit](images/Replit-Secrets-Setup.png)
 
-1. From the left side of Replit, open **Tools**.
+1. In **Replit**, open **Tools** from the left side.
 2. Choose **Secrets**.
 3. Choose **+ New Secret**.
 4. Add these secrets one at a time. For each one, fill out **Key** and
@@ -154,8 +160,8 @@ workshop.
 | Replit Secret | Value |
 |---|---|
 | `SPLUNK_REALM` | `us1` |
-| `SPLUNK_INGEST_TOKEN` | Paste the **Token Secret** copied from `DEV1942-INGEST` |
-| `SPLUNK_API_TOKEN` | Paste the **Token Secret** copied from `DEV1942-API` |
+| `SPLUNK_INGEST_TOKEN` | Paste the **Token Secret** copied from `Signalflow101_INGEST` |
+| `SPLUNK_API_TOKEN` | Paste the **Token Secret** copied from `Signalflow101_API` |
 | `PARTICIPANT_ID` | Your assigned participant ID from the handout |
 
 Do not paste secrets into Python files, chat windows, screenshots, or the public
@@ -166,7 +172,7 @@ to you by workshop staff.
 
 ## Step 0C: Verify Setup
 
-Run the setup check before starting the exercises. Replit's UI changes
+In **Replit**, run the setup check before starting the exercises. Replit's UI changes
 frequently. The most reliable way to open Workflows is:
 
 1. Press **Cmd+K** on Mac or **Ctrl+K** on Windows.
@@ -175,7 +181,7 @@ frequently. The most reliable way to open Workflows is:
 4. Run `0 - Check setup`.
 5. Press **Cmd+K** or **Ctrl+K**, search for `Console`, and open **Console** to see the workflow output.
 
-Expected setup check output:
+Expected **Console** output:
 
 ```text
 SignalFlow 101 setup check
@@ -202,7 +208,7 @@ After setup passes, continue to Exercise 1 in this file.
 
 ## Troubleshooting
 
-**Setup check says values are missing:** Open **Tools > Secrets** and confirm the names match exactly. Replit Secrets are case-sensitive.
+**Setup check says values are missing:** In **Replit**, open **Tools > Secrets** and confirm the names match exactly. Replit Secrets are case-sensitive.
 
 **You see `participant-unconfigured`:** `PARTICIPANT_ID` is missing or still set to a placeholder. Set it to your assigned alias, such as `participant-042`.
 
@@ -218,7 +224,7 @@ Your workshop environment can run a small API. Let's make sure everything is wor
 
 ### Step 1: Run your API
 
-Run the workflow `1 - Start API`, then open the web preview.
+In **Replit**, run the workflow `1 - Start API`, then open the web preview.
 
 Leave this workflow running for the rest of the timed exercises.
 
@@ -265,9 +271,9 @@ If you see your participant alias, your API is running. Move on to Step 2.
 
 Now let's send a metric.
 
-Run the workflow `1a - Send first metric`.
+In **Replit**, run the workflow `1a - Send first metric`.
 
-Expected terminal result:
+Expected **Console** result:
 
 ```
 Metric sent successfully.
@@ -275,7 +281,7 @@ participant_id: participant-042
 latency:        287.3ms
 ```
 
-The contents of `exercises/exercise1.py` are shown below for reference.
+The main code in `exercises-python/exercise1.py` is shown below for reference.
 
 ```python
 import random
@@ -340,7 +346,7 @@ work.
 
 ### Step 3: Verify in Splunk Observability Cloud
 
-Open Splunk Observability Cloud in your browser:
+In **Splunk Observability Cloud**, open:
 
 ```text
 https://app.us1.observability.splunkcloud.com/
@@ -350,7 +356,7 @@ Sign in using the O11y link and instructions from your workshop handout. If
 asked to choose an organization, choose **Observability Workshop AMER**. If
 asked to choose a team, choose **DEV1942-signalflow101**.
 
-To open the workshop dashboard:
+To open the workshop dashboard in **Splunk Observability Cloud**:
 
 1. Open **Dashboards**.
 2. Search for `SignalFlow`.
@@ -390,9 +396,9 @@ In Exercise 1 you proved the pipeline works. Now let's make the data meaningful 
 
 Your API responds to requests and measures how long each one takes.
 
-Run the workflow `2 - Send latency metrics`.
+In **Replit**, run the workflow `2 - Send latency metrics`.
 
-Expected terminal result:
+Expected **Console** result:
 
 ```
 Sending real latency metrics for participant-042...
@@ -405,7 +411,7 @@ Sent: 145.1ms
 
 Leave `2 - Send latency metrics` running.
 
-The contents of `exercises/exercise2a.py` are shown below for reference.
+The main code in `exercises-python/exercise2a.py` is shown below for reference.
 
 ```python
 import sys
@@ -463,7 +469,7 @@ except requests.RequestException as error:
     print("Start the API workflow, or run the API serve command from the guide.")
     print(f"Details: {error}")
 except KeyboardInterrupt:
-    print("\nStopped. Head to the next terminal for Exercise 2b.")
+    print("\nStopped. Head to Exercise 2b.")
 ```
 
 #### Interesting parts
@@ -476,17 +482,17 @@ converted to milliseconds, is the real round-trip latency for
 `http://localhost:8000/hello`.
 
 `while True` keeps the script running until you stop it with **Ctrl+C**. This is
-why the next step needs another terminal: this script is your live metric sender.
+why the next step runs separately: this script is your live metric sender.
 
 
 ### Step 2: Investigate the fleet
 
 With everyone's metrics flowing, let's look at the whole picture.
 
-Leave `2 - Send latency metrics` running, then run the workflow
+In **Replit**, leave `2 - Send latency metrics` running, then run the workflow
 `3 - View fleet latency`.
 
-Expected terminal result:
+Expected **Console** result:
 
 ```
 Waiting for SignalFlow fleet data. Fresh metrics can take 30-60 seconds to appear...
@@ -500,7 +506,7 @@ participant-042                          143.2ms  ██████████
 
 One participant stands out. That's not a coincidence.
 
-Now open the workshop dashboard in Splunk Observability Cloud to see the same
+In **Splunk Observability Cloud**, open the workshop dashboard to see the same
 data visualized live:
 
 https://app.us1.observability.splunkcloud.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA
@@ -509,7 +515,7 @@ In the dashboard group **SignalFlow 101 - .conf26**, open **SignalFlow 101 -
 Workshop Fleet** and look at **Fleet latency by participant**. The same outlier
 should stand out there.
 
-The contents of `exercises/exercise2b.py` are shown below for reference.
+The main code in `exercises-python/exercise2b.py` is shown below for reference.
 
 ```python
 import sys
@@ -637,10 +643,10 @@ Splunk Observability Cloud can show you latency. It can't compute Apdex — at l
 
 ### Step 1: Compute Apdex
 
-Leave `2 - Send latency metrics` running. Stop `3 - View fleet latency`, or
+In **Replit**, leave `2 - Send latency metrics` running. Stop `3 - View fleet latency`, or
 leave it alone and use another workflow slot, then run `4 - Compute Apdex`.
 
-Expected terminal result:
+Expected **Console** result:
 
 ```
 Waiting for SignalFlow Apdex data. Fresh metrics can take 30-60 seconds to appear...
@@ -660,11 +666,11 @@ The chaos-bot's Apdex score tells a clearer story than its raw latency alone.
 It's not just slow — by an industry-standard measure, it's delivering a poor
 experience.
 
-Return to the same workshop dashboard and look at **Apdex by participant**. The
+In **Splunk Observability Cloud**, return to the same workshop dashboard and look at **Apdex by participant**. The
 chaos-bot should now show a Poor or Unacceptable score while normal participants
 remain Excellent.
 
-The contents of `exercises/exercise3.py` are shown below for reference.
+The main code in `exercises-python/exercise3.py` is shown below for reference.
 
 ```python
 import sys
@@ -784,13 +790,15 @@ The following exercises are self-paced. They build on the main workshop but are 
 
 The files already exist in the repo. Run the commands shown from the repo root, then use the code listings to understand what each script does.
 
-Replit workflows are provided only for the in-class exercises. For take-homes, use the Replit Shell or Console.
+Replit workflows are provided only for the in-class exercises. For take-homes,
+use the **Console** or **Shell** tool tab. If one command is already running, use
+another Console/Shell session for the next command.
 
 ---
 
 ## Take-home Exercise 1: Make Your API Interesting
 
-> ⏱ **Estimated time:** 20–30 minutes. The three-terminal setup and the 5-minute Apdex window are the main time variables.
+> ⏱ **Estimated time:** 20–30 minutes. The multi-command setup and the 5-minute Apdex window are the main time variables.
 
 So far your API returns your participant alias from local configuration. Real APIs call other services — and those downstream calls are often where latency problems hide. In this exercise you'll add a real downstream dependency to your API: GitHub's public user API. Then you'll measure how long GitHub takes to respond, send that as a metric, and watch how real-world network variability affects your Apdex score.
 
@@ -1016,7 +1024,8 @@ The latency measurement is identical to what `exercise2a.py` does — capture th
 
 ### Step 4: Send GitHub latency as a metric
 
-Open a second terminal and run the existing `takehome/takehome1_sender.py` from the repo root:
+In **Replit**, open another Console/Shell session and run the existing
+`takehome/takehome1_sender.py` from the repo root:
 
 ```bash
 python takehome/takehome1_sender.py
@@ -1031,7 +1040,7 @@ Take-home Exercise 1: Make Your API Interesting — Step 4
 Measures real latency to the GitHub API and sends it as
 workshop.github.latency to Splunk Observability Cloud.
 
-Run in a second terminal while takehome1_api.py is running.
+Run in a separate command session while takehome1_api.py is running.
 Press Ctrl+C to stop.
 """
 
@@ -1134,7 +1143,8 @@ Ten seconds between sends matches the interval in `exercise2a.py`. This gives Sp
 
 ### Step 5: Compute Apdex for your GitHub metric
 
-Open a third terminal and run the existing `takehome/takehome1_apdex.py` from the repo root:
+In **Replit**, open another Console/Shell session and run the existing
+`takehome/takehome1_apdex.py` from the repo root:
 
 ```bash
 python takehome/takehome1_apdex.py
@@ -1384,7 +1394,8 @@ The SignalFlow Python client is optimized for running computations and streaming
 
 ### Step 2: Trigger the detector intentionally
 
-Now make the alert fire. Open a second terminal and run the existing `takehome/takehome2_spike.py` from the repo root:
+Now make the alert fire. In **Replit**, open another Console/Shell session and
+run the existing `takehome/takehome2_spike.py` from the repo root:
 
 ```bash
 python takehome/takehome2_spike.py
@@ -1846,7 +1857,7 @@ The workshop used a shared Splunk Observability Cloud organization provisioned f
 
 ### If you already have a Splunk Observability Cloud org
 
-In Replit, open **Tools > Secrets** and replace the workshop secret values with values from your own Splunk Observability Cloud org:
+In **Replit**, open **Tools > Secrets** and replace the workshop secret values with values from your own Splunk Observability Cloud org:
 
 | Replit Secret | Value |
 | --- | --- |
