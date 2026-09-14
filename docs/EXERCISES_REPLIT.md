@@ -42,7 +42,7 @@ To stop a running workflow, use the Replit Stop button.
 The checkpoints throughout the session are your signal to pause and look up —
 that's when we'll discuss what just happened before moving on.
 
-## Step 0: Sign In To Splunk Observability Cloud And Copy Token Values
+## Step 0A: Start Splunk Observability Cloud
 
 You will use Splunk Observability Cloud in your browser to view the shared
 workshop dashboard and to copy the token values your Python environment needs.
@@ -54,17 +54,90 @@ Open Splunk Observability Cloud:
 https://app.us1.observability.splunkcloud.com/
 ```
 
-Sign in with the O11y workshop account instructions from your handout. If O11y
-asks you to choose an organization, choose **Observability Workshop AMER**. If
-O11y asks you to choose a team, choose **DEV1942-signalflow101**.
+Sign in with the O11y workshop account instructions from your handout. The organization is **Observability Workshop AMER**. Your team is **DEV1942-signalflow101**.
 
 The handout gives you links and your assigned `PARTICIPANT_ID`. It does not
-print token values. You copy token secrets from O11y after signing in.
+print token values. Later in this exercise, you will copy secrets from O11y to
+paste into Replit.
 
-In your own enterprise environment, you would normally sign in with your own
-account and generate or use tokens assigned to you or your team. To keep this
-workshop simple and fast, everyone will use the shared workshop O11y login and
-the same pair of workshop tokens.
+Note: In a typical enterprise environment, you would sign in with your own
+account and generate or use tokens assigned specifically to you or your team. 
+To keep this workshop simple, everyone is using a shared O11y account login 
+and the same pair of workshop tokens.
+
+For now, just locate your dashboard and get ready to set up Replit in the 
+next section.
+
+### Open The Workshop Dashboard
+
+You will use this dashboard during the checkpoints:
+
+```text
+https://app.us1.observability.splunkcloud.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA
+```
+
+If the direct URL lands on the sign-in page, sign in first, then open the URL
+again.
+
+You can also find it from the O11y UI:
+
+1. In **Splunk Observability Cloud**, open **Dashboards**.
+2. Search for `SignalFlow`.
+3. Under **Custom dashboard groups**, open **SignalFlow 101 - .conf26**.
+4. Open **SignalFlow 101 - Workshop Fleet**.
+
+## Step 0B: Start Replit
+
+If you already have a Replit (https://replit.com) account, sign in to Replit and use it. If not, you must first complete the Replit
+free account sign up process (https://replit.com/signup). You can choose any way in, GitHub or Google or email. Please use your own email, not the one distributed in the workshop for O11y access. 
+
+### Import the Workshop from GitHub
+
+In **Replit** import the workshop project from GitHub:
+
+1. Sign in to Replit and go to your Replit home: [https://replit.com/~](https://replit.com/~)
+2. Choose **Import**. It's on the left bar, under "Personal Workspace".
+3. Under **Import**, choose **GitHub**.
+4. Under **Import from GitHub**, enter the workshop repo URL: `https://github.com/PKing70/signalflow101-conf26`.
+5. Confirm the suggested Repl name is `signalflow101-conf26` and that you are the owner, then choose **Import from GitHub**.
+6. Wait for Replit to finish importing the project.
+
+
+7. When the project opens, Replit may show an Agent panel asking what you want to
+   do with the project. Close the Agent panel with **X**, or drag its divider to
+   the left so you can focus on the project panes. We are not using the Agent in
+   this workshop.
+8. Do not paste workshop secrets into the Agent chat.
+9. The right side may say **Your app is not running**. That is expected. You are in the right place.
+
+If you already imported the repo earlier, use Replit's Git tools to pull the latest `main` branch before continuing.
+
+
+### Adjust the Replit UI
+
+Replit can present a variety of user interfaces. By default, it is likely you're looking
+at an Agent view asking you questions or a Preview view showing nothing yet. That's okay, you're in the right place. 
+
+Here is an example default Agent view, which we will not use:
+
+![Screenshot of Replit Agent](images/Replit_agent.png)
+
+Mouse-drag from the right side of the Agent view (where Replit is prompting you to Start chatting) you can shrink the Agent until it disappears, while leaving the left pane (your "Personal Workspace") still showing. You will want to retain the left bar under "Personal Workspace") so you can get to Import and Tools. 
+
+For this workshop, we will be using the Workflows and Console views. So, to get them onto your Replit top bar:
+
+1. Press **Cmd+K** on Mac or **Ctrl+K** on Windows.
+2. Search for `Workflows`.
+3. Press **Cmd+K** or **Ctrl+K**, search for `Console`.
+
+Hopefully, your Replit UI now looks something like this, where you have **Import** and **Tools** in your left bar, and **Workflows** and **Console** in your top bar, and you're not distracted by that Agent view which we hid.
+
+![Screenshot of Replit Agent](images/Replit_agent.png)
+
+
+
+
+
 
 ### Copy These Values
 
@@ -101,47 +174,6 @@ Exercise 2b will fail with an unauthorized SignalFlow error.
 
 Do not paste O11y passwords or token secrets into chat tools, screenshots,
 Python files, or the public repo.
-
-### Open The Workshop Dashboard
-
-You will use this dashboard during the checkpoints:
-
-```text
-https://app.us1.observability.splunkcloud.com/#/dashboard/HPtrGG-A4AE?groupId=HPtqyd5A0AA
-```
-
-If the direct URL lands on the sign-in page, sign in first, then open the URL
-again.
-
-You can also find it from the O11y UI:
-
-1. In **Splunk Observability Cloud**, open **Dashboards**.
-2. Search for `SignalFlow`.
-3. Under **Custom dashboard groups**, open **SignalFlow 101 - .conf26**.
-4. Open **SignalFlow 101 - Workshop Fleet**.
-
-Your scripts send the metric `workshop.api.latency`. Every datapoint includes a
-`participant_id` dimension, which is the string assigned to you by workshop
-staff.
-
-## Step 0A: Start From The Workshop Repo
-
-In **Replit**:
-
-1. Sign in to Replit and go to your Replit home: [https://replit.com/~](https://replit.com/~).
-2. Choose **Import code or design**.
-3. Under **Import to Replit**, choose **GitHub**.
-4. Under **Import from GitHub**, enter the workshop repo URL: `https://github.com/PKing70/signalflow101-conf26`.
-5. Confirm the suggested Repl name is `signalflow101-conf26` and that you are the owner, then choose **Import from GitHub**.
-6. Wait for Replit to finish importing the project.
-7. When the project opens, Replit may show an Agent panel asking what you want to
-   do with the project. Close the Agent panel with **X**, or drag its divider to
-   the left so you can focus on the project panes. We are not using the Agent in
-   this workshop.
-8. Do not paste workshop secrets into the Agent chat.
-9. The right side may say **Your app is not running**. That is expected. You are in the right place.
-
-If you already imported the repo earlier, use Replit's Git tools to pull the latest `main` branch before continuing.
 
 ## Step 0B: Add Your Workshop Values In Replit Secrets
 
