@@ -33,11 +33,7 @@ The take-home exercises at the end of this document go further: real downstream 
 ## How This Guide Works
 
 This is the Replit version of the workshop. Stay in this file for setup,
-Exercise 1, Exercise 2, Exercise 3, and the take-home exercises. When an exercise
-tells you to run something, use the named Replit workflow. Use the **Console**
-tool tab to read workflow output.
-
-To stop a running workflow, use the Replit Stop button.
+Exercise 1, Exercise 2, Exercise 3, and the take-home exercises. 
 
 The checkpoints throughout the session are your signal to pause and look up —
 that's when we'll discuss what just happened before moving on.
@@ -102,27 +98,17 @@ In **Replit** import the workshop project from GitHub:
 5. Confirm the suggested Repl name is `signalflow101-conf26` and that you are the owner, then choose **Import from GitHub**.
 6. Wait for Replit to finish importing the project.
 
-
-7. When the project opens, Replit may show an Agent panel asking what you want to
-   do with the project. Close the Agent panel with **X**, or drag its divider to
-   the left so you can focus on the project panes. We are not using the Agent in
-   this workshop.
-8. Do not paste workshop secrets into the Agent chat.
-9. The right side may say **Your app is not running**. That is expected. You are in the right place.
-
-If you already imported the repo earlier, use Replit's Git tools to pull the latest `main` branch before continuing.
-
-
 ### Adjust the Replit UI
 
-Replit can present a variety of user interfaces. By default, it is likely you're looking
-at an Agent view asking you questions or a Preview view showing nothing yet. That's okay, you're in the right place. 
+Replit can present a variety of user interfaces. By default, after import it is likely you're looking
+at an Agent view asking you questions like "What would you like to do with this Project?". 
+That's okay, you're in the right place. 
 
-Here is an example default Agent view, which we will not use:
+Here is an example default Agent view after workshop import. Your screen might look somewhat like ths:
 
-![Screenshot of Replit Agent](images/Replit_agent.png)
+![Screenshot of Replit Agent](images/Replit_After_Import.png)
 
-Mouse-drag from the right side of the Agent view (where Replit is prompting you to Start chatting) you can shrink the Agent until it disappears, while leaving the left pane (your "Personal Workspace") still showing. You will want to retain the left bar under "Personal Workspace") so you can get to Import and Tools. 
+Mouse-drag from the right side of the Agent view (which is where Replit is asking you questions such as "What would you like to do with this project?"). You can drag the Agent's right edge to the left until it disappears. 
 
 For this workshop, we will be using the Workflows and Console views. So, to get them onto your Replit top bar:
 
@@ -130,11 +116,17 @@ For this workshop, we will be using the Workflows and Console views. So, to get 
 2. Search for `Workflows`.
 3. Press **Cmd+K** or **Ctrl+K**, search for `Console`.
 
-Hopefully, your Replit UI now looks something like this, where you have **Import** and **Tools** in your left bar, and **Workflows** and **Console** in your top bar, and you're not distracted by that Agent view which we hid.
+Hopefully, your Replit UI now looks something like this, where you have **Import** in your left bar, and **Workflows** and **Console** in your top bar, and you're not distracted by that Agent view, which is hidden.
+
+![Screenshot of Replit Agent](images/Replit_After_Import.png)
 
 ![Screenshot of Replit Agent](images/Replit_agent.png)
 
+When an exercise
+tells you to run something, use the named Replit workflow. Use the **Console**
+tool tab to read workflow output.
 
+To stop a running workflow, use the Replit Stop button.
 
 
 
