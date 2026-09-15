@@ -141,41 +141,40 @@ Your Replit Python environment needs exactly these four values:
 | SPLUNK_API_TOKEN | The **Token Secret** copied from `Signalflow101_API` in O11y |
 | PARTICIPANT_ID | Your assigned participant ID from the handout, such as `participant-xxx` |
 
-SPLUNK_REALM is us1 for everyone. PARTICIPANT_ID is unique to you, and printed on your handout.
+SPLUNK_REALM is `us1` for everyone. PARTICIPANT_ID is unique to you, and printed on your handout.
 
-To add the first new secret:
+In **Replit**, open **Tools**, then choose **Secrets** from the Tools sidebar. Replit may already show a secret named `SESSION_SECRET`; leave it alone.
 
-1. From the Replit project for signalflow101-conf26, select **Tools**, **Secrets**, **+ New Secret**. (There should already be one secret there already, SESSION_SECRET which you will leave alone.)
-2. Enter SPLUNK_REALM for the **Key**, and us1 for the **Value**.
-3. Select **Add Secret** to put that secret into the list. 
+![Screenshot of Replit Tools sidebar with Secrets](images/Replit_tools.png)
 
-To add your PARTICIPANT_ID, follow the same procedure as you did above, but your value is unique to you and has been assigned by your handout in the room.
+Add the first two secrets directly in Replit:
 
-1. From the Replit project for signalflow101-conf26, select **Tools**, **Secrets**, **+ New Secret**.
-2. Enter PARTICIPANT_ID for the **Key**, and your own id string for the **Value**.
-3. Select **Add Secret** to put that secret into the list. Note there should already be one secret there named SESSION_SECRET which you will leave alone.
+1. In **Replit**, choose **+ New Secret**.
+2. Enter `SPLUNK_REALM` for the **Key**, and `us1` for the **Value**.
+3. Select **Add Secret**.
+4. Choose **+ New Secret** again.
+5. Enter `PARTICIPANT_ID` for the **Key**, and your assigned participant ID for the **Value**.
+6. Select **Add Secret**.
 
-To copy the token secrets:
+For the two token secrets, copy each **Token Secret** from Splunk Observability Cloud, then paste it into Replit:
 
 1. In **Splunk Observability Cloud**, open **Settings**.
 2. Open **Access Tokens**.
-3. Search by name for Signalflow101_INGEST.
-4. Select the Signalflow101_INGEST token name.
+3. Search by name for `Signalflow101_INGEST`.
+4. Select the `Signalflow101_INGEST` token name.
 5. Click the copy button for **Token Secret**.
-6. Switch back to Replit to add this value to a new secret for SPLUNK_INGEST_TOKEN.
-7. From the the Secrets list in you Replit project for signalflow101-conf26, select **+ New Secret**.
-8. Enter SPLUNK_INGEST_TOKEN for the **Key**, and paste the clipboard value for the **Value**.
-3. Select **Add Secret** to put that secret into the list. 
-8. Switch back to O11y to repeat for the final secret.
-9. In O11y, open **Access Tokens**.
-3. Search by name for Signalflow101_API.
-4. Select the Signalflow101_API token name.
-5. Click the copy button for **Token Secret**.
-6. Switch back to Replit to add this value to a new secret for SPLUNK_API_TOKEN.
-7. From the the Secrets list in you Replit project for signalflow101-conf26, select **+ New Secret**.
-8. Enter SPLUNK_API_TOKEN for the **Key**, and paste the clipboard value for the **Value**.
-
-![Screenshot of where to find Secrets in Replit](images/Replit-Secrets-Setup.png)
+6. Switch back to **Replit**.
+7. In **Secrets**, choose **+ New Secret**.
+8. Enter `SPLUNK_INGEST_TOKEN` for the **Key**, and paste the copied Token Secret for the **Value**.
+9. Select **Add Secret**.
+10. Switch back to **Splunk Observability Cloud**.
+11. In **Access Tokens**, search by name for `Signalflow101_API`.
+12. Select the `Signalflow101_API` token name.
+13. Click the copy button for **Token Secret**.
+14. Switch back to **Replit**.
+15. In **Secrets**, choose **+ New Secret**.
+16. Enter `SPLUNK_API_TOKEN` for the **Key**, and paste the copied Token Secret for the **Value**.
+17. Select **Add Secret**.
 
 Remember, use the token secrets from O11y, not the token IDs. 
 
@@ -235,21 +234,22 @@ Your workshop environment can run a small API. Let's make sure everything is wor
 
 ### Step 1: Run your API
 
-In **Replit**, run the workflow `1 - Start API`, then open the web preview.
+In **Replit**, run the workflow `1 - Start API`.
 
 **IMPORTANT:** Leave this workflow running for the rest of the timed exercises. Don't shut it down; it is the API that runs now for latency measurement in all the subsequent exercises.
 
-You might be able to see a preview of your API output in the **Preview** window of Replit, but honestly, sometimes Replit shows this and other times it spins and says "Your preview isn't ready.." It doesn't really matter to check your API preview in replit, because we are going to check its function in **Console** and its metrics in O11y.
+You might be able to see a preview of your API output in the **Preview** window of Replit, but Preview can be flaky. Sometimes it works; other times it spins and says your preview is not ready. That is not a problem for this workshop. We will verify the API from **Console** output and then verify metrics in Splunk Observability Cloud.
 
-In **Console** the output should look like:
+In **Console**, the output should include these startup lines:
 
 ```
 INFO:     Started server process [376]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     10.48.7.108:0 - "GET / HTTP/1.1" 200 OK
 ```
+
+You may also see `GET` request lines if Replit Preview or another workflow calls the API. Those extra lines are fine, but they are not required.
 
 In the repo, you can review the Python script that produced this. The corresponding Python file for this exercise in the repo is in [workshop.py](https://github.com/PKing70/signalflow101-conf26/blob/main/workshop.py).
 
