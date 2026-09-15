@@ -216,7 +216,7 @@ Note: this setup check verifies presence, not live token authorization.
 
 Congratulations! After setup passes, continue to Exercise 1 in this file.
 
-You can view a demo of the setup here: `https://app.vidcast.io/share/d9b87eed-edf4-443b-aebc-67641bd2e8d3s`  
+You can view a demo of the setup here: `https://app.vidcast.io/share/d9b87eed-edf4-443b-aebc-67641bd2e8d3`  
 
 ## Troubleshooting
 
