@@ -44,13 +44,19 @@ You will use Splunk Observability Cloud in your browser to view the shared
 workshop dashboard and to copy the token values your Python environment needs.
 This sign-in is separate from Replit, GitHub, and Splunk Show.
 
-Open Splunk Observability Cloud:
+### Open Splunk Observability Cloud:
 
 ```text
 https://app.us1.observability.splunkcloud.com/
 ```
 
-Sign in with the O11y workshop account instructions from your handout. The organization is **Observability Workshop AMER**. Your team is **DEV1942-signalflow101**.
+### Sign in with these O11y workshop credentials:
+
+Email: dev1942signalflow101@gmail.com
+
+Password: Splunk.conf26
+
+The organization is **Observability Workshop AMER**. Your team is **DEV1942-signalflow101**.
 
 The handout gives you links and your assigned `PARTICIPANT_ID`. It does not
 print token values. Later in this exercise, you will copy secrets from O11y to
