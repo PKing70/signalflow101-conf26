@@ -110,94 +110,81 @@ Here is an example default Agent view after workshop import. Your screen might l
 
 Mouse-drag from the right side of the Agent view (which is where Replit is asking you questions such as "What would you like to do with this project?"). You can drag the Agent's right edge to the left until it disappears. 
 
-For this workshop, we will be using the Workflows and Console views. So, to get them onto your Replit top bar:
+For this workshop, we will be using the Workflows and Console views. So, to get buttons for them onto your Replit top bar:
 
 1. Press **Cmd+K** on Mac or **Ctrl+K** on Windows.
 2. Search for `Workflows`.
 3. Press **Cmd+K** or **Ctrl+K**, search for `Console`.
 
-Hopefully, your Replit UI now looks something like this, where you have **Import** in your left bar, and **Workflows** and **Console** in your top bar, and you're not distracted by that Agent view, which is hidden.
+Hopefully, your Replit UI now looks something like below, where you still have **Import** in your left bar, and **Workflows** and **Console** in your top bar, and you're no longer distracted by that Agent view, which is hidden. That said, it's your Replit; you can reconfigure it a 
+variety of ways to your liking. Just know, we won't be using the Agent, and we will be using Workflows and the Console view in this workshop.
 
-![Screenshot of Replit Agent](images/Replit_After_Import.png)
+![Screenshot of Replit with no Agent](images/Replit_No_Agent.png)
 
-![Screenshot of Replit Agent](images/Replit_agent.png)
-
-When an exercise
-tells you to run something, use the named Replit workflow. Use the **Console**
+Soon, when an exercise tells you to run something, do it from the named Replit **Workflows**. Then, use the **Console**
 tool tab to read workflow output.
 
-To stop a running workflow, use the Replit Stop button.
+Know that to run a workflow, just click the Run button:
+![Replit Run button](images/Replit_Run.png)
 
+To stop a running workflow, use the Replit Stop button:
+![Replit Stop button](images/Replit_Running.png)
 
+### Enter Secret Values
 
-
-### Copy These Values
-
-Your Python environment needs exactly these four values:
+Your Replit Python environment needs exactly these four values:
 
 | Value | What To Use |
 |---|---|
-| `SPLUNK_REALM` | `us1` |
-| `SPLUNK_INGEST_TOKEN` | The **Token Secret** copied from `Signalflow101_INGEST` |
-| `SPLUNK_API_TOKEN` | The **Token Secret** copied from `Signalflow101_API` |
-| `PARTICIPANT_ID` | Your assigned participant ID from the handout, such as `participant-042` |
+| SPLUNK_REALM | us1 |
+| SPLUNK_INGEST_TOKEN | The **Token Secret** copied from `Signalflow101_INGEST` in O11y |
+| SPLUNK_API_TOKEN | The **Token Secret** copied from `Signalflow101_API` in O11y |
+| PARTICIPANT_ID | Your assigned participant ID from the handout, such as `participant-xxx` |
+
+SPLUNK_REALM is us1 for everyone. PARTICIPANT_ID is unique to you, and printed on your handout.
+
+To add the first new secret:
+
+1. From the Replit project for signalflow101-conf26, select **Tools**, **Secrets**, **+ New Secret**. (There should already be one secret there already, SESSION_SECRET which you will leave alone.)
+2. Enter SPLUNK_REALM for the **Key**, and us1 for the **Value**.
+3. Select **Add Secret** to put that secret into the list. 
+
+To add your PARTICIPANT_ID, follow the same procedure as you did above, but your value is unique to you and has been assigned by your handout in the room.
+
+1. From the Replit project for signalflow101-conf26, select **Tools**, **Secrets**, **+ New Secret**.
+2. Enter PARTICIPANT_ID for the **Key**, and your own id string for the **Value**.
+3. Select **Add Secret** to put that secret into the list. Note there should already be one secret there named SESSION_SECRET which you will leave alone.
 
 To copy the token secrets:
 
 1. In **Splunk Observability Cloud**, open **Settings**.
 2. Open **Access Tokens**.
-3. Search by name for `Signalflow101_INGEST`.
-4. Select the `Signalflow101_INGEST` token name.
-5. Click the copy button for **Token Secret**. You will paste that clipboard
-   value into `SPLUNK_INGEST_TOKEN` in Replit Secrets.
-6. Return to **Access Tokens** and search by name for `Signalflow101_API`.
-7. Select the `Signalflow101_API` token name.
-8. Click the copy button for **Token Secret**. You will paste that clipboard
-   value into `SPLUNK_API_TOKEN` in Replit Secrets.
-
-Use token secrets, not token IDs. Token IDs identify tokens inside O11y; Python
-needs the Token Secret values to authenticate. If the UI shows masked values,
-use the **Copy** control for the Token Secret rather than typing the masked
-preview.
-
-The ingest token and API token are different values. If you accidentally use the
-ingest token for both fields, Exercise 1 and Exercise 2a can send metrics, but
-Exercise 2b will fail with an unauthorized SignalFlow error.
-
-Do not paste O11y passwords or token secrets into chat tools, screenshots,
-Python files, or the public repo.
-
-## Step 0B: Add Your Workshop Values In Replit Secrets
-
-In **Replit**, use **Secrets**. Replit may already show a secret named
-`SESSION_SECRET`. Leave it alone. You will add four more secrets for this
-workshop.
+3. Search by name for Signalflow101_INGEST.
+4. Select the Signalflow101_INGEST token name.
+5. Click the copy button for **Token Secret**.
+6. Switch back to Replit to add this value to a new secret for SPLUNK_INGEST_TOKEN.
+7. From the the Secrets list in you Replit project for signalflow101-conf26, select **+ New Secret**.
+8. Enter SPLUNK_INGEST_TOKEN for the **Key**, and paste the clipboard value for the **Value**.
+3. Select **Add Secret** to put that secret into the list. 
+8. Switch back to O11y to repeat for the final secret.
+9. In O11y, open **Access Tokens**.
+3. Search by name for Signalflow101_API.
+4. Select the Signalflow101_API token name.
+5. Click the copy button for **Token Secret**.
+6. Switch back to Replit to add this value to a new secret for SPLUNK_API_TOKEN.
+7. From the the Secrets list in you Replit project for signalflow101-conf26, select **+ New Secret**.
+8. Enter SPLUNK_API_TOKEN for the **Key**, and paste the clipboard value for the **Value**.
 
 ![Screenshot of where to find Secrets in Replit](images/Replit-Secrets-Setup.png)
 
-1. In **Replit**, open **Tools** from the left side.
-2. Choose **Secrets**.
-3. Choose **+ New Secret**.
-4. Add these secrets one at a time. For each one, fill out **Key** and
-   **Value**, then choose **Add Secret**.
+Remember, use the token secrets from O11y, not the token IDs. 
 
-| Replit Secret | Value |
-|---|---|
-| `SPLUNK_REALM` | `us1` |
-| `SPLUNK_INGEST_TOKEN` | Paste the **Token Secret** copied from `Signalflow101_INGEST` |
-| `SPLUNK_API_TOKEN` | Paste the **Token Secret** copied from `Signalflow101_API` |
-| `PARTICIPANT_ID` | Your assigned participant ID from the handout |
-
-Do not paste secrets into Python files, chat windows, screenshots, or the public
-repo. Do not paste token secrets into the Replit Agent chat.
-
-The example `participant-042` is only an example. Use the exact value assigned
-to you by workshop staff.
+Do not paste O11y token secrets into chat tools, Python files, etc. You can unmask them in O11y or Replit if you're curious, 
+but it's good practice to keep them offscreen.
 
 ## Step 0C: Verify Setup
 
-In **Replit**, run the setup check before starting the exercises. Replit's UI changes
-frequently. The most reliable way to open Workflows is:
+In **Replit**, run the setup check before starting the exercises. The most reliable way to open Workflows is:
 
 1. Press **Cmd+K** on Mac or **Ctrl+K** on Windows.
 2. Search for `Workflows`.
@@ -228,7 +215,7 @@ Ready. Start the API, then start sending latency metrics.
 Note: this setup check verifies presence, not live token authorization.
 ```
 
-After setup passes, continue to Exercise 1 in this file.
+Congratulations! After setup passes, continue to Exercise 1 in this file.
 
 ## Troubleshooting
 
