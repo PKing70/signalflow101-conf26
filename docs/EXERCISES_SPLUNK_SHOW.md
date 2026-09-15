@@ -127,20 +127,31 @@ staff.
 
 ## Step 0A: Sign In To Splunk Show
 
-1. Go to [https://show.splunk.com/](https://show.splunk.com/).
-2. Sign in with the email address you used to register for this workshop.
-3. Find your Splunk Show password and SSH connection command.
-4. Open Terminal, Windows Terminal, PowerShell, or another SSH-capable terminal.
+You should have received an invitation to Splunk Show for this workshop that looks like this in your inbox:
+
+![Screenshot of Splunk Show Invitation](images/Show_Invitation.png)
+
+Click on your Event page to go to a page for this workshop, DEV1942 (below screenshot shows an example that differs PLA1234). If you're not already enrolled, click Enroll.
+
+![Screenshot of Splunk Show Enrollment](images/Show_Enroll.png)
+
+Then you can scroll down and get your instance information, such as the screenshot below:
+
+![Screenshot of Splunk Show Instances](images/Show_Instances.png)
+
+Sign in to you instance:
+
+1. Open Terminal, Windows Terminal, PowerShell, or another SSH-capable terminal.
    On Windows, open **Windows Terminal**. If it is not already using
    PowerShell, open a **PowerShell** tab.
-5. Connect to your assigned workshop instance using the SSH command shown in
+2. Connect to your assigned workshop instance using the SSH command shown in
    Splunk Show. It will look similar to this:
 
 ```bash
 ssh -p 2222 splunk@<your-show-host>
 ```
 
-6. Enter your Splunk Show password when prompted.
+3. Enter your Splunk Show password when prompted.
 
 After you connect, you will run the exercises from that SSH terminal.
 
