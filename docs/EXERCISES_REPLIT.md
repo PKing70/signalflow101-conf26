@@ -216,6 +216,8 @@ Note: this setup check verifies presence, not live token authorization.
 
 Congratulations! After setup passes, continue to Exercise 1 in this file.
 
+You can view a demo of the setup here: `https://app.vidcast.io/share/d9b87eed-edf4-443b-aebc-67641bd2e8d3`  
+
 ## Troubleshooting
 
 **Setup check says values are missing:** In **Replit**, open **Tools > Secrets** and confirm the names match exactly. Replit Secrets are case-sensitive.
@@ -374,6 +376,8 @@ If the direct URL lands on the sign-in page, sign in first, then open the URL
 again.
 
 When you find your metric, you're looking for `workshop.api.latency` filtered by your `participant_id`. If it's there, you're fully connected and ready to move on.
+
+You can find a demo video of this exercise here: `https://app.vidcast.io/share/e518fd53-df30-4b87-bac7-068cb098eee3` 
 
 ---
 
