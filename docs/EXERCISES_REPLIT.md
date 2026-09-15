@@ -237,23 +237,21 @@ Your workshop environment can run a small API. Let's make sure everything is wor
 
 In **Replit**, run the workflow `1 - Start API`, then open the web preview.
 
-Leave this workflow running for the rest of the timed exercises.
+**IMPORTANT:** Leave this workflow running for the rest of the timed exercises. Don't shut it down; it is the API that runs now for latency measurement in all the subsequent exercises.
 
-If your instructor provides a URL or port-forwarding instructions, open that URL
-in your browser.
+You might be able to see a preview of your API output in the **Preview** window of Replit, but honestly, sometimes Replit shows this and other times it spins and says "Your preview isn't ready.." It doesn't really matter to check your API preview in replit, because we are going to check its function in **Console** and its metrics in O11y.
 
-Add `/hello` to the end of the URL. You should see your participant alias —
-pulled from the `PARTICIPANT_ID` you configured earlier.
+In **Console** the output should look like:
 
-Expected browser result:
-
-```json
-{
-  "participant_id": "participant-042",
-  "message": "hello from participant-042",
-  "simulated_processing_ms": 105.5
-}
 ```
+INFO:     Started server process [376]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     10.48.7.108:0 - "GET / HTTP/1.1" 200 OK
+```
+
+In the repo, you can review the Python script that produced this. The corresponding Python file for this exercise in the repo is in [workshop.py](https://github.com/PKing70/signalflow101-conf26/blob/main/workshop.py).
 
 The relevant part of `workshop_api.py` is shown below.
 
@@ -269,14 +267,6 @@ def hello():
         "simulated_processing_ms": round(delay_ms, 1),
     }
 ```
-
-#### Interesting parts
-
-The `/hello` endpoint is the API being measured. It returns your participant ID
-and waits for a small simulated delay. The observability pattern is deliberately
-simple: call an endpoint, measure the time, send that measurement as a metric.
-
-If you see your participant alias, your API is running. Move on to Step 2.
 
 ### Step 2: Send your first metric to Splunk Observability Cloud
 
