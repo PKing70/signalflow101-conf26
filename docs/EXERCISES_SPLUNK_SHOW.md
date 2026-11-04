@@ -55,15 +55,9 @@ Open Splunk Observability Cloud:
 https://app.us1.observability.splunkcloud.com/
 ```
 
-### Sign in with these O11y workshop credentials:
+### Sign in with the O11y workshop credentials provided in your workshop handout.
 
-Email: dev1942signalflow101@gmail.com
-
-Password: Splunk.conf26
-
-If O11y
-asks you to choose an organization, choose **Observability Workshop AMER**. If
-O11y asks you to choose a team, choose **DEV1942-signalflow101**.
+Do not publish shared account credentials in this guide or in the public repository. If you did not receive the handout, ask the workshop organizers for access.
 
 The handout gives you links and your assigned `PARTICIPANT_ID`. It does not
 print token values. You copy token secrets from O11y after signing in.

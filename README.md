@@ -68,17 +68,18 @@ signalflow101-conf26/
 │   └── chaos_bot.py                 ← instructor-run bot that seeds the fleet mystery
 │
 ├── workshop-setup/                  ← instructor use only
+│   ├── REHEARSAL_GUIDE.md           ← pre-workshop rehearsal steps
 │   ├── build_dashboards.py          ← programmatically creates/updates the workshop dashboard
 │   ├── generate_participant_aliases.py ← creates participant-001 style aliases
-│   └── INSTRUCTOR_NOTES.md         ← day-of setup checklist
+│   ├── smoke_test_o11y.py           ← checks the workshop organization and token
+│   └── INSTRUCTOR_NOTES.md          ← day-of setup checklist
 │
 └── docs/
     ├── EXERCISE_GUIDE.md            ← path picker for old links
     ├── EXERCISES_REPLIT.md          ← complete Replit attendee guide
     ├── EXERCISES_SPLUNK_SHOW.md     ← complete Splunk Show SSH attendee guide
     ├── EXERCISES_LOCAL.md           ← complete local Python attendee guide
-    ├── signalflow101_conf26.pptx    ← slide deck (working draft)
-    └── signalflow101_conf26.pdf     ← PDF export for easy viewing
+    └── images/                      ← setup screenshots for Replit and Splunk Show
 ```
 
 ---
